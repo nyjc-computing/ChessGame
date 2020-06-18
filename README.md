@@ -12,11 +12,11 @@ See [grading.md](grading.md)
 
 ## Team Setup
 
-1. Team leader is to fork the ChessGame repository (using the fork button) on Github.
+1. Team leader is to fork the ChessGame repository (using the fork button) on Github. You now has a copy of the ChessGame repository under your account.
 2. In the repository page, go to `Settings` → `Manage access` → `Invite a collaborator`. Add the rest of your team.
 3. Each group member is to take one of the branches under **Core Requirements**.
 4. **As a team**, discuss broadly how you will implement each feature.
-5. Create any common attributes or methods that are required.  
+5. Create any common attributes or methods that are required. You may wish to use the Github web editor for this.  
    As a team, standardise the name of these attributes or methods, and the method interfaces.  
    Add docstrings so that the whole team knows how to use these methods.  
    Commit your changes directly to the `master` branch.
@@ -97,7 +97,7 @@ Checkmate can be determined by taking the start position of each opponent piece 
 
 ## Bonus additions:
 
-Teams may propose any bonus additions not mentioned here.
+Teams may propose any other features as bonus additions if they are not mentioned here.
 
 ### branch: **debug** (★)
 
