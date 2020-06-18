@@ -4,35 +4,47 @@ class Board:
     with each position on the grid described as
     a pair of ints (range 0-7): col followed by row
 
-    0,7  1,7  2,7  3,7  4,7  5,7  6,7  7,7
-    0,6  1,6  2,6  3,6  4,6  5,6  6,6  7,6
-    0,5  1,5  2,5  3,5  4,5  5,5  6,5  7,5
-    0,4  1,4  2,4  3,4  4,4  5,4  6,4  7,4
-    0,3  1,3  2,3  3,3  4,3  5,3  6,3  7,3
-    0,2  1,2  2,2  3,2  4,2  5,2  6,2  7,2
-    0,1  1,1  2,1  3,1  4,1  5,1  6,1  7,1
-    0,0  1,0  2,0  3,0  4,0  5,0  6,0  7,0
+    07  17  27  37  47  57  67  77
+    06  16  26  36  46  56  66  76
+    05  15  25  35  45  55  65  75
+    04  14  24  34  44  54  64  74
+    03  13  23  33  43  53  63  73
+    02  12  22  32  42  52  62  72
+    01  11  21  31  41  51  61  71
+    00  10  20  30  40  50  60  70
     '''
     def __init__(self):
         self.position = {}
 
     def coords(self):
+        '''Return list of piece coordinates.'''
         return self.position.keys()
 
     def pieces(self):
+        '''Return list of board pieces.'''
         return self.position.values()
     
     def get_piece(self, coord):
+        '''
+        Return the piece at coord.
+        Returns None if no piece at coord.
+        '''
         return self.position.get(coord, None)
 
     def add(self, coord, piece):
+        '''Add a piece at coord.'''
         self.position[coord] = piece
 
     def remove(self, coord):
+        '''
+        Remove the piece at coord, if any.
+        Does nothing if there is no piece at coord.
+        '''
         if coord in self.coords():
             del self.position[coord]
 
     def start(self):
+        '''Set up the pieces and start the game.'''
         colour = 'black'
         self.add((0, 7), Rook(colour))
         self.add((1, 7), Knight(colour))
@@ -63,7 +75,7 @@ class Board:
     def display(self):
         '''
         Displays the contents of the board.
-        Each piece is represented by a symbol.
+        Each piece is represented by a coloured symbol.
         '''
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
@@ -78,7 +90,7 @@ class Board:
                     print(' ', end='')
                 if col == 7:     # Put line break at the end
                     print('')
-                else:            # Print 2 spaces between pieces
+                else:            # Print a space between pieces
                     print(' ', end='')
 
     def prompt(self):
@@ -128,9 +140,12 @@ class Board:
 
     def valid_move(self, start, end):
         '''
+        Returns True if all conditions are met:
         1. There is a start piece of the player's colour
         2. There is no end piece, or end piece is not of player's colour
         3. The move is not valid for the selected piece
+        
+        Returns False otherwise
         '''
         start_piece = self.get_piece(start)
         end_piece = self.get_piece(end)
@@ -143,15 +158,22 @@ class Board:
         return True
 
     def move(self, start, end):
+        '''
+        Move the piece at start to end.
+        Validation should be carried out first
+        to ensure the move is valid.
+        '''
         piece = self.get_piece(start)
         self.remove(start)
         self.add(end, piece)
 
     def update(self, start, end):
+        '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
 
     def next_turn(self):
+        '''Hand the turn over to the other player.'''
         if self.turn == 'white':
             self.turn = 'black'
         elif self.turn == 'black':
@@ -184,7 +206,7 @@ class BasePiece:
         dist = abs(x) + abs(y)
         return x, y, dist
 
-# inheritance
+
 class King(BasePiece):
     name = 'king'
     sym = {'white': '♔', 'black': '♚'}
@@ -195,6 +217,7 @@ class King(BasePiece):
         x, y, dist = self.vector(start, end)
         return (dist == 1) or (abs(x) == abs(y) == 1)
 
+    
 class Queen(BasePiece):
     name = 'queen'
     sym = {'white': '♕', 'black': '♛'}
@@ -209,7 +232,7 @@ class Queen(BasePiece):
         return (abs(x) == abs(y) != 0) \
             or ((abs(x) == 0 and abs(y) != 0) \
             or (abs(y) == 0 and abs(x) != 0))
-        
+
 
 class Bishop(BasePiece):
     name = 'bishop'
@@ -224,6 +247,7 @@ class Bishop(BasePiece):
         x, y, dist = self.vector(start, end)
         return (abs(x) == abs(y) != 0)
 
+
 class Knight(BasePiece):
     name = 'knight'
     sym = {'white': '♘', 'black': '♞'}
@@ -236,6 +260,7 @@ class Knight(BasePiece):
         '''
         x, y, dist = self.vector(start, end)
         return (dist == 3) and (abs(x) != 3 or abs(y) != 3)
+
 
 class Rook(BasePiece):
     name = 'rook'
@@ -250,6 +275,7 @@ class Rook(BasePiece):
         x, y, dist = self.vector(start, end)
         return (abs(x) == 0 and abs(y) != 0) \
             or (abs(y) == 0 and abs(x) != 0) 
+
 
 class Pawn(BasePiece):
     name = 'pawn'
