@@ -97,6 +97,8 @@ Checkmate can be determined by taking the start position of each opponent piece 
 
 ## Bonus additions:
 
+Teams may propose any bonus additions not mentioned here.
+
 ### branch: **debug** (★)
 
 Add a `debug mode` to the game.
@@ -154,7 +156,7 @@ In chess, pieces may not jump over another piece while moving to the end positio
 Update the move validation code to check if there are any pieces in the path of movement.
 
 ### branch: **castling** (★★★)
-(prerequisites: **pawnfirstmove**)
+(prerequisites: **pawnfirstmove**, **checkmate**)
 
 Add additional move validation to the `King` and `Board` classes for **castling** moves.
 
