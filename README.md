@@ -24,9 +24,9 @@ Before writing your code, you are strongly recommended to discuss the changes yo
 
 ## Core Requirements
 
-★: Involves new attribute or minor edits to existing methods
-★★: Likely involves new method, plus edits
-★★★: Likely involves extensive edits
+★: Involves new attribute or minor edits to existing methods  
+★★: Likely involves new method, plus edits  
+★★★: Likely involves extensive edits  
 
 The game code in `main.py` *should not be modified* (except for **moveerror** branch which will need to add keyword arguments when creating the game board).
 
