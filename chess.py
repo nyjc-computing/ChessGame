@@ -43,6 +43,16 @@ class Board:
         if coord in self.coords():
             del self.position[coord]
 
+    def move(self, start, end):
+        '''
+        Move the piece at start to end.
+        Validation should be carried out first
+        to ensure the move is valid.
+        '''
+        piece = self.get_piece(start)
+        self.remove(start)
+        self.add(end, piece)
+
     def start(self):
         '''Set up the pieces and start the game.'''
         colour = 'black'
@@ -157,16 +167,6 @@ class Board:
             return False
         return True
 
-    def move(self, start, end):
-        '''
-        Move the piece at start to end.
-        Validation should be carried out first
-        to ensure the move is valid.
-        '''
-        piece = self.get_piece(start)
-        self.remove(start)
-        self.add(end, piece)
-
     def update(self, start, end):
         '''Update board information with the player's move.'''
         self.remove(end)
@@ -201,6 +201,16 @@ class BasePiece:
 
     @staticmethod
     def vector(start, end):
+        '''
+        Return three values as a tuple:
+        - x, the number of spaces moved horizontally,
+        - y, the number of spaces moved vertically,
+        - dist, the total number of spaces moved.
+        
+        positive integers indicate upward or rightward direction,
+        negative integers indicate downward or leftward direction.
+        dist is always positive.
+        '''
         x = end[0] - start[0]
         y = end[1] - start[1]
         dist = abs(x) + abs(y)
@@ -214,6 +224,10 @@ class King(BasePiece):
         return f"King('{self.name}')"
 
     def isvalid(self, start: tuple, end: tuple):
+        '''
+        King can move one step in any direction
+        horizontally, vertically, or diagonally.
+        '''
         x, y, dist = self.vector(start, end)
         return (dist == 1) or (abs(x) == abs(y) == 1)
 
@@ -226,7 +240,8 @@ class Queen(BasePiece):
 
     def isvalid(self, start: tuple, end: tuple):
         '''
-        Queen can move any number of steps horizontally, vertically, or diagonally.
+        Queen can move any number of steps horizontally,
+        vertically, or diagonally.
         '''
         x, y, dist = self.vector(start, end)
         return (abs(x) == abs(y) != 0) \
@@ -241,9 +256,7 @@ class Bishop(BasePiece):
         return f"Bishop('{self.name}')"
 
     def isvalid(self, start: tuple, end: tuple):
-        '''
-        Bishop can move any number of steps diagonally.
-        '''
+        '''Bishop can move any number of steps diagonally.'''
         x, y, dist = self.vector(start, end)
         return (abs(x) == abs(y) != 0)
 
@@ -256,10 +269,11 @@ class Knight(BasePiece):
 
     def isvalid(self, start: tuple, end: tuple):
         '''
-        Knight moves 2 spaces in any direction, and 1 space perpendicular to that direction, in an "L"-shape.
+        Knight moves 2 spaces in any direction, and
+        1 space perpendicular to that direction, in an L-shape.
         '''
         x, y, dist = self.vector(start, end)
-        return (dist == 3) and (abs(x) != 3 or abs(y) != 3)
+        return (dist == 3) and (abs(x) != 3 and abs(y) != 3)
 
 
 class Rook(BasePiece):
@@ -270,7 +284,8 @@ class Rook(BasePiece):
 
     def isvalid(self, start: tuple, end: tuple):
         '''
-        Rook can move any number of steps horizontally or vertically.
+        Rook can move any number of steps horizontally
+        or vertically.
         '''
         x, y, dist = self.vector(start, end)
         return (abs(x) == 0 and abs(y) != 0) \
@@ -284,9 +299,7 @@ class Pawn(BasePiece):
         return f"Pawn('{self.name}')"
 
     def isvalid(self, start: tuple, end: tuple):
-        '''
-        Pawn can only move 1 step forward.
-        '''
+        '''Pawn can only move 1 step forward.'''
         x, y, dist = self.vector(start, end)
         if x == 0:
             if self.colour == 'black':
