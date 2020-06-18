@@ -2,25 +2,37 @@
 
 A repository for a chess game in Python (Assignment 12).
 
+
+
 ## Grading rubrics
 
 See [grading.md](grading.md)
 
-## Setup
+
+
+## Team Setup
 
 1. Team leader is to fork the ChessGame repository (using the fork button) on Github.
 2. In the repository page, go to `Settings` → `Manage access` → `Invite a collaborator`. Add the rest of your team.
-3. In repl.it, each member should click on `new repl` → `Import from Github` and paste the URL of the repository. This will create a repl that is linked to the repository, and is able to pull commits from and push commits to it.
+3. Each group member is to take one of the branches under **Core Requirements**.
+4. **As a team**, discuss broadly how you will implement each feature.
+5. Create any common attributes or methods that are required.  
+   As a team, standardise the name of these attributes or methods, and the method interfaces.  
+   Add docstrings so that the whole team knows how to use these methods.  
+   Commit your changes directly to the `master` branch.
+
+
 
 ## Instructions
 
-1. Each group member is to take one of the branches under **Core Requirements**.
-2. Create a new branch with the branch name.
-3. Modify the code, making the minimum required modifications to the code. Code should be committed to the appropriate branch, not to `main` branch.
+1. In repl.it, each member should click on `new repl` → `Import from Github` and paste the URL of the repository.  
+   This will create a repl that is linked to the repository, and is able to pull commits from and push commits to it.
+2. In the repl, under the **Version Control** sidebar tab, create a new branch with the branch name.
+3. Modify the code to implement your feature, making the minimum required modifications to the code. Code should be committed to the appropriate branch, not to `master` branch.
 4. Test the code and make sure it is working.
 5. Merge it back into the `main` branch by creating a pull request in Github.
 
-Before writing your code, you are strongly recommended to discuss the changes you will be making to the code with the rest of the group, to see if there might be any conflicting changes.
+
 
 ## Core Requirements
 
@@ -80,6 +92,7 @@ Print a message if any player is checkmated at the end of the turn.
 **Example:** `white is checkmated!`
 
 Checkmate can be determined by taking the start position of each opponent piece on the board, taking the player’s King as the end position, and checking if this is a valid move for the opponent piece.
+
 
 
 ## Bonus additions:
