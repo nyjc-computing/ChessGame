@@ -1,6 +1,11 @@
 # Rubric for grading
 
-Grading will be carried out **on the core requirements only**. Bonus additions, if implemented, should not break the game code or affect its core functionality. Each bonus addition, if successfully implemented, gains the group one bonus mark.
+Grading will be carried out **on the core requirements only**.
+
+Bonus additions, if implemented, should not break the game code or affect its core functionality.  
+Each bonus addition, if successfully implemented by a member, gains the group one bonus mark.  
+Further additions by the same member will not gain any bonus marks until other members of the group have also implemented bonus additions.
+
 
 Teams may propose bonus additions
 
