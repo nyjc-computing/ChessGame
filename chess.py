@@ -147,6 +147,9 @@ class Board:
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
+                    
+        def printmove(self):
+            pass
 
     def valid_move(self, start, end):
         '''
