@@ -89,19 +89,27 @@ class Board:
         '''
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
+        print("           [ column ]", end="\n")
+        print("        0\\1\\2\\3\\4\\5\\6\\7\\")
         for row in range(7, -1, -1):
+            print(f' [row {row}]', end='')
+            # for i in range(0,8):
+                # print(i, end="")
             for col in range(8):
                 coord = (col, row)  # tuple
                 if coord in self.coords():
                     piece = self.get_piece(coord)
+                    #not here
                     print(f'{piece.symbol()}', end='')
                 else:
                     piece = None
                     print(' ', end='')
-                if col == 7:     # Put line break at the end
-                    print('')
+                if col == 7:     # Put line break atthe end
+                    print(f' [row {row}]')
                 else:            # Print a space between pieces
                     print(' ', end='')
+        print("        0/1/2/3/4/5/6/7/")
+        print("           [ column ]", end="\n")
 
     def prompt(self):
         '''
