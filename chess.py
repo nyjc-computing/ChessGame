@@ -180,6 +180,7 @@ class Board:
             if piece.name == "pawn" and (coord[1] == 0 or coord[1] == 7):
                 choice = input("choose what piece to promote to:")
                 self.position[coord] = Queen(piece.colour)
+                pass
 
 
 
