@@ -167,10 +167,23 @@ class Board:
             return False
         return True
 
+    def winnercheck(self):
+        #1. if the turn now is white, 
+            # if king piece for black is not there, then end the game.
+        #2. If the turn now is black, if king piece for white is not there, then end the game.
+        if self.turn == 'white' and King not in self.pieces():
+            return 'white wins'
+        if self.turn == 'black' and 'white king' not in self.piece:
+            return 'black wins' 
+
+
+            
+
     def update(self, start, end):
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
+
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
