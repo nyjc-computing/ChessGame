@@ -89,6 +89,7 @@ class Board:
         '''
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
+        # Row 8 is for column labels, Column -1 is for Row labels
         for row in range(8, -1, -1):
             for col in range(-1, 8):
                 coord = (col, row)  # tuple
