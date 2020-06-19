@@ -173,8 +173,8 @@ class Board:
         self.move(start, end)
         
         
-        if self.name == 'pawn' and end[1] in (0,7):
-            self.promotion
+        if self.get_peice == 'pawn' and end[1] in (0,7):
+            self.promotion(end)
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
@@ -314,7 +314,16 @@ class Pawn(BasePiece):
                 return False
         return False
 
-    def promotion(self,new):
+    def promotion(self,coord):
         ''' 
         promote a pawn into a queen, knight, bishop or rook
         '''
+        print(
+          'please choose a piece you want to promote to,the input sould be one of the following:\n queen knight bishop rook\n')
+        new == input()
+        if not new in ['queen','knight','bishhop','rook']:
+            print('wrong input. the input sould be one of the following:\n queen knight bishop rook\n')
+        else:
+             pass
+        remove(coord)
+        add(coord,new)
