@@ -22,7 +22,7 @@ class Board:
 
     def pieces(self):
         '''Return list of board pieces.'''
-        return self.position.values()
+        return self.position.values() 
     
     def get_piece(self, coord):
         '''
@@ -171,7 +171,17 @@ class Board:
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
-
+        print(self.get_piece(end), f'{start[0]}{start[1]} -> {end[0]}{end[1]}')
+    
+    def winner(self): 
+        pass
+    
+    def promotion(self): 
+        pass
+    
+    def pawnfirstmove(self):
+        pass
+    
     def next_turn(self):
         '''Hand the turn over to the other player.'''
         if self.turn == 'white':
@@ -295,6 +305,7 @@ class Rook(BasePiece):
 class Pawn(BasePiece):
     name = 'pawn'
     sym = {'white': '♙', 'black': '♟︎'}
+    counter = True
     def __repr__(self):
         return f"Pawn('{self.name}')"
 
