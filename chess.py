@@ -173,7 +173,7 @@ class Board:
         self.move(start, end)
         
         
-        if self.get_peice == 'pawn' and end[1] in (0,7):
+        if self.get_peice(end).name == 'pawn' and end[1] in (0,7):
             self.promotion(end)
 
     def next_turn(self):
