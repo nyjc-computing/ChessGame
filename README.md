@@ -12,7 +12,7 @@ See [grading.md](grading.md)
 
 ## Team Setup
 
-1. Team leader is to fork the ChessGame repository (using the fork button) on Github. You now has a copy of the ChessGame repository under your account.
+1. Team leader is to fork the ChessGame repository (using the fork button) on Github. You now have a copy of the ChessGame repository under your account.
 2. In the repository page, go to `Settings` → `Manage access` → `Invite a collaborator`. Add the rest of your team.
 3. Each group member is to take one of the branches under **Core Requirements**.
 4. **As a team**, discuss broadly how you will implement each feature.
