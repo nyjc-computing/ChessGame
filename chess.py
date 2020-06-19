@@ -90,13 +90,13 @@ class Board:
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
         
-        for row in range(7, -1, -1):
-          print(f' row {row}')
-          '''
-          if row <  :
+        for row in range(7, -1, -1):#print the indicating number for column and row
+          if row == 7:
+            print(" ",end="")
             for num in range(8):
-              print(num)
-          '''
+              print(str(num)+" ", end='')
+            print('')
+            
           for col in range(8):
             if col < 1:
               print(row, end="")
