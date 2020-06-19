@@ -176,7 +176,13 @@ class Board:
     
     def promotioncheck(self):
         '''check for pawn promotion'''
-        pass
+        for coord , piece in self.position.items():
+            if piece.name == "pawn" and (coord[1] == 0 or coord[1] == 7):
+                choice = input("choose what piece to promote to:")
+                self.position[coord] = Queen(piece.colour)
+
+
+
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
@@ -192,9 +198,6 @@ class Board:
             self.turn = 'black'
         elif self.turn == 'black':
             self.turn = 'white'
-
-    def promotion(self):
-        pass
     
 class BasePiece:
     name = 'piece'
