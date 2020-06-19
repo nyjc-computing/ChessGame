@@ -175,7 +175,6 @@ class Board:
         colour = piece.colour
         if type(piece) == Pawn:
             self.add(end,Queen(colour))
-        pass
     
     def printmove(self,start,end):
         pass
