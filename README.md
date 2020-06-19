@@ -17,8 +17,8 @@ See [grading.md](grading.md)
 3. Each group member is to take one of the branches under **Core Requirements**.
 4. **As a team**, discuss broadly how you will implement each feature.
 5. Create any common attributes or methods that are required. You may wish to use the Github web editor for this.  
-   As a team, standardise the name of these attributes or methods, and the method interfaces.  
-   Add docstrings so that the whole team knows how to use these methods.  
+   **As a team**, standardise the name of these attributes or methods, and the method interfaces.  
+   **Add docstrings** so that the whole team knows how to use these methods.  
    Commit your changes directly to the `master` branch.
 
 
