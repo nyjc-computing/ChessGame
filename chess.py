@@ -56,28 +56,28 @@ class Board:
     def start(self):
         '''Set up the pieces and start the game.'''
         colour = 'black'
-        # self.add((0, 7), Rook(colour))
-        # self.add((1, 7), Knight(colour))
-        # self.add((2, 7), Bishop(colour))
-        # self.add((3, 7), Queen(colour))
-        # self.add((4, 7), King(colour))
-        # self.add((5, 7), Bishop(colour))
-        # self.add((6, 7), Knight(colour))
-        # self.add((7, 7), Rook(colour))
-        # for x in range(0, 8):
-        #     self.add((x, 6), Pawn(colour))
-
-        colour = 'white'
-        # self.add((0, 0), Rook(colour))
-        # self.add((1, 0), Knight(colour))
-        # self.add((2, 0), Bishop(colour))
-        # self.add((3, 0), Queen(colour))
-        # self.add((4, 0), King(colour))
-        # self.add((5, 0), Bishop(colour))
-        # self.add((6, 0), Knight(colour))
-        # self.add((7, 0), Rook(colour))
+        self.add((0, 7), Rook(colour))
+        self.add((1, 7), Knight(colour))
+        self.add((2, 7), Bishop(colour))
+        self.add((3, 7), Queen(colour))
+        self.add((4, 7), King(colour))
+        self.add((5, 7), Bishop(colour))
+        self.add((6, 7), Knight(colour))
+        self.add((7, 7), Rook(colour))
         for x in range(0, 8):
             self.add((x, 6), Pawn(colour))
+
+        colour = 'white'
+        self.add((0, 0), Rook(colour))
+        self.add((1, 0), Knight(colour))
+        self.add((2, 0), Bishop(colour))
+        self.add((3, 0), Queen(colour))
+        self.add((4, 0), King(colour))
+        self.add((5, 0), Bishop(colour))
+        self.add((6, 0), Knight(colour))
+        self.add((7, 0), Rook(colour))
+        for x in range(0, 8):
+            self.add((x, 1), Pawn(colour))
         
         self.winner = None
         self.turn = 'white'
