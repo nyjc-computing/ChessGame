@@ -1,4 +1,6 @@
-# ChessGame
+# ChessGame 
+
+[![Run on Repl.it](https://repl.it/badge/github/recreationx/ChessGame)](https://repl.it/github/recreationx/ChessGame)
 
 A repository for a chess game in Python (Assignment 12).
 
@@ -191,5 +193,3 @@ white 01 -> 02
 black 06 -> 05
 ...
 ```
-
-[![Run on Repl.it](https://repl.it/badge/github/recreationx/ChessGame)](https://repl.it/github/recreationx/ChessGame)
