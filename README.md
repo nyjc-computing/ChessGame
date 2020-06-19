@@ -148,7 +148,7 @@ Possible options:
 
 The output from this may improve your code for the `update()` method, and for tasks such as **pawncapture** and **castling**
 
-### branch: **nojump** (★★★)
+### branch: **nojump** (★★★) Anoop (X)
 
 In chess, pieces may not jump over another piece while moving to the end position. The Knight is the only piece that may do so.
 
