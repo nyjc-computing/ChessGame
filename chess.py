@@ -144,6 +144,8 @@ class Board:
             else:
                 start, end = split_and_convert(inputstr)
                 if self.valid_move(start, end):
+                    startcoord, endcoord = inputstr.split(' ')
+                    print(f"{self.get_piece(start)} {startcoord} --> {endcoord}")
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
@@ -171,6 +173,7 @@ class Board:
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
+        
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
