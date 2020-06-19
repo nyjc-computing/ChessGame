@@ -110,40 +110,35 @@ class Board:
         then another 2 ints
         e.g. 07 27
         '''
-        def valid_format(inputstr):
+        def valid_input(inputstr):
             '''
             Ensure input is 5 characters: 2 numerals,
             followed by a space,
             followed by 2 numerals
             '''
             return len(inputstr) == 5 and inputstr[2] == ' ' \
-                and inputstr[0:1].isdigit() \
-                and inputstr[3:4].isdigit()
-        
-        def valid_num(inputstr):
-            '''Ensure all inputted numerals are 0-7.'''
-            for char in (inputstr[0:1] + inputstr[3:4]):
-                if char not in '01234567':
-                    return False
-            return True
+                and inputstr[0] in ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h') \
+                and inputstr[3] in ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h') \
+                and inputstr[1] in ('1', '2', '3', '4', '5', '6', '7', '8') \
+                and inputstr[4] in ('1', '2', '3', '4', '5', '6', '7', '8')
         
         def split_and_convert(inputstr):
             '''Convert 5-char inputstr into start and end tuples.'''
             start, end = inputstr.split(' ')
-            start = (int(start[0]), int(start[1]))
-            end = (int(end[0]), int(end[1]))
+            k = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
+            start = (k[start[0]] - 1, int(start[1]) - 1)
+            end = (k[end[0]] - 1, int(end[1]) - 1)
             return (start, end)
 
         while True:
             inputstr = input(f'{self.turn.title()} player: ')
-            if not valid_format(inputstr):
+            if not valid_input(inputstr):
                 print('Invalid input. Please enter your move in the '
-                      'following format: __ __, _ represents a digit.')
-            elif not valid_num(inputstr):
-                print('Invalid input. Move digits should be 0-7.')
+                      'following format: -_ -_, _ represents a digit from 1 to 8, - represents a letter from a-b')
             else:
                 start, end = split_and_convert(inputstr)
                 if self.valid_move(start, end):
+                    print(f'{self.get_piece(start)} to {end}')
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
