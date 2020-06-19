@@ -117,12 +117,12 @@ class Board:
             followed by 2 numerals
             '''
             return len(inputstr) == 5 and inputstr[2] == ' ' \
-                and inputstr[0:1].isdigit() \
-                and inputstr[3:4].isdigit()
+                and inputstr[0:2].isdigit() \
+                and inputstr[3:5].isdigit()
         
         def valid_num(inputstr):
             '''Ensure all inputted numerals are 0-7.'''
-            for char in (inputstr[0:1] + inputstr[3:4]):
+            for char in (inputstr[0:2] + inputstr[3:5]):
                 if char not in '01234567':
                     return False
             return True
