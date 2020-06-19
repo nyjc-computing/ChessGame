@@ -171,6 +171,18 @@ class Board:
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
+        bk = False
+        wk = False
+        for i in self.coords():
+            if self.get_piece(i).name == "king":
+                if self.get_piece(i).colour == 'white':
+                    wk = True
+                else:
+                    bk = True
+        if not wk:
+            self.winner = 'black'
+        if not bk:
+            self.winner = 'white'
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
