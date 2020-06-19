@@ -179,7 +179,9 @@ class Board:
         elif self.turn == 'black':
             self.turn = 'white'
 
-
+    def promotion(self):
+        pass
+    
 class BasePiece:
     name = 'piece'
     def __init__(self, colour):
