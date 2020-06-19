@@ -166,11 +166,24 @@ class Board:
         elif not start_piece.isvalid(start, end):
             return False
         return True
+    
+    def end(self,start,end):
+        pass
+    
+    def promotion(start,end):
+        pass
+    
+    def printmove(start,end):
+        pass
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
+        self.end(start,end)
         self.remove(end)
         self.move(start, end)
+        promotion(start,end)
+        printmove(start,end)
+        
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
