@@ -171,6 +171,10 @@ class Board:
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
+        
+        
+        if self.name == 'pawn' and end[1] in (0,7):
+            self.promotion
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
@@ -309,3 +313,8 @@ class Pawn(BasePiece):
             else:
                 return False
         return False
+
+    def promotion(self,new):
+        ''' 
+        promote a pawn into a queen, knight, bishop or rook
+        '''
