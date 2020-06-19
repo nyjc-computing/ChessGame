@@ -138,7 +138,7 @@ class Board:
             inputstr = input(f'{self.turn.title()} player: ')
             if not valid_format(inputstr):
                 print('Invalid input. Please enter your move in the '
-                      'following format: __ __, _ represents a digit.')
+                      'following format: __ __, _ represents a 07digit.')
             elif not valid_num(inputstr):
                 print('Invalid input. Move digits should be 0-7.')
             else:
@@ -171,6 +171,22 @@ class Board:
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
+        self.promotion()
+    
+    def promotion(self):
+        '''
+        Check if last row contains opposing pawn and swap to queen if true
+        '''
+        black_last_row = [(0, 7), (1, 7), (2, 7), (3, 7), (4, 7), (5,7), (6, 7), (7,7)]
+        white_last_row = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0)]
+        for coords in black_last_row:
+            if str(self.get_piece(coords)) == 'white pawn':
+                self.remove(coords)
+                self.add(coords, Queen('white'))
+        for coords in white_last_row:
+            if str(self.get_piece(coords)) == 'black pawn':
+                self.remove(coords)
+                self.add(coords, Queen('black'))
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
