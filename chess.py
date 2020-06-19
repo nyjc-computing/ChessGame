@@ -196,7 +196,7 @@ class Board:
             return False
         elif not start_piece.isvalid(start, end):
             return False
-        elif "knight" not in str(start_piece) and self.blocked(start, end):
+        elif not isinstance(start_piece, Knight) and self.blocked(start, end):
             return False
         return True
 
