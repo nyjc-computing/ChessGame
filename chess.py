@@ -170,10 +170,10 @@ class Board:
     def end(self,start,end):
         pass
     
-    def promotion(start,end):
+    def promotion(self,start,end):
         pass
     
-    def printmove(start,end):
+    def printmove(self,start,end):
         pass
 
     def update(self, start, end):
@@ -181,8 +181,8 @@ class Board:
         self.end(start,end)
         self.remove(end)
         self.move(start, end)
-        promotion(start,end)
-        printmove(start,end)
+        self.promotion(start,end)
+        self.printmove(start,end)
         
 
     def next_turn(self):
