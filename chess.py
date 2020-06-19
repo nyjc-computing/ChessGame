@@ -117,8 +117,8 @@ class Board:
             followed by 2 numerals
             '''
             return len(inputstr) == 5 and inputstr[2] == ' ' \
-                and inputstr[0:1].isdigit() \
-                and inputstr[3:4].isdigit()
+                and inputstr[0:2].isdigit() \
+                and inputstr[3:].isdigit()
         
         def valid_num(inputstr):
             '''Ensure all inputted numerals are 0-7.'''
@@ -134,6 +134,11 @@ class Board:
             end = (int(end[0]), int(end[1]))
             return (start, end)
 
+        def printmove(start, end):
+            '''Print the player\'s move.'''
+            movedpiece = str(self.get_piece(start))
+            return f'{movedpiece} {start} -> {end}'
+
         while True:
             inputstr = input(f'{self.turn.title()} player: ')
             if not valid_format(inputstr):
@@ -144,12 +149,10 @@ class Board:
             else:
                 start, end = split_and_convert(inputstr)
                 if self.valid_move(start, end):
+                    print(printmove(start, end))
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
-                    
-        def printmove(self):
-            pass
 
     def valid_move(self, start, end):
         '''
