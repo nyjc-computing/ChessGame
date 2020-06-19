@@ -42,7 +42,7 @@ See [grading.md](grading.md)
 
 The game code in `main.py` *should not be modified* (except for **moveerror** branch which will need to add keyword arguments when creating the game board).
 
-### branch: **labels** (★)
+### branch: **labels** (★) Yiming
 
 Add row and column labels to make it easier for the player to count positions. These labels should appear when `display()` is called.
 
@@ -61,23 +61,22 @@ Add row and column labels to make it easier for the player to count positions. T
 
 You may modify the code for `display()` as long as the displayed board remains identical.
 
-### branch: **winner** (★)
+### branch: **winner** (★) ALFIYAN
 
 Update the game so that it ends when a winner emerges.
 
 If a player’s `King` piece is eliminated in any round, the opponent player wins.
 
-### branch: **pawnfirstmove** (★)
-
+### branch: **pawnfirstmove** (★) ISAAC
 In chess, the pawn may move two steps on *its first move*. Regardless of whether it took one or two steps on the first move, it may only move one step on subsequent moves.
 
-### branch: **printmove** (★★)
+### branch: **printmove** (★★) Anoop
 
 Print the player's move after `prompt()`, before `next_turn()`
 
 **Example:** `white pawn 01 -> 02`
 
-### branch: **promotion** (★★)
+### branch: **promotion** (★★) Yirui
 
 Add additional code to check for **promotion** during `update()`. In chess, when a `Pawn` reaches the opposite side of the board, it may be promoted to a `Rook`, `Knight`, `Bishop`, or `Queen`.
 
