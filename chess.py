@@ -96,16 +96,13 @@ class Board:
                 if coord in self.coords():
                     piece = self.get_piece(coord)
                     print(f'{piece.symbol()}', end='')
-
                 elif row == 8:
                   if col == -1:
                     print(' ', end='')
                   else:
                     print(f'{col}', end='')
-
                 elif col == -1:
                   print(f'{row}', end='')
-
                 else:
                     piece = None
                     print(' ', end='')
