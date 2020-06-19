@@ -70,7 +70,7 @@ If a player’s `King` piece is eliminated in any round, the opponent player win
 ### branch: **pawnfirstmove** (★) ISAAC
 In chess, the pawn may move two steps on *its first move*. Regardless of whether it took one or two steps on the first move, it may only move one step on subsequent moves.
 
-### branch: **printmove** (★★) Anoop
+### branch: **printmove** (★★) Anoop (X)
 
 Print the player's move after `prompt()`, before `next_turn()`
 
@@ -176,7 +176,7 @@ Castling may only happen if:
 
 If a white pawn is on row 4 (or a black pawn on row 5), 
 
-### branch: **movelog** (★)
+### branch: **movelog** (★) Anoop (X)
 (prerequisites: **printmove**)
 
 As the game progresses, save each player’s move to a text file, `moves.txt`.
