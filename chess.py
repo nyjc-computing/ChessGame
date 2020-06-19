@@ -117,8 +117,8 @@ class Board:
             followed by 2 numerals
             '''
             return len(inputstr) == 5 and inputstr[2] == ' ' \
-                and inputstr[0:2].isdigit() \
-                and inputstr[3:].isdigit()
+                and inputstr[0:1].isdigit() \
+                and inputstr[3:4].isdigit()
         
         def valid_num(inputstr):
             '''Ensure all inputted numerals are 0-7.'''
@@ -136,8 +136,10 @@ class Board:
 
         def printmove(start, end):
             '''Print the player\'s move.'''
+            a,b = start
+            c,d = end
             movedpiece = str(self.get_piece(start))
-            return f'{movedpiece} {start} -> {end}'
+            return f'{movedpiece} {a}{b} -> {c}{d}'
 
         while True:
             inputstr = input(f'{self.turn.title()} player: ')
