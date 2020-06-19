@@ -174,6 +174,9 @@ class Board:
         pass
     
     def printmove(self,start,end):
+        a,b = start 
+        c,d = end
+        print(f'{self.get_piece(end)} {a}{b} -> {c}{d}')
         pass
 
     def update(self, start, end):
