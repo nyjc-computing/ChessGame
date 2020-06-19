@@ -168,7 +168,9 @@ class Board:
         return True
     
     def end(self,start,end):
-        pass
+        '''Checks if King piece is eliminated'''
+        if self.get_piece(end) == 'king':
+            return game.winner == self.colour(start)
     
     def promotion(start,end):
         pass
