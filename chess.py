@@ -169,11 +169,22 @@ class Board:
         elif not start_piece.isvalid(start, end):
             return False
         return True
+    
+    def winnercheck(self):
+        '''check for winner'''
+        pass
+    
+    def promotioncheck(self):
+        '''check for pawn promotion'''
+        pass
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
+        self.winnercheck()
+        self.promotioncheck()
+            
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
