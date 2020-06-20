@@ -98,7 +98,7 @@ Print a message if any player is checked at the end of the turn.
 
 Check can be determined by taking the start position of each opponent piece on the board, taking the player’s King as the end position, and checking if this is a valid move for the opponent piece.
 
-### branch: **debug** (★)
+### branch: **debug** (★) Anoop (X)
 
 Add a `debug mode` to the game.
 
