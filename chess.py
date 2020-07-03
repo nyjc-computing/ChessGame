@@ -41,7 +41,7 @@ class Board:
         Does nothing if there is no piece at coord.
         '''
         if coord in self.coords():
-            del self.position[coord]
+            return self.position.pop(coord)
 
     def move(self, start, end):
         '''
@@ -169,9 +169,12 @@ class Board:
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
-        self.remove(end)
+        dead = self.remove(end)
         self.move(start, end)
-
+        if "king" in dead:
+          color = end_piece.split(" ")[0]
+          self.winner = color
+          
     def next_turn(self):
         '''Hand the turn over to the other player.'''
         if self.turn == 'white':
