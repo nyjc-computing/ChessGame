@@ -171,8 +171,8 @@ class Board:
         '''Update board information with the player's move.'''
         dead = self.remove(end)
         self.move(start, end)
-        if "king" in dead:
-          color = end_piece.split(" ")[0]
+        if isinstance(dead, King):
+          color = str(end_piece).split(" ")[0]
           self.winner = color
           
     def next_turn(self):
