@@ -90,7 +90,7 @@ The turn ends only after the piece is promoted.
 
 Teams may propose any other features as bonus additions if they are not mentioned here.
 
-### branch: **check** (★★)
+### branch: **check** (★★) Anoop (X)
 
 Print a message if any player is checked at the end of the turn.
 
