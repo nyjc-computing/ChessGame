@@ -90,7 +90,7 @@ The turn ends only after the piece is promoted.
 
 Teams may propose any other features as bonus additions if they are not mentioned here.
 
-### branch: **check** (★★)
+### branch: **check** (★★) Anoop (X)
 
 Print a message if any player is checked at the end of the turn.
 
@@ -98,7 +98,7 @@ Print a message if any player is checked at the end of the turn.
 
 Check can be determined by taking the start position of each opponent piece on the board, taking the player’s King as the end position, and checking if this is a valid move for the opponent piece.
 
-### branch: **debug** (★)
+### branch: **debug** (★) Anoop (X)
 
 Add a `debug mode` to the game.
 
@@ -148,7 +148,7 @@ Possible options:
 
 The output from this may improve your code for the `update()` method, and for tasks such as **pawncapture** and **castling**
 
-### branch: **nojump** (★★★)
+### branch: **nojump** (★★★) Anoop (X)
 
 In chess, pieces may not jump over another piece while moving to the end position. The Knight is the only piece that may do so.
 
