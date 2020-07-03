@@ -85,19 +85,19 @@ For simplicity, you may assume that all promoted pawns will be promoted to `Quee
 
 The turn ends only after the piece is promoted.
 
-### branch: **checkmate** (★★)
-
-Print a message if any player is checkmated at the end of the turn.
-
-**Example:** `white is checkmated!`
-
-Checkmate can be determined by taking the start position of each opponent piece on the board, taking the player’s King as the end position, and checking if this is a valid move for the opponent piece.
-
 
 
 ## Bonus additions:
 
 Teams may propose any other features as bonus additions if they are not mentioned here.
+
+### branch: **check** (★★)
+
+Print a message if any player is checked at the end of the turn.
+
+**Example:** `white is checked!`
+
+Check can be determined by taking the start position of each opponent piece on the board, taking the player’s King as the end position, and checking if this is a valid move for the opponent piece.
 
 ### branch: **debug** (★)
 
