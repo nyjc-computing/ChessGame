@@ -1,4 +1,3 @@
-class Board:
     '''
     The game board is represented as an 8×8 grid,
     with each position on the grid described as
@@ -23,8 +22,15 @@ class Board:
     def pieces(self):
         '''Return list of board pieces.'''
         return self.position.values()
-    
+
     def get_piece(self, coord):
+        '''
+        Return the piece at coord.
+        Returns None if no piece at coord.
+        '''
+        return self.position.get(coord, None)
+
+    def c(self, coord):
         '''
         Return the piece at coord.
         Returns None if no piece at coord.
@@ -89,19 +95,27 @@ class Board:
         '''
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
+        print("           [ column ]", end="\n")
+        print("        0\\1\\2\\3\\4\\5\\6\\7\\")
         for row in range(7, -1, -1):
+            print(f' [row {row}]', end='')
+            # for i in range(0,8):
+                # print(i, end="")
             for col in range(8):
                 coord = (col, row)  # tuple
                 if coord in self.coords():
                     piece = self.get_piece(coord)
+                    #not here
                     print(f'{piece.symbol()}', end='')
                 else:
                     piece = None
                     print(' ', end='')
-                if col == 7:     # Put line break at the end
-                    print('')
+                if col == 7:     # Put line break atthe end
+                    print(f' [row {row}]')
                 else:            # Print a space between pieces
                     print(' ', end='')
+        print("        0/1/2/3/4/5/6/7/")
+        print("           [ column ]", end="\n")
 
     def prompt(self):
         '''
@@ -117,12 +131,12 @@ class Board:
             followed by 2 numerals
             '''
             return len(inputstr) == 5 and inputstr[2] == ' ' \
-                and inputstr[0:1].isdigit() \
-                and inputstr[3:4].isdigit()
+                and inputstr[0:2].isdigit() \
+                and inputstr[3:5].isdigit()
         
         def valid_num(inputstr):
             '''Ensure all inputted numerals are 0-7.'''
-            for char in (inputstr[0:1] + inputstr[3:4]):
+            for char in (inputstr[0:2] + inputstr[3:5]):
                 if char not in '01234567':
                     return False
             return True
@@ -138,7 +152,7 @@ class Board:
             inputstr = input(f'{self.turn.title()} player: ')
             if not valid_format(inputstr):
                 print('Invalid input. Please enter your move in the '
-                      'following format: __ __, _ represents a digit.')
+                      'following format: __ __, _ represents a 07digit.')
             elif not valid_num(inputstr):
                 print('Invalid input. Move digits should be 0-7.')
             else:
@@ -173,7 +187,34 @@ class Board:
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
-        
+        self.win()
+
+    def win(self):
+        listpiece = list(self.pieces())
+        piecelist = []
+        for i in listpiece:
+            piecelist.append(str(i))
+        print(piecelist)
+        if 'black king' not in piecelist:
+            self.winner = 'White'
+        if 'white king' not in piecelist:
+            self.winner = 'black'
+        self.promotion()
+    
+    def promotion(self):
+        '''
+        Check if last row contains opposing pawn and swap to queen if true
+        '''
+        black_last_row = [(0, 7), (1, 7), (2, 7), (3, 7), (4, 7), (5,7), (6, 7), (7,7)]
+        white_last_row = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0)]
+        for coords in black_last_row:
+            if str(self.get_piece(coords)) == 'white pawn':
+                self.remove(coords)
+                self.add(coords, Queen('white'))
+        for coords in white_last_row:
+            if str(self.get_piece(coords)) == 'black pawn':
+                self.remove(coords)
+                self.add(coords, Queen('black'))
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
@@ -301,13 +342,26 @@ class Pawn(BasePiece):
     def __repr__(self):
         return f"Pawn('{self.name}')"
 
+    def pawnfirstmove(self,start,end):
+        if self.colour == 'black':
+            if start[1] != 6:
+                return False
+        if self.colour == 'white':
+            if start[1] != 1:
+                return False
+        return True
+
     def isvalid(self, start: tuple, end: tuple):
         '''Pawn can only move 1 step forward.'''
         x, y, dist = self.vector(start, end)
         if x == 0:
             if self.colour == 'black':
+                if self.pawnfirstmove(start,end):
+                    return ((y == -1) or (y == -2)) 
                 return (y == -1)
             elif self.colour == 'white':
+                if self.pawnfirstmove(start,end):
+                    return ((y == 1) or (y == 2)) 
                 return (y == 1)
             else:
                 return False
