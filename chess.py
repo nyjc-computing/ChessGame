@@ -171,7 +171,10 @@ class Board:
         pass
     
     def promotion(self,start,end):
-        pass
+        piece = self.get_piece(end)
+        colour = piece.colour
+        if type(piece) == Pawn and (end[2] == 0 or end[2] == 7):
+            self.add(end,Queen(colour))
     
     def printmove(self,start,end):
         a,b = start
