@@ -18,7 +18,7 @@ class Board:
       Jian San
 
       """
-        self.position = {}
+      self.position = {}
 
     def coords(self):
         '''Return list of piece coordinates.'''
