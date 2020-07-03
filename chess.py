@@ -255,8 +255,8 @@ class Board:
           'please choose a piece you want to promote to,the input sould be one of the following:\nqueen knight bishop rook\n')
         choices = {'queen':Queen(colour),
                    'knight':Knight(colour),
-                   'bishop':Knight(colour),
-                   'rook':Knight(colour)}
+                   'bishop':Bishop(colour),
+                   'rook':Rook(colour)}
         new = input()
         if not new in ['queen','knight','bishhop','rook']:
             print('wrong input. the input sould be one of the following:\n queen knight bishop rook\n')
