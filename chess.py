@@ -64,7 +64,7 @@ class Board:
     def start(self):
         """Set up the pieces and start the game."""
         colour = "black"
-        self.add((0, 7), Rook("white"))
+        self.add((0, 7), Rook(colour))
         self.add((1, 7), Knight(colour))
         self.add((2, 7), Bishop(colour))
         self.add((3, 7), Queen(colour))
@@ -210,21 +210,21 @@ class Board:
         self.promotion()
     
     def check(self):
-        if self.winner == None:
-            for coord in self.coords():
-                if "white king" in str(self.get_piece(coord)):
-                    wkingcoord = coord
-                elif "black king" in str(self.get_piece(coord)):
-                    bkingcoord = coord
-            for coord in self.coords():
-                if self.valid_move(coord, wkingcoord):
-                    print("white is in check!")
-                    self.check = True
-                    break
-                elif self.valid_move(coord, bkingcoord):
-                    print("black is in check!")
-                    self.check = True
-                    break
+        self.checking = None
+        for coord in self.coords():
+            if "white king" in str(self.get_piece(coord)):
+                wkingcoord = coord
+            elif "black king" in str(self.get_piece(coord)):
+                bkingcoord = coord
+        for coord in self.coords():
+            if self.valid_move(coord, wkingcoord):
+                print("white is in check!")
+                self.checking = True
+                break
+            elif self.valid_move(coord, bkingcoord):
+                print("black is in check!")
+                self.checking = True
+                break
 
     def promotion(self):
         """
