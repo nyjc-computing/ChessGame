@@ -249,6 +249,11 @@ class Board:
         self.check(self.turn)
 
         
+        if end[1] == 0 or end[1] == 7:
+             f self.get_piece(end).name == 'pawn':
+                 colour = self.turn
+                 self.promotion(end,colour)
+        
         
     def promotion(self,coord,colour):
         ''' 
