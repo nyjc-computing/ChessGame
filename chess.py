@@ -13,7 +13,11 @@ class Board:
     01  11  21  31  41  51  61  71
     00  10  20  30  40  50  60  70
     '''
-    def __init__(self):
+    def __init__(self, **kwargs):
+      """ 
+      Jian San
+
+      """
         self.position = {}
 
     def coords(self):
@@ -199,10 +203,20 @@ class Board:
                 self.position[coord] = Queen(piece.colour)
                 pass
 
+    def check(self):
+      """
+      Anson
+      """
+
+      pass
+
+    
+
     def update(self, start, end):
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
+        self.check()
         self.winnercheck()
         self.promotioncheck()
 
@@ -236,6 +250,12 @@ class BasePiece:
     def symbol(self):
         return f'{self.sym[self.colour]}'
 
+    def nojump(self):
+      """
+      Yu Heng
+      """
+      pass
+
     @staticmethod
     def vector(start, end):
         '''
@@ -252,6 +272,8 @@ class BasePiece:
         y = end[1] - start[1]
         dist = abs(x) + abs(y)
         return x, y, dist
+
+    
 
 
 class King(BasePiece):
@@ -336,7 +358,9 @@ class Pawn(BasePiece):
         return f"Pawn('{self.name}')"
 
     def isvalid(self, start: tuple, end: tuple):
-        '''Pawn can only move 1 step forward.'''
+        '''Pawn can only move 1 step forward.
+        Ryan - PawnCapture enpassant
+        '''
         x, y, dist = self.vector(start, end)
         if x == 0:
             if self.colour == 'black':
@@ -350,3 +374,9 @@ class Pawn(BasePiece):
             else:
                 return False
         return False
+
+class MoveError(Exception):
+  pass
+  """
+  Hin
+  """
