@@ -140,22 +140,31 @@ class Board:
         '''
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
+
         if self.debug:
           print("== DISPLAY ==")
-
-        for row in range(7, -1, -1):
-            for col in range(8):
-                coord = (col, row)  # tuple
-                if coord in self.coords():
-                    piece = self.get_piece(coord)
-                    print(f'{piece.symbol()}', end='')
-                else:
-                    piece = None
-                    print(' ', end='')
-                if col == 7:     # Put line break at the end
-                    print('')
-                else:            # Print a space between pieces
-                    print(' ', end='')
+        
+        for row in range(7, -1, -1):#print the indicating number for column and row
+          if row == 7:
+            print(" ",end="")
+            for num in range(8):
+              print(str(num)+" ", end='')
+            print('')
+            
+          for col in range(8):
+            if col < 1:
+              print(row, end="")
+            coord = (col, row)  # tuple
+            if coord in self.coords():
+                piece = self.get_piece(coord)
+                print(f'{piece.symbol()}', end='')
+            else:
+                piece = None
+                print(' ', end='')
+            if col == 7:     # Put line break at the end
+                print('')
+            else:            # Print a space between pieces
+                print(' ', end='')
 
     def prompt(self):
         '''
@@ -228,6 +237,7 @@ class Board:
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
+
         if self.debug:
           print("== UPDATE ==")
 
