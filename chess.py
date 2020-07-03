@@ -184,7 +184,10 @@ class Board:
     
     def winnercheck(self):
         '''check for winner'''
-        pass
+        if self.turn == 'white' and self.pieces().count(King('king')) != 2:
+            return 'white wins'
+        if self.turn == 'black' and self.pieces().count(King('king')) != 2:
+            return 'black wins' 
     
     def promotioncheck(self):
         '''check for pawn promotion'''
@@ -194,27 +197,15 @@ class Board:
                 self.position[coord] = Queen(piece.colour)
                 pass
 
-
-
-
-    def winner(self):
-        if self.turn == 'white' and self.pieces().count(King('king')) != 2:
-            return 'white wins'
-        if self.turn == 'black' and self.pieces().count(King('king')) != 2:
-            return 'black wins' 
-
     def update(self, start, end):
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
         self.winnercheck()
         self.promotioncheck()
-            
-
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
-
         if self.winner is None:
             if self.turn == 'white':
                 self.turn = 'black'
