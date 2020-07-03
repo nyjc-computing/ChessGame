@@ -88,12 +88,20 @@ class Board:
         '''
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
-        for row in range(7, -1, -1):
-            for col in range(8):
+        # Row 8 is for column labels, Column -1 is for Row labels
+        for row in range(8, -1, -1):
+            for col in range(-1, 8):
                 coord = (col, row)  # tuple
                 if coord in self.coords():
                     piece = self.get_piece(coord)
                     print(f'{piece.symbol()}', end='')
+                elif row == 8:
+                  if col == -1:
+                    print(' ', end='')
+                  else:
+                    print(f'{col}', end='')
+                elif col == -1:
+                  print(f'{row}', end='')
                 else:
                     piece = None
                     print(' ', end='')
@@ -146,6 +154,9 @@ class Board:
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
+                    
+        def printmove(self):
+            pass
 
     def valid_move(self, start, end):
         '''
@@ -165,6 +176,21 @@ class Board:
         elif not start_piece.isvalid(start, end):
             return False
         return True
+    
+    def winnercheck(self):
+        '''check for winner'''
+        pass
+    
+    def promotioncheck(self):
+        '''check for pawn promotion'''
+        for coord , piece in self.position.items():
+            if piece.name == "pawn" and (coord[1] == 0 or coord[1] == 7):
+                choice = input("choose what piece to promote to:")
+                self.position[coord] = Queen(piece.colour)
+                pass
+
+
+
 
     def winner(self):
         if self.turn == 'white' and self.pieces().count(King('king')) != 2:
@@ -176,10 +202,14 @@ class Board:
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
+        self.winnercheck()
+        self.promotioncheck()
+            
 
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
+
         if game.winner is None:
             if self.turn == 'white':
                 self.turn = 'black'
