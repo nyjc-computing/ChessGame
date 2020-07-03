@@ -23,8 +23,15 @@ class Board:
     def pieces(self):
         '''Return list of board pieces.'''
         return self.position.values()
-    
+
     def get_piece(self, coord):
+        '''
+        Return the piece at coord.
+        Returns None if no piece at coord.
+        '''
+        return self.position.get(coord, None)
+
+    def c(self, coord):
         '''
         Return the piece at coord.
         Returns None if no piece at coord.
@@ -171,6 +178,18 @@ class Board:
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
+        self.win()
+
+    def win(self):
+        listpiece = list(self.pieces())
+        piecelist = []
+        for i in listpiece:
+            piecelist.append(str(i))
+        print(piecelist)
+        if 'black king' not in piecelist:
+            self.winner = 'White'
+        if 'white king' not in piecelist:
+            self.winner = 'black'
         self.promotion()
     
     def promotion(self):
