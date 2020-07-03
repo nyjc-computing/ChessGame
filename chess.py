@@ -187,6 +187,9 @@ class Board:
             return False
         elif end_piece is not None and end_piece.colour == self.turn:
             return False
+        elif start_piece.name == 'pawn':
+            if not start_piece.isvalid(start, end, end_piece):
+                return False
         elif not start_piece.isvalid(start, end):
             return False
         return True
@@ -373,6 +376,9 @@ class Pawn(BasePiece):
     def __repr__(self):
         return f"Pawn('{self.name}')"
 
+    def isvalid(self, start: tuple, end: tuple, end_piece):
+        '''Pawn can only move 1 step forward.'''
+       
     def pawnfirstmove(self, start, end):
         if self.colour == "black":
             if start[1] != 6:
@@ -394,6 +400,16 @@ class Pawn(BasePiece):
                 if self.pawnfirstmove(start, end):
                     return (y == 1) or (y == 2)
                 return y == 1
+            else:
+                return False
+        if abs(x) == 1:
+            if end_piece == None:
+                return False
+            elif end_piece.name == 'pawn':
+                if self.colour == 'black':
+                    return (y == -1)
+                elif self.colour == 'white':
+                    return (y == 1)
             else:
                 return False
         return False
