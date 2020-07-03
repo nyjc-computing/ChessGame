@@ -1,4 +1,3 @@
-class Board:
     '''
     The game board is represented as an 8×8 grid,
     with each position on the grid described as
