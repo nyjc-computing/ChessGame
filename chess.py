@@ -250,7 +250,7 @@ class Board:
 
         
         if end[1] == 0 or end[1] == 7:
-             f self.get_piece(end).name == 'pawn':
+             if self.get_piece(end).name == 'pawn':
                  colour = self.turn
                  self.promotion(end,colour)
         
