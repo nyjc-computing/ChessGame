@@ -170,7 +170,7 @@ class Board:
     def end(self,start,end):
         pass
     
-    def promotion(self,start,end):
+    def promotion(self,end):
         piece = self.get_piece(end)
         colour = piece.colour
         if type(piece) == Pawn and (end[2] == 0 or end[2] == 7):
@@ -187,7 +187,7 @@ class Board:
         self.end(start,end)
         self.remove(end)
         self.move(start, end)
-        self.promotion(start,end)
+        self.promotion(end)
         self.printmove(start,end)
         
 
