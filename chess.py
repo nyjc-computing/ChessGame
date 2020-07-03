@@ -52,6 +52,21 @@ class Board:
         piece = self.get_piece(start)
         self.remove(start)
         self.add(end, piece)
+        
+        
+        '''
+        Promote the 'Pawn' piece to a 'Queen' piece when the 'Pawn' piece reaches the opposite end
+        '''
+        if self.get_piece(end).name == Pawn and (end[1] == 0 or end[1] == 7):
+            if self.get_piece(end).colour == 'black':
+                self.remove(end)
+                self.add(end,Queen(black))
+            else:
+                self.remove(end)
+                self.add(end,Queen(white))
+
+        
+        
 
     def start(self):
         '''Set up the pieces and start the game.'''
