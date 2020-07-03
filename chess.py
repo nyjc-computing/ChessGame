@@ -215,7 +215,7 @@ class Board:
     def next_turn(self):
         '''Hand the turn over to the other player.'''
 
-        if game.winner is None:
+        if self.winner is None:
             if self.turn == 'white':
                 self.turn = 'black'
             elif self.turn == 'black':
