@@ -32,13 +32,6 @@ class Board:
         """
         return self.position.get(coord, None)
 
-    def c(self, coord):
-        """
-        Return the piece at coord.
-        Returns None if no piece at coord.
-        """
-        return self.position.get(coord, None)
-
     def add(self, coord, piece):
         """Add a piece at coord."""
         self.position[coord] = piece
