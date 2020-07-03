@@ -169,18 +169,24 @@ class Board:
 
     def valid_move(self, start, end):
         '''
-        Returns True if all conditions are met:
-        1. There is a start piece of the player's colour
-        2. There is no end piece, or end piece is not of player's colour
+        Returns False if any of the conditions are met:
+        1. There is a start piece not of the player's colour
+        2. There is no start piece, no end piece, or end piece is of player's colour
         3. The move is not valid for the selected piece
         
-        Returns False otherwise
+        Returns True otherwise
         '''
         start_piece = self.get_piece(start)
         end_piece = self.get_piece(end)
         if start_piece is None or start_piece.colour != self.turn:
             return False
         elif end_piece is not None and end_piece.colour == self.turn:
+            return False
+        elif start_piece.name == 'pawn':
+          is_valid, is_capture = start_piece.isvalid(start, end)
+          if is_capture and end_piece is None:
+            return False
+          elif not is_capture and end_piece is not None:
             return False
         elif not start_piece.isvalid(start, end):
             return False
@@ -362,18 +368,20 @@ class Pawn(BasePiece):
         Ryan - PawnCapture enpassant
         '''
         x, y, dist = self.vector(start, end)
-        if x == 0:
-            if self.colour == 'black':
-                if start[1] ==  6:
-                    return (y == -1 or y == -2) 
-                return (y == -1)
-            elif self.colour == 'white':
-                if start[1] ==  1:
-                    return (y == 1 or y == 2)  
-                return (y == 1)
-            else:
-                return False
-        return False
+        is_capture = False
+        if x == -1 or x == 1:
+          is_capture = True
+        if self.colour == 'black':
+            if start[1] ==  6:
+                return (y == -1 or y == -2), is_capture 
+            return (y == -1), is_capture
+        elif self.colour == 'white':
+            if start[1] ==  1:
+                return (y == 1 or y == 2), is_capture
+            return (y == 1), is_capture
+        else:
+            return False, is_capture
+
 
 class MoveError(Exception):
   pass
