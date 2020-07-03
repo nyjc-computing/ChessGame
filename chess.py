@@ -192,6 +192,7 @@ class Board:
         self.remove(end)
         self.move(start, end)
         self.win()
+        self.check()
 
     def win(self):
         listpiece = list(self.pieces())
@@ -203,6 +204,24 @@ class Board:
         if "white king" not in piecelist:
             self.winner = "black"
         self.promotion()
+
+    
+    def check(self):
+        self.checking = None
+        for coord in self.coords():
+            if "white king" in str(self.get_piece(coord)):
+                wkingcoord = coord
+            elif "black king" in str(self.get_piece(coord)):
+                bkingcoord = coord
+        for coord in self.coords():
+            if self.valid_move(coord, wkingcoord):
+                print("white is in check!")
+                self.checking = True
+                break
+            elif self.valid_move(coord, bkingcoord):
+                print("black is in check!")
+                self.checking = True
+                break
 
     def promotion(self):
         """
