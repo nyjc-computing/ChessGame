@@ -59,9 +59,11 @@ class Board:
         '''
         if self.get_piece(end).name == Pawn and (end[1] == 0 or end[1] == 7):
             if self.get_piece(end).colour == 'black':
-                self.add(end,Queen(black)
+                self.remove(end)
+                self.add(end,Queen(black))
             else:
-                self.add(end,Queen(white)
+                self.remove(end)
+                self.add(end,Queen(white))
 
         
         
