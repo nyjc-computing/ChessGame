@@ -78,9 +78,8 @@ class Board:
         self.add((7, 0), Rook(colour))
         for x in range(0, 8):
             self.add((x, 1), Pawn(colour))
-        
-        self.winner = None
         self.turn = 'white'
+        self.winner = None
         
     def display(self):
         '''
@@ -193,6 +192,12 @@ class Board:
 
 
 
+    def winner(self):
+        if self.turn == 'white' and self.pieces().count(King('king')) != 2:
+            return 'white wins'
+        if self.turn == 'black' and self.pieces().count(King('king')) != 2:
+            return 'black wins' 
+
     def update(self, start, end):
         '''Update board information with the player's move.'''
         self.remove(end)
@@ -201,13 +206,19 @@ class Board:
         self.promotioncheck()
             
 
+
     def next_turn(self):
         '''Hand the turn over to the other player.'''
-        if self.turn == 'white':
-            self.turn = 'black'
-        elif self.turn == 'black':
-            self.turn = 'white'
-    
+
+        if game.winner is None:
+            if self.turn == 'white':
+                self.turn = 'black'
+            elif self.turn == 'black':
+                self.turn = 'white'
+        else:
+            pass
+
+
 class BasePiece:
     name = 'piece'
     def __init__(self, colour):
