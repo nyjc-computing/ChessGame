@@ -167,9 +167,9 @@ class Board:
         return True
 
     def winner(self):
-        if self.turn == 'white' and self.pieces().count('King('king')') != 2:
+        if self.turn == 'white' and self.pieces().count(King('king')) != 2:
             return 'white wins'
-        if self.turn == 'black' and self.pieces().count('King('king')') != 2:
+        if self.turn == 'black' and self.pieces().count(King('king')) != 2:
             return 'black wins' 
 
     def update(self, start, end):
