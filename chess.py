@@ -328,9 +328,15 @@ class Pawn(BasePiece):
         x, y, dist = self.vector(start, end)
         if x == 0:
             if self.colour == 'black':
-                return (y == -1)
+                if start[1] == 6:
+                    return (y == -1 or y == -2)
+                else:
+                    return (y == -1)
             elif self.colour == 'white':
-                return (y == 1)
+                if start[1] == 1:
+                    return (y == 1 or y == 2)
+                else:
+                    return (y == 1)
             else:
                 return False
         return False
