@@ -141,6 +141,13 @@ class Board:
             end = (int(end[0]), int(end[1]))
             return (start, end)
 
+        def printmove(start, end):
+            '''Print the player\'s move.'''
+            a,b = start
+            c,d = end
+            movedpiece = str(self.get_piece(start))
+            return f'{movedpiece} {a}{b} -> {c}{d}'
+
         while True:
             inputstr = input(f'{self.turn.title()} player: ')
             if not valid_format(inputstr):
@@ -151,12 +158,10 @@ class Board:
             else:
                 start, end = split_and_convert(inputstr)
                 if self.valid_move(start, end):
+                    print(printmove(start, end))
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
-                    
-        def printmove(self):
-            pass
 
     def valid_move(self, start, end):
         '''
