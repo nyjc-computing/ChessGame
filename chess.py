@@ -78,9 +78,8 @@ class Board:
         self.add((7, 0), Rook(colour))
         for x in range(0, 8):
             self.add((x, 1), Pawn(colour))
-        
-        self.winner = None
         self.turn = 'white'
+        self.winner = None
         
     def display(self):
         '''
@@ -167,17 +166,11 @@ class Board:
             return False
         return True
 
-    def winnercheck(self):
-        #1. if the turn now is white, 
-            # if king piece for black is not there, then end the game.
-        #2. If the turn now is black, if king piece for white is not there, then end the game.
-        if self.turn == 'white' and King not in self.pieces():
+    def winner(self):
+        if self.turn == 'white' and self.pieces().count('King('king')') != 2:
             return 'white wins'
-        if self.turn == 'black' and 'white king' not in self.piece:
+        if self.turn == 'black' and self.pieces().count('King('king')') != 2:
             return 'black wins' 
-
-
-            
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
@@ -187,10 +180,13 @@ class Board:
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
-        if self.turn == 'white':
-            self.turn = 'black'
-        elif self.turn == 'black':
-            self.turn = 'white'
+        if game.winner is None:
+            if self.turn == 'white':
+                self.turn = 'black'
+            elif self.turn == 'black':
+                self.turn = 'white'
+        else:
+            pass
 
 
 class BasePiece:
