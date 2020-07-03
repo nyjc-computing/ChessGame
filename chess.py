@@ -172,6 +172,17 @@ class Board:
         self.remove(end)
         self.move(start, end)
         print(self.get_piece(end), f'{start[0]}{start[1]} -> {end[0]}{end[1]}')
+        self.win()
+
+    def win(self): #game.winner
+        list_pieces = self.pieces()
+        piece_list = [str(i) for i in list_pieces]
+        if 'white king' not in piece_list:
+            self.winner = 'Black'
+        elif 'black king' not in piece_list:
+            self.winner = 'White'
+        else:
+            self.winner = None
     
     def winner(self): 
         pass
