@@ -89,12 +89,18 @@ class Board:
         '''
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
-        for row in range(7, -1, -1):
-            for col in range(8):
+        for row in range(8, -1, -1):
+            
+            for col in range(-1, 8):
                 coord = (col, row)  # tuple
                 if coord in self.coords():
                     piece = self.get_piece(coord)
                     print(f'{piece.symbol()}', end='')
+                elif row == 8:
+                    if col == -1:
+                        print(' ','0 1 2 3 4 5 6 7' ,end='')
+                elif col == -1:
+                    print(row,end='')   
                 else:
                     piece = None
                     print(' ', end='')
