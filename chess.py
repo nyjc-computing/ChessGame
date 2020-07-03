@@ -184,9 +184,9 @@ class Board:
     
     def winnercheck(self):
         '''check for winner'''
-        if self.turn == 'white' and self.pieces().count(King('king')) != 2:
+        if self.turn == 'white' and list(self.pieces()).count(King('king')) != 2:
             return 'white wins'
-        if self.turn == 'black' and self.pieces().count(King('king')) != 2:
+        if self.turn == 'black' and list(self.pieces()).count(King('king')) != 2:
             return 'black wins' 
     
     def promotioncheck(self):
