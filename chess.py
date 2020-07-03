@@ -168,7 +168,6 @@ class Board:
         return True
 
 
-
     def update(self, start, end):
         '''Update board information with the player's move.'''
         self.remove(end)
