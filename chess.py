@@ -13,8 +13,11 @@ class Board:
     01  11  21  31  41  51  61  71
     00  10  20  30  40  50  60  70
     '''
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.position = {}
+        self.debug = kwargs.get('debug',False)
+        
+        
 
     def coords(self):
         '''Return list of piece coordinates.'''
@@ -89,6 +92,8 @@ class Board:
         '''
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
+        if self.debug == True:
+            print('== DISPLAY ==')
         for row in range(8, -1, -1):
             
             for col in range(-1, 8):
@@ -116,6 +121,8 @@ class Board:
         then another 2 ints
         e.g. 07 27
         '''
+        if self.debug == True:
+            print('== PROMPT ==')
         def valid_format(inputstr):
             '''
             Ensure input is 5 characters: 2 numerals,
@@ -189,6 +196,8 @@ class Board:
         pass
 
     def update(self, start, end):
+        if self.debug == True:
+            print('== UPDATE ==')
         '''Update board information with the player's move.'''
         self.end(start,end)
         self.remove(end)
@@ -198,6 +207,8 @@ class Board:
         
 
     def next_turn(self):
+        if self.debug == True:
+            print('== NEXT TURN ==')
         '''Hand the turn over to the other player.'''
         if self.turn == 'white':
             self.turn = 'black'
