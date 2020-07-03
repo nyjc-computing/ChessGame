@@ -89,17 +89,44 @@ class Board:
         '''
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
+        
         for row in range(7, -1, -1):
+            if row == 7:
+                print('a b c d e f g h')
             for col in range(8):
-                coord = (col, row)  # tuple
+                coord = (col , row)  # tuple
+                
                 if coord in self.coords():
                     piece = self.get_piece(coord)
                     print(f'{piece.symbol()}', end='')
+                #  elif col == 0 and row == 2:
+                #     print('2')
+                # elif col == 0 and row == 3:
+                #     print('3')
+                # elif col == 0 and row == 4:
+                #     print('4')
                 else:
                     piece = None
                     print(' ', end='')
-                if col == 7:     # Put line break at the end
-                    print('')
+
+                if col == 7 and row == 7:     # Put line break at the end
+                    print(' 8')
+                elif col == 7 and row == 6:
+                    print(' 7')
+                elif col == 7 and row == 5:
+                    print(' 6')
+                elif col == 7 and row == 4:
+                    print(' 5')
+                elif col == 7 and row == 3:
+                    print(' 4')
+                elif col == 7 and row == 2:
+                    print(' 3')
+                elif col == 7 and row == 1:
+                    print(' 2')
+                elif col == 7 and row == 0:
+                    print(' 1')
+                
+                
                 else:            # Print a space between pieces
                     print(' ', end='')
 
