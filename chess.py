@@ -173,9 +173,17 @@ class Board:
         self.move(start, end)
         self.promotion()
         print(self.get_piece(end), f'{start[0]}{start[1]} -> {end[0]}{end[1]}')
+	self.win()
     
-    def winner(self): 
-        pass
+    def win(self): 
+        list_pieces = self.pieces()
+        piece_list = [str(i) for i in list_pieces]
+        if 'white king' not in piece_list:
+            self.winner = 'Black'
+        elif 'black king' not in piece_list:
+            self.winner = 'White'
+        else:
+            self.winner = None
     
     def promotion(self):
         end_pieces_top = []
