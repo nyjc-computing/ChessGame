@@ -2,6 +2,7 @@ from chess import Board, King, Queen, Bishop, Knight, Rook, Pawn
 
 game = Board()
 game.start()
+
 while game.winner is None:
     game.display()
     start, end = game.prompt()

@@ -184,10 +184,12 @@ class Board:
     
     def winnercheck(self):
         '''check for winner'''
-        if self.turn == 'white' and list(self.pieces()).count(King('king')) != 2:
-            return 'white wins'
-        if self.turn == 'black' and list(self.pieces()).count(King('king')) != 2:
-            return 'black wins' 
+        no_of_kings = 0
+        for pieces in list(self.pieces()):
+            if pieces.name == 'king':
+              no_of_kings += 1
+        if no_of_kings != 2:
+          self.winner = self.turn
     
     def promotioncheck(self):
         '''check for pawn promotion'''
