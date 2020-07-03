@@ -1,6 +1,6 @@
 from chess import Board, King, Queen, Bishop, Knight, Rook, Pawn
 
-game = Board()
+game = Board(debug=True)
 game.start()
 while game.winner is None:
     game.display()
@@ -8,3 +8,4 @@ while game.winner is None:
     game.update(start, end)
     game.next_turn()
 print(f'Game over. {game.winner} player wins!')
+
