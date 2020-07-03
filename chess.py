@@ -171,14 +171,42 @@ class Board:
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
+        self.promotion()
         print(self.get_piece(end), f'{start[0]}{start[1]} -> {end[0]}{end[1]}')
     
     def winner(self): 
         pass
     
-    def promotion(self): 
-        pass
-    
+    def promotion(self):
+        end_pieces_top = []
+        end_pieces_bottom = []
+        top_pawn = None
+        bottom_pawn = None
+        for cols in range(8):
+            end_pieces_top.append(self.get_piece((cols, 7)))
+            end_pieces_bottom.append(self.get_piece((cols, 0)))
+        pos_col_top = 0
+        for el in end_pieces_top:
+            if str(el) == "white pawn" or str(el) == "black pawn":
+                top_pawn = (pos_col_top, 7)
+                break
+            pos_col_top += 1
+        pos_col_bottom = 0
+        for el in end_pieces_bottom:
+            if str(el) == "white pawn" or str(el) == "black pawn":
+                bottom_pawn = (pos_col_bottom, 0)
+                break
+            pos_col_bottom += 1
+        # print(f'top_pawn {top_pawn}')
+        # print(f'bottom_pawn {bottom_pawn}')
+        if not (top_pawn == None and bottom_pawn == None):
+            if bottom_pawn == None:
+                self.remove(top_pawn)
+                self.add(top_pawn, Queen('white'))
+            else:
+                self.remove(bottom_pawn)
+                self.add(bottom_pawn, Queen('black'))
+        
     def pawnfirstmove(self):
         pass
     
