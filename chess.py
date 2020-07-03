@@ -182,13 +182,23 @@ class Board:
             return False
         elif end_piece is not None and end_piece.colour == self.turn:
             return False
+        elif not start_piece.isvalid(start, end):
+            return False
+
         elif start_piece.name == 'pawn':
           is_valid, is_capture = start_piece.isvalid(start, end)
           if is_capture and end_piece is None:
-            return False
+            xcord = end[0]
+            ycord = start[1]
+            sidepiece = self.get_piece((xcord, ycord))
+            if sidepiece.name == 'pawn':
+              if not sidepiece.doublemoveprevturn:
+                return False
+              else:
+                self.move((xcord, ycord), end)
+            else:
+              return False
           elif not is_capture and end_piece is not None:
-            return False
-        elif not start_piece.isvalid(start, end):
             return False
         return True
     
@@ -372,13 +382,19 @@ class Pawn(BasePiece):
         if x == -1 or x == 1:
           is_capture = True
         if self.colour == 'black':
-            if start[1] ==  6:
-                return (y == -1 or y == -2), is_capture 
-            return (y == -1), is_capture
+          self.doublemoveprevturn = False
+          if start[1] ==  6:
+            if y == -2:
+              self.doublemoveprevturn = True
+            return (y == -1 or y == -2), is_capture 
+          return (y == -1), is_capture
         elif self.colour == 'white':
-            if start[1] ==  1:
-                return (y == 1 or y == 2), is_capture
-            return (y == 1), is_capture
+          self.doublemoveprevturn = False
+          if start[1] ==  1:
+              if y == 2:
+                self.doublemoveprevturn = True
+              return (y == 1 or y == 2), is_capture
+          return (y == 1), is_capture
         else:
             return False, is_capture
 
