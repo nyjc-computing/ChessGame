@@ -331,20 +331,44 @@ class Rook(BasePiece):
 
 
 class Pawn(BasePiece):
-    name = 'pawn'
-    sym = {'white': '♙', 'black': '♟︎'}
-    counter = True
-    def __repr__(self):
-        return f"Pawn('{self.name}')"
+	name = 'pawn'
+	sym = {'white': '♙', 'black': '♟︎'}
+	def __repr__(self):
+		return f"Pawn('{self.name}')"
 
-    def isvalid(self, start: tuple, end: tuple):
-        '''Pawn can only move 1 step forward.'''
-        x, y, dist = self.vector(start, end)
-        if x == 0:
-            if self.colour == 'black':
-                return (y == -1)
-            elif self.colour == 'white':
-                return (y == 1)
-            else:
-                return False
-        return False
+	def isvalid(self, start: tuple, end: tuple):
+		'''Pawn can only move 1 step forward.'''
+		counter = True
+		x, y, dist = self.vector(start, end)
+		if counter == False:
+			if x == 0:
+				if self.colour == 'black':
+					return (y == -1)
+				elif self.colour == 'white':
+					return (y == 1)
+				else:
+					return False
+			return False
+		else:
+			if x == 0:
+				counter = False
+				choice = input("confirm moving once or twice? ")
+				while choice not in ("once","twice"):
+					choice = input("confirm moving once or twice? ")
+				
+				if choice == "once":
+					if self.colour == 'black':
+						return (y == -1)
+					elif self.colour == 'white':
+						return (y == 1)
+					else:
+						return False
+
+				elif choice == 'twice':
+					if self.colour == 'black':
+						return (y == -2)
+					elif self.colour == 'white':
+						return (y == 2)
+					else:
+						return False
+			return False
