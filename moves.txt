@@ -1,6 +1,0 @@
-white pawn 51 -> 52
-black pawn 46 -> 45
-white pawn 61 -> 62
-black pawn 45 -> 44
-white pawn 62 -> 63
-black queen 37 -> 73
