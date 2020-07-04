@@ -14,11 +14,15 @@ class Board:
     00  10  20  30  40  50  60  70
     '''
     def __init__(self, **kwargs):
-      """ 
-      Jian San
-
-      """
-      self.position = {}
+        self.position = {}
+        if 'debug' in kwargs.keys():
+            if kwargs['debug'] == True:
+                self.debug = True
+            else:
+                self.debug = False
+        else:
+            self.debug = False  
+        
 
     def coords(self):
         '''Return list of piece coordinates.'''
