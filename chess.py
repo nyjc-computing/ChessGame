@@ -207,20 +207,47 @@ class Board:
                 self.position[coord] = Queen(piece.colour)
                 pass
 
-    def check(self):
-      """
-      Anson
-      """
+    def check(self, colour):
+        """
+        self.check(colour)
 
-      pass
+        the colour argument tells which king to check if it is checked.
+        return boolean 
+        Anson
+        """
+        # get all the pieces
+        if self.debug:
+            print(f"Now checking if the {colour} king is being checked")
+        isCheck = False
+        pieces_coords_list = list(self.coords())
+        own_pieces_list = []
+        opponent_pieces_list = []
+        for coord in pieces_coords_list:
+            piece = self.get_piece(coord)
+            if piece.colour == colour:
+                if type(piece) == King:
+                    own_king = piece
+                    own_king_coord = coord
 
-    
+            else:
+                if type(piece) == King:
+                    opponent_king = piece
+                    opponent_king_coord = coord
+                else:
+                    opponent_pieces_list.append((piece, coord))
+
+        # check all valid opponent start positions to check own king (opponent, end)
+        for (piece, start_coord) in opponent_pieces_list:
+            if piece.isvalid(start_coord, own_king_coord):
+                isCheck = True
+        if self.debug:
+            print(f"{colour} King is in check: {isCheck}")
+        return isCheck
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
-        self.check()
         self.winnercheck()
         self.promotioncheck()
 
@@ -231,8 +258,8 @@ class Board:
                 self.turn = 'black'
             elif self.turn == 'black':
                 self.turn = 'white'
-        else:
-            pass
+        if check(self.turn):
+            print(f"{self.turn} King is in check")
 
 
 class BasePiece:
