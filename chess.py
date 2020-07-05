@@ -163,6 +163,7 @@ class Board:
                 start, end = split_and_convert(inputstr)
                 if self.valid_move(start, end):
                     print(printmove(start, end))
+                    self.previousmove = (start, end)
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
@@ -176,6 +177,31 @@ class Board:
         
         Returns True otherwise
         '''
+        def pawn_isvalid():
+          """
+          Extra validation for pawn capturing and en passant moves
+          Returns True if move is valid, else returns False
+          """
+          is_capture = start_piece.is_capture(start, end)
+          if is_capture and end_piece is None:
+            xcord = end[0]
+            ycord = start[1]
+            sidepiece = self.get_piece((xcord, ycord))
+            if sidepiece.name == 'pawn':
+              if not sidepiece.doublemoveprevturn:
+                return False
+              elif (xcord, ycord) == self.previousmove[1]:
+                self.move((xcord, ycord), end)
+                return True
+              else:
+                return False
+            else:
+              return False
+          elif not is_capture and end_piece is not None:
+            return False
+          else:
+            return True
+
         start_piece = self.get_piece(start)
         end_piece = self.get_piece(end)
         if start_piece is None or start_piece.colour != self.turn:
@@ -184,21 +210,8 @@ class Board:
             return False
         elif not start_piece.isvalid(start, end):
             return False
-
         elif start_piece.name == 'pawn':
-          is_valid, is_capture = start_piece.isvalid(start, end)
-          if is_capture and end_piece is None:
-            xcord = end[0]
-            ycord = start[1]
-            sidepiece = self.get_piece((xcord, ycord))
-            if sidepiece.name == 'pawn':
-              if not sidepiece.doublemoveprevturn:
-                return False
-              else:
-                self.move((xcord, ycord), end)
-            else:
-              return False
-          elif not is_capture and end_piece is not None:
+          if not pawn_isvalid():
             return False
         return True
     
@@ -374,29 +387,42 @@ class Pawn(BasePiece):
         return f"Pawn('{self.name}')"
 
     def isvalid(self, start: tuple, end: tuple):
-        '''Pawn can only move 1 step forward.
+        '''
+        Pawn can only move 1 step forward into empty space, or 1 step horizontally and 1 step forward while capturing.
+        Attribute self.doublemoveprevturn is True when the Pawn moves 2 spaces. Else self.doublemoveprevturn is False
+
         Ryan - PawnCapture enpassant
         '''
         x, y, dist = self.vector(start, end)
-        is_capture = False
-        if x == -1 or x == 1:
-          is_capture = True
-        if self.colour == 'black':
-          self.doublemoveprevturn = False
-          if start[1] ==  6:
-            if y == -2:
-              self.doublemoveprevturn = True
-            return (y == -1 or y == -2), is_capture 
-          return (y == -1), is_capture
-        elif self.colour == 'white':
-          self.doublemoveprevturn = False
-          if start[1] ==  1:
-              if y == 2:
+        if x == -1 or x == 1 or x == 0:
+          if self.colour == 'black':
+            self.doublemoveprevturn = False
+            if start[1] ==  6:
+              if y == -2:
                 self.doublemoveprevturn = True
-              return (y == 1 or y == 2), is_capture
-          return (y == 1), is_capture
+              return (y == -1 or y == -2)
+            return (y == -1)
+          elif self.colour == 'white':
+            self.doublemoveprevturn = False
+            if start[1] ==  1:
+                if y == 2:
+                  self.doublemoveprevturn = True
+                return (y == 1 or y == 2)
+            return (y == 1)
+          else:
+            return False
         else:
-            return False, is_capture
+            return False
+    def is_capture(self, start: tuple, end: tuple):
+      """
+      Returns True if pawn makes a horizontal move in any direction (a capturing move). Else returns False
+      """
+      x, y, dist = self.vector(start, end)
+      if x == -1 or x == 1:
+        return True
+      else:
+        return False
+
 
 
 class MoveError(Exception):
