@@ -188,7 +188,7 @@ class Board:
             return False
         elif not start_piece.isvalid(start, end):
             return False
-        elif nojumpcheck(self, start, end) == False:
+        elif self.nojumpcheck(start, end) == False:
             return False
         return True
         
@@ -202,27 +202,35 @@ class Board:
         else True
         yuheng
         '''
-        vector(start, end)
-        position_checking = list(start)
-        if x == 1 or y == 1:
+        x = end[0]- start[0]
+        y = end[1]- start[1]
+        position_checking = start
+        nojump = True
+        if abs(x) == 1 or abs(y) == 1:
             nojump = True
         elif x == 0:
             # moving vertically
-            for i in range(0, x):
-                position_checking[1] += 1
+            for i in range(0, abs(y)-1):
+                position_checking = list(position_checking)
+                position_checking[1] += y/abs(y)
+                position_checking = tuple(position_checking)
                 if self.get_piece(position_checking) != None:
                     nojump = False
         elif y == 0:
             # moving horizontally
-            for i in range(0, y):
-                position_checking[0] += 1
+            for i in range(0, abs(x)-1):
+                position_checking = list(position_checking)
+                position_checking[0] += x/abs(x)
+                position_checking = tuple(position_checking)
                 if self.get_piece(position_checking) != None:
                     nojump = False
         else:
             # moving diagonally
-            for i in range(0, x):
-                position_checking[0] += 1
-                position_checking[1] += 1
+            for i in range(0, abs(x)-1):
+                position_checking = list(position_checking)
+                position_checking[0] += x/abs(x)
+                position_checking[1] += y/abs(y)
+                position_checking = tuple(position_checking)
                 if self.get_piece(position_checking) != None:
                     nojump = False
         return nojump
@@ -296,7 +304,7 @@ class Board:
                 self.turn = 'black'
             elif self.turn == 'black':
                 self.turn = 'white'
-        if check(self.turn):
+        if self.check(self.turn):
             print(f"{self.turn} King is in check")
 
 
