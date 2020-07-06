@@ -57,38 +57,36 @@ class Board:
         Validation should be carried out first
         to ensure the move is valid.
         '''
-        if self.castling(start, end):
-            self.casstlingmove(start, end)
-        else:
-            piece = self.get_piece(start)
-            self.remove(start)
-            self.add(end, piece)
+        piece = self.get_piece(start)
+        piece.moved = True
+        self.remove(start)
+        self.add(end, piece)
 
     def start(self):
         '''Set up the pieces and start the game.'''
         colour = 'black'
-        self.add((0, 7), Rook(colour ,False))
-        # self.add((1, 7), Knight(colour))
-        # self.add((2, 7), Bishop(colour))
-        # self.add((3, 7), Queen(colour))
-        self.add((4, 7), King(colour ,False))
-        # self.add((5, 7), Bishop(colour))
-        # self.add((6, 7), Knight(colour))
-        self.add((7, 7), Rook(colour ,False))
-        # for x in range(0, 8):
-            # self.add((x, 6), Pawn(colour ,False))
+        self.add((0, 7), Rook(colour))
+        self.add((1, 7), Knight(colour))
+        self.add((2, 7), Bishop(colour))
+        self.add((3, 7), Queen(colour))
+        self.add((4, 7), King(colour))
+        self.add((5, 7), Bishop(colour))
+        self.add((6, 7), Knight(colour))
+        self.add((7, 7), Rook(colour))
+        for x in range(0, 8):
+            self.add((x, 6), Pawn(colour))
 
         colour = 'white'
-        self.add((0, 0), Rook(colour ,False))
-        # self.add((1, 0), Knight(colour))
-        # self.add((2, 0), Bishop(colour))
-        # self.add((3, 0), Queen(colour))
-        self.add((4, 0), King(colour ,False))
-        # self.add((5, 0), Bishop(colour))
-        # self.add((6, 0), Knight(colour))
-        self.add((7, 0), Rook(colour ,False))
-        # for x in range(0, 8):
-        #     self.add((x, 1), Pawn(colour ,False))
+        self.add((0, 0), Rook(colour))
+        self.add((1, 0), Knight(colour))
+        self.add((2, 0), Bishop(colour))
+        self.add((3, 0), Queen(colour))
+        self.add((4, 0), King(colour))
+        self.add((5, 0), Bishop(colour))
+        self.add((6, 0), Knight(colour))
+        self.add((7, 0), Rook(colour))
+        for x in range(0, 8):
+            self.add((x, 1), Pawn(colour))
         self.turn = 'white'
         self.winner = None
         
@@ -154,10 +152,13 @@ class Board:
 
         def printmove(start, end):
             '''Print the player\'s move.'''
-            a,b = start
-            c,d = end
-            movedpiece = str(self.get_piece(start))
-            return f'{movedpiece} {a}{b} -> {c}{d}'
+            if self.caslting(start, end):
+                return f'{self.turn} castling.'
+            else:
+                a,b = start
+                c,d = end
+                movedpiece = str(self.get_piece(start))
+                return f'{movedpiece} {a}{b} -> {c}{d}'
 
         while True:
             inputstr = input(f'{self.turn.title()} player: ')
@@ -187,8 +188,9 @@ class Board:
         start_piece = self.get_piece(start)
         end_piece = self.get_piece(end)
         if self.castling(start, end):
+            print('valid move')
             return True
-        if start_piece is None or start_piece.colour != self.turn:
+        elif start_piece is None or start_piece.colour != self.turn:
             return False
         elif end_piece is not None and end_piece.colour == self.turn:
             return False
@@ -256,21 +258,15 @@ class Board:
         '''
         start_piece = self.get_piece(start)
         end_piece = self.get_piece(end)
-        print(f'start_piece, end_piece is {start_piece},{end_piece}')
         if start_piece == None or end_piece == None:
-            print('some piece is none')
             return False
         elif start_piece.colour != end_piece.colour:
-            print('piece colour not matched')
             return False
         elif start_piece.moved or end_piece.moved:
-            print('piece moved')
             return False
         elif not ((start_piece.name == 'king' and end_piece.name == 'rook') or (start_piece.name == 'rook' and end_piece.name == 'king')):
-            print('not one king one rook')
             return False
         elif not self.nojumpcheck(start, end):
-            print('jumping over')
             return False
         else:
             if start_piece.name == 'king':
@@ -279,37 +275,25 @@ class Board:
             else:
                 king_pos = end
                 rook_pos = start
-            print(f'king_pos is {king_pos},rook_pos is {rook_pos}')
             if self.check(self.turn) == True:
-                print('being checked')
                 return False
             else:
                 x = rook_pos[0] - king_pos[0]
-                print(f'x is {x}')
-                last_position = king_pos
-                position_checking = []
-                print(f'last_position is {last_position}')
+                position_checking = king_pos
                 for i in range(0, 2):
-                    # print('checking...')
-                    position_checking = list(last_position)
-                    # print(f'position_checking is {position_checking}')
+                    position_checking = list(position_checking)
                     position_checking[0] += x/abs(x)
-                    # print(type(position_checking[0]))
-                    # print(f'position_checking is {position_checking}')
+                    print(type(position_checking[0]))
                     position_checking = tuple(position_checking)
-                    # print(f'position_checking is {position_checking}')
                     self.add(position_checking, King(self.turn))
-                    self.display()
                     if self.check(self.turn) == True:
-                        self.remove(position_checking, king_pos)
+                        self.remove(position_checking)
                         return False
                     self.remove(position_checking)
-                self.display()
-                print('end castling')
                 return True
 
-    def castlingmove(start, end):
-        print('castlingmove')
+    def castlingmove(self, start, end):
+        start_piece = self.get_piece(start)
         if start_piece.name == 'king':
             king_pos = start
             rook_pos = end
@@ -320,16 +304,11 @@ class Board:
         king_pos_end = list(king_pos)
         king_pos_end[0] += 2*(x/abs(x))
         king_pos_end = tuple(king_pos_end)
-        piece = self.get_piece(king_pos)
-        self.remove(king_pos)
-        self.add(king_pos_end, piece)
+        self.move(king_pos, king_pos_end)
         rook_pos_end = list(rook_pos)
         rook_pos_end[0] = king_pos_end[0] - x/abs(x)
         rook_pos_end = tuple(rook_pos_end)
-        piece = self.get_piece(rook_pos)
-        self.remove(rook_pos)
-        self.add(rook_pos_end, piece)
-        self.display()
+        self.move(rook_pos, rook_pos_end)
 
     def winnercheck(self):
         '''check for winner'''
@@ -338,15 +317,13 @@ class Board:
             if pieces.name == 'king':
               no_of_kings += 1
         if no_of_kings != 2:
-          self.winner = self.turn
+            self.winner = self.turn
     
     def promotioncheck(self):
         '''check for pawn promotion'''
         for coord , piece in self.position.items():
             if piece.name == "pawn" and (coord[1] == 0 or coord[1] == 7):
-                choice = input("choose what piece to promote to:")
                 self.position[coord] = Queen(piece.colour)
-                pass
 
     def check(self, colour):
         """
@@ -388,8 +365,12 @@ class Board:
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
-        self.remove(end)
-        self.move(start, end)
+        if self.castling(start, end):
+            self.castlingmove(start, end)
+        else:
+            self.remove(end)
+            self.move(start, end)
+            print(f'moved is {self.get_piece(end).moved}')
         self.winnercheck()
         self.promotioncheck()
 
@@ -406,7 +387,7 @@ class Board:
 
 class BasePiece:
     name = 'piece'
-    def __init__(self, colour, moved = True):
+    def __init__(self, colour, moved = False):
         if type(colour) != str:
             raise TypeError('colour argument must be str')
         elif colour.lower() not in {'white', 'black'}:
