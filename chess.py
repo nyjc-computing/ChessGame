@@ -235,6 +235,56 @@ class Board:
                     nojump = False
         return nojump
 
+    def castling(self, start, end):
+        '''
+        special move: castling
+        1. The king and the chosen rook are on the player's first rank.
+        2. Neither the king nor the chosen rook has previously moved.
+        3. There are no pieces between the king and the chosen rook.
+        4. The king is not currently in check.
+        5. The king does not pass through a square that is attacked by an enemy piece.
+        returns boolean:
+        if castling move is valid return True
+        else return False
+        yuheng
+        '''
+        start_piece = self.get_piece(start)
+        end_piece = self.get_piece(end)
+        if start_piece == None or end_piece == None:
+            return False
+        elif start_piece.colour != end_piece.colour:
+            return False
+        elif start_piece.moved or end_piece.moved:
+            return False
+        elif not ((start_piece.name == 'king' and end_piece.name == 'rook') or (start_piece.name == 'rook' and end_piece.name == 'king')):
+            return False
+        elif not self.nojumpcheck(start, end):
+            return False
+        else:
+            if start_piece.name == 'king':
+                king_pos = start
+                rook_pos = end
+            else:
+                king_pos = end
+                rook_pos = start
+            if check(self.turn) == True:
+                return False
+            else:
+                x = rook_pos[0] - king_pos[0]
+                position_checking = king_pos
+                for i in range(0, 2):
+                    position_checking = list(position_checking)
+                    position_checking[0] += x/abs(x)
+                    position_checking = tuple(position_checking)
+                    self.move(king_pos, position_checking)
+                    if check(self.turn) == True:
+                        self.move(position_checking, king_pos)
+                        return False
+                rook_pos_end = list(rook_pos)
+                rook_pos_end[0] = position_checking[0] - x/abs(x)
+                rook_pos_end = tuple(rook_pos_end)
+                self.move(rook_pos, rook_pos_end)
+                return True
     
     def winnercheck(self):
         '''check for winner'''
