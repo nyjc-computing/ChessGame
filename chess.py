@@ -39,7 +39,7 @@ class Board:
         '''
         return self.position.get(coord, None)
 
-    def add(self, coord, piece):
+    def add(self, coord, piece, moved = False):
         '''Add a piece at coord.'''
         self.position[coord] = piece
 
@@ -65,24 +65,24 @@ class Board:
         '''Set up the pieces and start the game.'''
         colour = 'black'
         self.add((0, 7), Rook(colour))
-        self.add((1, 7), Knight(colour))
-        self.add((2, 7), Bishop(colour))
-        self.add((3, 7), Queen(colour))
+        # self.add((1, 7), Knight(colour))
+        # self.add((2, 7), Bishop(colour))
+        # self.add((3, 7), Queen(colour))
         self.add((4, 7), King(colour))
-        self.add((5, 7), Bishop(colour))
-        self.add((6, 7), Knight(colour))
+        # self.add((5, 7), Bishop(colour))
+        # self.add((6, 7), Knight(colour))
         self.add((7, 7), Rook(colour))
         for x in range(0, 8):
             self.add((x, 6), Pawn(colour))
 
         colour = 'white'
         self.add((0, 0), Rook(colour))
-        self.add((1, 0), Knight(colour))
-        self.add((2, 0), Bishop(colour))
-        self.add((3, 0), Queen(colour))
+        # self.add((1, 0), Knight(colour))
+        # self.add((2, 0), Bishop(colour))
+        # self.add((3, 0), Queen(colour))
         self.add((4, 0), King(colour))
-        self.add((5, 0), Bishop(colour))
-        self.add((6, 0), Knight(colour))
+        # self.add((5, 0), Bishop(colour))
+        # self.add((6, 0), Knight(colour))
         self.add((7, 0), Rook(colour))
         for x in range(0, 8):
             self.add((x, 1), Pawn(colour))
@@ -179,16 +179,19 @@ class Board:
         3. The move is not invalid for the selected piece
         4. There is no moving over other pieces
         Returns False otherwise
+        5. Special moves
         '''
         start_piece = self.get_piece(start)
         end_piece = self.get_piece(end)
+        if self.castling(start, end):
+            return True
         if start_piece is None or start_piece.colour != self.turn:
             return False
         elif end_piece is not None and end_piece.colour == self.turn:
             return False
         elif not start_piece.isvalid(start, end):
             return False
-        elif self.nojumpcheck(start, end) == False:
+        elif not self.nojumpcheck(start, end):
             return False
         return True
         
@@ -360,13 +363,14 @@ class Board:
 
 class BasePiece:
     name = 'piece'
-    def __init__(self, colour):
+    def __init__(self, colour, moved = True):
         if type(colour) != str:
             raise TypeError('colour argument must be str')
         elif colour.lower() not in {'white', 'black'}:
             raise ValueError('colour must be {white, black}')
         else:
             self.colour = colour
+            self.moved = moved
 
     def __repr__(self):
         return f'BasePiece({repr(self.colour)})'
