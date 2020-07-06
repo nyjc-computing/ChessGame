@@ -176,8 +176,8 @@ class Board:
         Returns True if all conditions are met:
         1. There is a start piece of the player's colour
         2. There is no end piece, or end piece is not of player's colour
-        3. The move is not valid for the selected piece
-        
+        3. The move is not invalid for the selected piece
+        4. There is no moving over other pieces
         Returns False otherwise
         '''
         start_piece = self.get_piece(start)
@@ -188,7 +188,45 @@ class Board:
             return False
         elif not start_piece.isvalid(start, end):
             return False
+        elif nojumpcheck(self, start, end) == False:
+            return False
         return True
+        
+    def nojumpcheck(self, start, end):
+        '''
+        self.nojumpcheck(start, end)
+        
+        check if the piece moved will move over another piece
+        return boolean:
+        False if jumping over happens
+        else True
+        yuheng
+        '''
+        vector(start, end)
+        position_checking = list(start)
+        if x == 1 or y == 1:
+            nojump = True
+        elif x == 0:
+            # moving vertically
+            for i in range(0, x):
+                position_checking[1] += 1
+                if self.get_piece(position_checking) != None:
+                    nojump = False
+        elif y == 0:
+            # moving horizontally
+            for i in range(0, y):
+                position_checking[0] += 1
+                if self.get_piece(position_checking) != None:
+                    nojump = False
+        else:
+            # moving diagonally
+            for i in range(0, x):
+                position_checking[0] += 1
+                position_checking[1] += 1
+                if self.get_piece(position_checking) != None:
+                    nojump = False
+        return nojump
+
     
     def winnercheck(self):
         '''check for winner'''
@@ -280,12 +318,7 @@ class BasePiece:
 
     def symbol(self):
         return f'{self.sym[self.colour]}'
-
-    def nojump(self):
-      """
-      Yu Heng
-      """
-      pass
+    
 
     @staticmethod
     def vector(start, end):
