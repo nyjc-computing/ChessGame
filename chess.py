@@ -39,7 +39,7 @@ class Board:
         '''
         return self.position.get(coord, None)
 
-    def add(self, coord, piece, moved = False):
+    def add(self, coord, piece):
         '''Add a piece at coord.'''
         self.position[coord] = piece
 
@@ -57,35 +57,38 @@ class Board:
         Validation should be carried out first
         to ensure the move is valid.
         '''
-        piece = self.get_piece(start)
-        self.remove(start)
-        self.add(end, piece)
+        if self.castling(start, end):
+            self.casstlingmove(start, end)
+        else:
+            piece = self.get_piece(start)
+            self.remove(start)
+            self.add(end, piece)
 
     def start(self):
         '''Set up the pieces and start the game.'''
         colour = 'black'
-        self.add((0, 7), Rook(colour))
+        self.add((0, 7), Rook(colour ,False))
         # self.add((1, 7), Knight(colour))
         # self.add((2, 7), Bishop(colour))
         # self.add((3, 7), Queen(colour))
-        self.add((4, 7), King(colour))
+        self.add((4, 7), King(colour ,False))
         # self.add((5, 7), Bishop(colour))
         # self.add((6, 7), Knight(colour))
-        self.add((7, 7), Rook(colour))
-        for x in range(0, 8):
-            self.add((x, 6), Pawn(colour))
+        self.add((7, 7), Rook(colour ,False))
+        # for x in range(0, 8):
+            # self.add((x, 6), Pawn(colour ,False))
 
         colour = 'white'
-        self.add((0, 0), Rook(colour))
+        self.add((0, 0), Rook(colour ,False))
         # self.add((1, 0), Knight(colour))
         # self.add((2, 0), Bishop(colour))
         # self.add((3, 0), Queen(colour))
-        self.add((4, 0), King(colour))
+        self.add((4, 0), King(colour ,False))
         # self.add((5, 0), Bishop(colour))
         # self.add((6, 0), Knight(colour))
-        self.add((7, 0), Rook(colour))
-        for x in range(0, 8):
-            self.add((x, 1), Pawn(colour))
+        self.add((7, 0), Rook(colour ,False))
+        # for x in range(0, 8):
+        #     self.add((x, 1), Pawn(colour ,False))
         self.turn = 'white'
         self.winner = None
         
@@ -253,15 +256,21 @@ class Board:
         '''
         start_piece = self.get_piece(start)
         end_piece = self.get_piece(end)
+        print(f'start_piece, end_piece is {start_piece},{end_piece}')
         if start_piece == None or end_piece == None:
+            print('some piece is none')
             return False
         elif start_piece.colour != end_piece.colour:
+            print('piece colour not matched')
             return False
         elif start_piece.moved or end_piece.moved:
+            print('piece moved')
             return False
         elif not ((start_piece.name == 'king' and end_piece.name == 'rook') or (start_piece.name == 'rook' and end_piece.name == 'king')):
+            print('not one king one rook')
             return False
         elif not self.nojumpcheck(start, end):
+            print('jumping over')
             return False
         else:
             if start_piece.name == 'king':
@@ -270,25 +279,58 @@ class Board:
             else:
                 king_pos = end
                 rook_pos = start
-            if check(self.turn) == True:
+            print(f'king_pos is {king_pos},rook_pos is {rook_pos}')
+            if self.check(self.turn) == True:
+                print('being checked')
                 return False
             else:
                 x = rook_pos[0] - king_pos[0]
-                position_checking = king_pos
+                print(f'x is {x}')
+                last_position = king_pos
+                position_checking = []
+                print(f'last_position is {last_position}')
                 for i in range(0, 2):
-                    position_checking = list(position_checking)
+                    # print('checking...')
+                    position_checking = list(last_position)
+                    # print(f'position_checking is {position_checking}')
                     position_checking[0] += x/abs(x)
+                    # print(type(position_checking[0]))
+                    # print(f'position_checking is {position_checking}')
                     position_checking = tuple(position_checking)
-                    self.move(king_pos, position_checking)
-                    if check(self.turn) == True:
-                        self.move(position_checking, king_pos)
+                    # print(f'position_checking is {position_checking}')
+                    self.add(position_checking, King(self.turn))
+                    self.display()
+                    if self.check(self.turn) == True:
+                        self.remove(position_checking, king_pos)
                         return False
-                rook_pos_end = list(rook_pos)
-                rook_pos_end[0] = position_checking[0] - x/abs(x)
-                rook_pos_end = tuple(rook_pos_end)
-                self.move(rook_pos, rook_pos_end)
+                    self.remove(position_checking)
+                self.display()
+                print('end castling')
                 return True
-    
+
+    def castlingmove(start, end):
+        print('castlingmove')
+        if start_piece.name == 'king':
+            king_pos = start
+            rook_pos = end
+        else:
+            king_pos = end
+            rook_pos = start
+        x = rook_pos[0] - king_pos[0]
+        king_pos_end = list(king_pos)
+        king_pos_end[0] += 2*(x/abs(x))
+        king_pos_end = tuple(king_pos_end)
+        piece = self.get_piece(king_pos)
+        self.remove(king_pos)
+        self.add(king_pos_end, piece)
+        rook_pos_end = list(rook_pos)
+        rook_pos_end[0] = king_pos_end[0] - x/abs(x)
+        rook_pos_end = tuple(rook_pos_end)
+        piece = self.get_piece(rook_pos)
+        self.remove(rook_pos)
+        self.add(rook_pos_end, piece)
+        self.display()
+
     def winnercheck(self):
         '''check for winner'''
         no_of_kings = 0
@@ -319,6 +361,7 @@ class Board:
             print(f"Now checking if the {colour} king is being checked")
         isCheck = False
         pieces_coords_list = list(self.coords())
+        print(pieces_coords_list)
         own_pieces_list = []
         opponent_pieces_list = []
         for coord in pieces_coords_list:
