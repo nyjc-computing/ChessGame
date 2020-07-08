@@ -65,33 +65,33 @@ class Board:
     def start(self):
         '''Set up the pieces and start the game.'''
         colour = 'black'
-        # self.add((0, 7), Rook(colour))
-        # self.add((1, 7), Knight(colour))
-        # self.add((2, 7), Bishop(colour))
-        # self.add((3, 7), Queen(colour))
-        # self.add((4, 7), King(colour))
-        # self.add((5, 7), Bishop(colour))
-        # self.add((6, 7), Knight(colour))
-        # self.add((7, 7), Rook(colour))
-        # for x in range(0, 8):
-        #     self.add((x, 6), Pawn(colour))
+        self.add((0, 7), Rook(colour))
+        self.add((1, 7), Knight(colour))
+        self.add((2, 7), Bishop(colour))
+        self.add((3, 7), Queen(colour))
+        self.add((4, 7), King(colour))
+        self.add((5, 7), Bishop(colour))
+        self.add((6, 7), Knight(colour))
+        self.add((7, 7), Rook(colour))
+        for x in range(0, 8):
+            self.add((x, 6), Pawn(colour))
 
-        # colour = 'white'
-        # self.add((0, 0), Rook(colour))
-        # self.add((1, 0), Knight(colour))
-        # self.add((2, 0), Bishop(colour))
-        # self.add((3, 0), Queen(colour))
-        # self.add((4, 0), King(colour))
-        # self.add((5, 0), Bishop(colour))
-        # self.add((6, 0), Knight(colour))
-        # self.add((7, 0), Rook(colour))
-        # for x in range(0, 8):
-        #     self.add((x, 1), Pawn(colour))
+        colour = 'white'
+        self.add((0, 0), Rook(colour))
+        self.add((1, 0), Knight(colour))
+        self.add((2, 0), Bishop(colour))
+        self.add((3, 0), Queen(colour))
+        self.add((4, 0), King(colour))
+        self.add((5, 0), Bishop(colour))
+        self.add((6, 0), Knight(colour))
+        self.add((7, 0), Rook(colour))
+        for x in range(0, 8):
+            self.add((x, 1), Pawn(colour))
 
-        self.add((0,4),Rook('black'))
-        self.add((2,4),Pawn('white'))
-        self.add((6,4),King('white'))
-        self.add((0,0),King('black'))
+        # self.add((0,4),Rook('black'))
+        # self.add((2,4),Pawn('white'))
+        # self.add((6,4),King('white'))
+        # self.add((0,0),King('black'))
 
         self.winner = None
         self.turn = 'white'
@@ -158,6 +158,11 @@ class Board:
             start = (int(start[0]), int(start[1]))
             end = (int(end[0]), int(end[1]))
             return (start, end)
+        
+        def valid_piece(start):
+            start_piece = self.get_piece(start)
+            if start_piece is None or start_piece.colour != self.turn:
+                return False
 
         while True:
             inputstr = input(f'{self.turn.title()} player: ')
@@ -168,7 +173,7 @@ class Board:
                 print('Invalid input. Move digits should be 0-7.')
             else:
                 start, end = split_and_convert(inputstr)
-                if self.valid_move(start, end) and self.uncheck(start,end):
+                if self.valid_move(start, end) and valid_piece(start) and self.uncheck(start,end):
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
@@ -184,9 +189,7 @@ class Board:
         '''
         start_piece = self.get_piece(start)
         end_piece = self.get_piece(end)
-        if start_piece is None or start_piece.colour != self.turn:
-            return False
-        elif end_piece is not None and end_piece.colour == self.turn:
+        if end_piece is not None and end_piece.colour == start_piece.colour:
             return False
         elif not start_piece.isvalid(start, end):
             return False
@@ -266,7 +269,7 @@ class Board:
         for i in self.position.items():
             piece = i[1]
             if piece.colour != colour:
-                print(piece)
+                print(i)
                 if self.valid_move(i[0], king_pos):
                     print('check: True')
                     return True
