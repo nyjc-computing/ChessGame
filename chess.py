@@ -84,6 +84,7 @@ class Board:
         
         self.winner = None
         self.turn = 'white'
+        self.other_turn = 'black'
         
     def display(self):
         '''
@@ -227,17 +228,18 @@ class Board:
             self.add(end,Queen(colour))
     
     def check(self,colour):
+        '''Checks if the king of the input colour is checked'''
         for i in self.position.items():
             piece = i[1]
-            if piece.colour != colour and piece.name == 'king':
+            if piece.colour == colour and piece.name == 'king':
                 king_pos = i[0]
-                enemy_colour = piece.colour
 
         for i in self.position.items():
             piece = i[1]
-            if piece.colour == colour:
+            if piece.colour != colour:
                 if self.valid_move(i[0], king_pos):
-                    print(f'{enemy_colour} is checked')
+                    return True
+        return False
     
     def printmove(self,start,end):
         a,b = start
@@ -253,9 +255,15 @@ class Board:
         self.move(start, end)
         self.end()
         self.promotion(end)
-        self.check(self.turn)
+        if self.check(self.other_turn):
+            print(f'{self.other_turn} is checked')
         self.printmove(start,end)
         
+    def other_colour(self,colour):
+        if colour == 'white':
+            return 'black'
+        else:
+            return 'white'
 
     def next_turn(self):
         if self.debug == True:
@@ -265,6 +273,7 @@ class Board:
             self.turn = 'black'
         elif self.turn == 'black':
             self.turn = 'white'
+        self.other_turn = self.other_colour(self.turn)
 
 
 class BasePiece:
