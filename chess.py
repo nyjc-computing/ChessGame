@@ -184,6 +184,7 @@ class Board:
         4. There is no moving over other pieces
         Returns False otherwise
         5. Special moves
+        6. It will not result in check.
         '''
         start_piece = self.get_piece(start)
         end_piece = self.get_piece(end)
@@ -197,6 +198,11 @@ class Board:
         elif not start_piece.isvalid(start, end):
             return False
         elif not self.nojumpcheck(start, end):
+            return False
+        tempBoard = Board()
+        tempBoard.position = self.position
+        tempBoard.update(start, end)
+        if tempBoard.check(self.turn):
             return False
         return True
         
