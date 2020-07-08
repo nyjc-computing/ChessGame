@@ -181,7 +181,17 @@ class Board:
         return True
     
     def end(self):
-        pass
+        '''Checks if King piece is eliminated'''
+        d = self.pieces()
+        counter = 0
+        for each in d:
+            if each.name == 'king':
+                counter += 1
+                colour = each.colour
+        if counter == 1:
+            self.winner = colour
+        else:
+            pass
     
     def promotion(self,end):
         piece = self.get_piece(end)
