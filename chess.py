@@ -194,7 +194,6 @@ class Board:
             y_dir = 0
         else:
             y_dir = int(y/abs(y))
-        print(x_dir,y_dir)
 
         x_pos,y_pos = start
         valid = True
@@ -227,6 +226,19 @@ class Board:
         if type(piece) == Pawn and (end[1] == 0 or end[1] == 7):
             self.add(end,Queen(colour))
     
+    def check(self):
+        for i in self.position.items():
+            piece = i[1]
+            if piece.colour != self.turn and piece.name == 'king':
+                king_pos = i[0]
+                colour = piece.colour
+
+        for i in self.position.items():
+            piece = i[1]
+            if piece.colour == self.turn:
+                if self.valid_move(i[0], king_pos):
+                    print(f'{colour} is checked')
+    
     def printmove(self,start,end):
         a,b = start
         c,d = end
@@ -241,6 +253,7 @@ class Board:
         self.move(start, end)
         self.end()
         self.promotion(end)
+        self.check()
         self.printmove(start,end)
         
 
