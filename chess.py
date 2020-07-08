@@ -184,7 +184,28 @@ class Board:
         return True
     
     def nojump(self,start,end):
-        return True
+        x, y, dist = BasePiece.vector(start, end)
+        if x == 0:
+            x_dir = 0
+        else:
+            x_dir = int(x/abs(x))
+
+        if y == 0:
+            y_dir = 0
+        else:
+            y_dir = int(y/abs(y))
+        print(x_dir,y_dir)
+
+        x_pos,y_pos = start
+        valid = True
+        while valid:
+            x_pos += x_dir
+            y_pos += y_dir
+            if (x_pos,y_pos) == end:
+                return True
+            valid = self.get_piece((x_pos,y_pos)) == None
+
+        return valid
         
 
     def end(self):
