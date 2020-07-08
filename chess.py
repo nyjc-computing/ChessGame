@@ -167,10 +167,19 @@ class Board:
             return False
         return True
     
-    def end(self,start,end):
+    def end(self):
         '''Checks if King piece is eliminated'''
-        if self.get_piece(end) == 'king':
-            return game.winner == self.colour(start)
+        d = self.pieces()
+        counter = 0
+        for each in d:
+            if each.name == 'king':
+                counter += 1
+                colour = each.colour
+        if counter == 1:
+            self.winner = colour
+        else:
+            pass
+
     
     def promotion(start,end):
         pass
@@ -180,11 +189,9 @@ class Board:
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
-        self.end(start,end)
         self.remove(end)
         self.move(start, end)
-        promotion(start,end)
-        printmove(start,end)
+        self.end()
         
 
     def next_turn(self):
