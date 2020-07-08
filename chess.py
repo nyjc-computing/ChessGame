@@ -226,18 +226,18 @@ class Board:
         if type(piece) == Pawn and (end[1] == 0 or end[1] == 7):
             self.add(end,Queen(colour))
     
-    def check(self):
+    def check(self,colour):
         for i in self.position.items():
             piece = i[1]
-            if piece.colour != self.turn and piece.name == 'king':
+            if piece.colour != colour and piece.name == 'king':
                 king_pos = i[0]
-                colour = piece.colour
+                enemy_colour = piece.colour
 
         for i in self.position.items():
             piece = i[1]
-            if piece.colour == self.turn:
+            if piece.colour == colour:
                 if self.valid_move(i[0], king_pos):
-                    print(f'{colour} is checked')
+                    print(f'{enemy_colour} is checked')
     
     def printmove(self,start,end):
         a,b = start
@@ -253,7 +253,7 @@ class Board:
         self.move(start, end)
         self.end()
         self.promotion(end)
-        self.check()
+        self.check(self.turn)
         self.printmove(start,end)
         
 
