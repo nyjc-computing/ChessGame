@@ -162,6 +162,7 @@ class Board:
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
 
+
     def valid_move(self, start, end):
         '''
         Returns True if all conditions are met:
