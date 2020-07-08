@@ -16,8 +16,6 @@ class Board:
     def __init__(self, **kwargs):
         self.position = {}
         self.debug = kwargs.get('debug',False)
-        
-        
 
     def coords(self):
         '''Return list of piece coordinates.'''
@@ -26,7 +24,7 @@ class Board:
     def pieces(self):
         '''Return list of board pieces.'''
         return self.position.values()
-    
+
     def get_piece(self, coord):
         '''
         Return the piece at coord.
@@ -53,35 +51,47 @@ class Board:
         to ensure the move is valid.
         '''
         piece = self.get_piece(start)
+        #print(f'start: {start} end: {end} piece: {piece}')
         self.remove(start)
         self.add(end, piece)
 
+    def save(self):
+        import copy
+        self.copy = copy.copy(self.position)
+    
+    def undo(self):
+        self.position = self.copy
+
     def start(self):
         '''Set up the pieces and start the game.'''
-        colour = 'black'
-        self.add((0, 7), Rook(colour))
-        self.add((1, 7), Knight(colour))
-        self.add((2, 7), Bishop(colour))
-        self.add((3, 7), Queen(colour))
-        self.add((4, 7), King(colour))
-        self.add((5, 7), Bishop(colour))
-        self.add((6, 7), Knight(colour))
-        self.add((7, 7), Rook(colour))
-        for x in range(0, 8):
-            self.add((x, 6), Pawn(colour))
+        # colour = 'black'
+        # self.add((0, 7), Rook(colour))
+        # self.add((1, 7), Knight(colour))
+        # self.add((2, 7), Bishop(colour))
+        # self.add((3, 7), Queen(colour))
+        # self.add((4, 7), King(colour))
+        # self.add((5, 7), Bishop(colour))
+        # self.add((6, 7), Knight(colour))
+        # self.add((7, 7), Rook(colour))
+        # for x in range(0, 8):
+        #     self.add((x, 6), Pawn(colour))
 
-        colour = 'white'
-        self.add((0, 0), Rook(colour))
-        self.add((1, 0), Knight(colour))
-        self.add((2, 0), Bishop(colour))
-        self.add((3, 0), Queen(colour))
-        self.add((4, 0), King(colour))
-        self.add((5, 0), Bishop(colour))
-        self.add((6, 0), Knight(colour))
-        self.add((7, 0), Rook(colour))
-        for x in range(0, 8):
-            self.add((x, 1), Pawn(colour))
-        
+        # colour = 'white'
+        # self.add((0, 0), Rook(colour))
+        # self.add((1, 0), Knight(colour))
+        # self.add((2, 0), Bishop(colour))
+        # self.add((3, 0), Queen(colour))
+        # self.add((4, 0), King(colour))
+        # self.add((5, 0), Bishop(colour))
+        # self.add((6, 0), Knight(colour))
+        # self.add((7, 0), Rook(colour))
+        # for x in range(0, 8):
+        #     self.add((x, 1), Pawn(colour))
+
+        self.add((0,4),Rook('black'))
+        self.add((2,4),Pawn('white'))
+        self.add((6,4),King('white'))
+        self.add((0,0),King('black'))
         self.winner = None
         self.turn = 'white'
         self.other_turn = 'black'
@@ -180,9 +190,24 @@ class Board:
         elif not start_piece.isvalid(start, end):
             return False
         elif (start_piece.name == 'queen' or start_piece.name == 'bishop' or start_piece.name == 'rook'):
-            return self.nojump(start,end)
+            if not self.nojump(start,end):
+                return False
+        
+        self.save()
+    
+        # print(start)
+        # print(self.get_piece(start))
+        self.move(start,end)
+        validation = not self.check(self.turn)
+        # print('copy')
+        # print(self.position)
 
-        return True
+        self.undo()
+
+        # print('original')
+        # print(self.position)
+        print( not validation)
+        return validation
     
     def nojump(self,start,end):
         x, y, dist = BasePiece.vector(start, end)
@@ -229,6 +254,7 @@ class Board:
     
     def check(self,colour):
         '''Checks if the king of the input colour is checked'''
+        print(colour)
         for i in self.position.items():
             piece = i[1]
             if piece.colour == colour and piece.name == 'king':
