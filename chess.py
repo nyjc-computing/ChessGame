@@ -383,8 +383,10 @@ class Rook(BasePiece):
 class Pawn(BasePiece):
     name = 'pawn'
     sym = {'white': '♙', 'black': '♟︎'}
+    doublemoveprevturn = False
     def __repr__(self):
         return f"Pawn('{self.name}')"
+    
 
     def isvalid(self, start: tuple, end: tuple):
         '''
