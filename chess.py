@@ -180,7 +180,7 @@ class Board:
             return False
         return True
     
-    def end(self,start,end):
+    def end(self):
         pass
     
     def promotion(self,end):
@@ -199,9 +199,9 @@ class Board:
         if self.debug == True:
             print('== UPDATE ==')
         '''Update board information with the player's move.'''
-        self.end(start,end)
         self.remove(end)
         self.move(start, end)
+        self.end()
         self.promotion(end)
         self.printmove(start,end)
         
