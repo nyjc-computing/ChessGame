@@ -178,8 +178,15 @@ class Board:
             return False
         elif not start_piece.isvalid(start, end):
             return False
+        elif (start_piece.name == 'queen' or start_piece.name == 'bishop' or start_piece.name == 'rook'):
+            return self.nojump(start,end)
+
         return True
     
+    def nojump(self,start,end):
+        return True
+        
+
     def end(self):
         '''Checks if King piece is eliminated'''
         d = self.pieces()
