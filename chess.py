@@ -64,7 +64,7 @@ class Board:
 
     def start(self):
         '''Set up the pieces and start the game.'''
-        # colour = 'black'
+        colour = 'black'
         # self.add((0, 7), Rook(colour))
         # self.add((1, 7), Knight(colour))
         # self.add((2, 7), Bishop(colour))
@@ -92,6 +92,7 @@ class Board:
         self.add((2,4),Pawn('white'))
         self.add((6,4),King('white'))
         self.add((0,0),King('black'))
+
         self.winner = None
         self.turn = 'white'
         self.other_turn = 'black'
@@ -167,7 +168,7 @@ class Board:
                 print('Invalid input. Move digits should be 0-7.')
             else:
                 start, end = split_and_convert(inputstr)
-                if self.valid_move(start, end):
+                if self.valid_move(start, end) and self.uncheck(start,end):
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
@@ -192,7 +193,9 @@ class Board:
         elif (start_piece.name == 'queen' or start_piece.name == 'bishop' or start_piece.name == 'rook'):
             if not self.nojump(start,end):
                 return False
-        
+        return True
+
+    def uncheck(self,start,end):
         self.save()
     
         # print(start)
@@ -206,7 +209,6 @@ class Board:
 
         # print('original')
         # print(self.position)
-        print( not validation)
         return validation
     
     def nojump(self,start,end):
@@ -259,12 +261,16 @@ class Board:
             piece = i[1]
             if piece.colour == colour and piece.name == 'king':
                 king_pos = i[0]
+        print(self.position.items())
 
         for i in self.position.items():
             piece = i[1]
             if piece.colour != colour:
+                print(piece)
                 if self.valid_move(i[0], king_pos):
+                    print('check: True')
                     return True
+        print('check: False')
         return False
     
     def printmove(self,start,end):
