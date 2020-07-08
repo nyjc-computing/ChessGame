@@ -16,8 +16,6 @@ class Board:
     def __init__(self, **kwargs):
         self.position = {}
         self.debug = kwargs.get('debug',False)
-        
-        
 
     def coords(self):
         '''Return list of piece coordinates.'''
@@ -26,7 +24,7 @@ class Board:
     def pieces(self):
         '''Return list of board pieces.'''
         return self.position.values()
-    
+
     def get_piece(self, coord):
         '''
         Return the piece at coord.
@@ -53,8 +51,16 @@ class Board:
         to ensure the move is valid.
         '''
         piece = self.get_piece(start)
+        #print(f'start: {start} end: {end} piece: {piece}')
         self.remove(start)
         self.add(end, piece)
+
+    def save(self):
+        import copy
+        self.copy = copy.copy(self.position)
+    
+    def undo(self):
+        self.position = self.copy
 
     def start(self):
         '''Set up the pieces and start the game.'''
@@ -81,7 +87,12 @@ class Board:
         self.add((7, 0), Rook(colour))
         for x in range(0, 8):
             self.add((x, 1), Pawn(colour))
-        
+
+        # self.add((0,4),Rook('black'))
+        # self.add((2,4),Pawn('white'))
+        # self.add((6,4),King('white'))
+        # self.add((0,0),King('black'))
+
         self.winner = None
         self.turn = 'white'
         self.other_turn = 'black'
@@ -147,6 +158,11 @@ class Board:
             start = (int(start[0]), int(start[1]))
             end = (int(end[0]), int(end[1]))
             return (start, end)
+        
+        def valid_piece(start):
+            start_piece = self.get_piece(start)
+            if start_piece is None or start_piece.colour != self.turn:
+                return False
 
         while True:
             inputstr = input(f'{self.turn.title()} player: ')
@@ -157,7 +173,7 @@ class Board:
                 print('Invalid input. Move digits should be 0-7.')
             else:
                 start, end = split_and_convert(inputstr)
-                if self.valid_move(start, end):
+                if self.valid_move(start, end) and valid_piece(start) and self.uncheck(start,end):
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
@@ -173,16 +189,30 @@ class Board:
         '''
         start_piece = self.get_piece(start)
         end_piece = self.get_piece(end)
-        if start_piece is None or start_piece.colour != self.turn:
-            return False
-        elif end_piece is not None and end_piece.colour == self.turn:
+        if end_piece is not None and end_piece.colour == start_piece.colour:
             return False
         elif not start_piece.isvalid(start, end):
             return False
         elif (start_piece.name == 'queen' or start_piece.name == 'bishop' or start_piece.name == 'rook'):
-            return self.nojump(start,end)
-
+            if not self.nojump(start,end):
+                return False
         return True
+
+    def uncheck(self,start,end):
+        self.save()
+    
+        # print(start)
+        # print(self.get_piece(start))
+        self.move(start,end)
+        validation = not self.check(self.turn)
+        # print('copy')
+        # print(self.position)
+
+        self.undo()
+
+        # print('original')
+        # print(self.position)
+        return validation
     
     def nojump(self,start,end):
         x, y, dist = BasePiece.vector(start, end)
@@ -229,16 +259,21 @@ class Board:
     
     def check(self,colour):
         '''Checks if the king of the input colour is checked'''
+        print(colour)
         for i in self.position.items():
             piece = i[1]
             if piece.colour == colour and piece.name == 'king':
                 king_pos = i[0]
+        print(self.position.items())
 
         for i in self.position.items():
             piece = i[1]
             if piece.colour != colour:
+                print(i)
                 if self.valid_move(i[0], king_pos):
+                    print('check: True')
                     return True
+        print('check: False')
         return False
     
     def printmove(self,start,end):
