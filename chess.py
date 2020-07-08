@@ -63,7 +63,7 @@ class Board:
         self.add(end, piece)
 
     def start(self):
-        '''Set up the pieces and start the game.'''
+        '''Set up the pieces and start the game. Create CSV file movelog_file.'''
         colour = 'black'
         self.add((0, 7), Rook(colour))
         self.add((1, 7), Knight(colour))
@@ -89,6 +89,10 @@ class Board:
             self.add((x, 1), Pawn(colour))
         self.turn = 'white'
         self.winner = None
+
+        f = open('movelog_file', 'w'):
+        f.close()
+
         
     def display(self):
         '''
@@ -151,14 +155,21 @@ class Board:
             return (start, end)
 
         def printmove(start, end):
-            '''Print the player\'s move.'''
-            if self.caslting(start, end):
+            '''Print the player\'s move'''
+            if self.castling(start, end):
                 return f'{self.turn} castling.'
             else:
                 a,b = start
                 c,d = end
                 movedpiece = str(self.get_piece(start))
                 return f'{movedpiece} {a}{b} -> {c}{d}'
+            
+        def movelog(start, end):
+            '''
+            Save all moves made into the CSV file movelog_file
+            '''
+            with open('movelog_file', 'a') as f:
+                f.write(f'\n{printmove(start, end)}')
 
         while True:
             inputstr = input(f'{self.turn.title()} player: ')
@@ -526,7 +537,7 @@ class Pawn(BasePiece):
         return False
 
 class MoveError(Exception):
-  pass
   """
-  Hin
+  Raised when an invalid move is made.
   """
+    pass
