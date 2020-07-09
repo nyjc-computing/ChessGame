@@ -34,6 +34,7 @@ class Board:
 
     def add(self, coord, piece):
         '''Add a piece at coord.'''
+        self.log(f'== PIECE {piece} ADDED AT {coord} ==')
         self.position[coord] = piece
 
     def remove(self, coord):
@@ -53,9 +54,17 @@ class Board:
         piece = self.get_piece(start)
         self.remove(start)
         self.add(end, piece)
+        print(self.get_piece(end), f'{start[0]}{start[1]} -> {end[0]}{end[1]}')
 
     def start(self):
         '''Set up the pieces and start the game.'''
+        i = input("Start game with debug mode? (T or F)")
+        while i not in ('T', 'F'):
+            i = input("Start game with debug mode? (T or F)")
+        if i == "T":
+            self.debug = True
+        else:
+            self.debug = False
         colour = 'black'
         self.add((0, 7), Rook(colour))
         self.add((1, 7), Knight(colour))
@@ -88,6 +97,7 @@ class Board:
         Displays the contents of the board.
         Each piece is represented by a coloured symbol.
         '''
+        self.log("== DISPLAY ==")
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
         for row in range(7, -1, -1):
@@ -136,6 +146,7 @@ class Board:
             end = (int(end[0]), int(end[1]))
             return (start, end)
 
+        self.log("== PROMPT ==")
         while True:
             inputstr = input(f'{self.turn.title()} player: ')
             if not valid_format(inputstr):
@@ -171,16 +182,17 @@ class Board:
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
+        self.log("== UPDATE ==")
         self.remove(end)
         self.move(start, end)
         self.promotion(end)
-        print(self.get_piece(end), f'{start[0]}{start[1]} -> {end[0]}{end[1]}')
         self.win()
 
     def win(self):
         """
         Checks for a winner
         """
+        self.log("== FINDING GAME WINNER ==")
         list_pieces = self.pieces()
         piece_list = [str(i) for i in list_pieces]
         if 'white king' not in piece_list:
@@ -188,12 +200,14 @@ class Board:
         elif 'black king' not in piece_list:
             self.winner = 'White'
         else:
+            self.log("== WINNER NOT FOUND, CONTINUING... ==")
             self.winner = None
 
     def promotion(self, end):
         """
         Checks for available pawns to be promoted and prompts player for choice of promotion.
         """
+        self.log("== CHECKING FOR PROMOTION ==")
         if end[1] in (0, 7):
             piece = self.get_piece(end)
             if str(piece) in ("black pawn", "white pawn"):
@@ -219,11 +233,15 @@ class Board:
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
+        self.log("== NEXT TURN ==")
         if self.turn == 'white':
             self.turn = 'black'
         elif self.turn == 'black':
             self.turn = 'white'
 
+    def log(self, message):
+        if self.debug:
+            print(message)
 
 class BasePiece:
     name = 'piece'
