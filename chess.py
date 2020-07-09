@@ -1,3 +1,4 @@
+class Board:
     '''
     The game board is represented as an 8×8 grid,
     with each position on the grid described as
@@ -88,8 +89,8 @@
         '''
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
-        print("           [ column ]", end="\n")
-        print("        0\\1\\2\\3\\4\\5\\6\\7\\")
+        print("           [ column ]          ", end="\n")
+        print("        0\\1\\2\\3\\4\\5\\6\\7\\       ")
         for row in range(7, -1, -1):
             print(f' [row {row}]', end='')
             # for i in range(0,8):
@@ -107,8 +108,8 @@
                     print(f' [row {row}]')
                 else:            # Print a space between pieces
                     print(' ', end='')
-        print("        0/1/2/3/4/5/6/7/")
-        print("           [ column ]", end="\n")
+        print("        0/1/2/3/4/5/6/7/       ")
+        print("           [ column ]          ", end="\n")
 
     def prompt(self):
         '''
