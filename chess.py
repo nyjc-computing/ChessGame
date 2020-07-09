@@ -406,7 +406,7 @@ class Pawn(BasePiece):
                 return False
         return True
 
-    def isvalid(self, start: tuple, end: tuple):
+    def isvalid(self, start: tuple, end: tuple, end_piece):
         """Pawn can only move 1 step forward."""
         x, y, dist = self.vector(start, end)
         if x == 0:
@@ -420,7 +420,7 @@ class Pawn(BasePiece):
                 return y == 1
             else:
                 return False
-        if abs(x) == 1:
+        elif abs(x) == 1:
             if end_piece == None:
                 return False
             elif end_piece.name == 'pawn':
