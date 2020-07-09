@@ -182,12 +182,14 @@ class Board:
                 start, end = split_and_convert(inputstr)
                 if self.valid_move(start, end):
                     print(printmove(start, end))
+                    self.previousmove = (start, end)
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
 
     def valid_move(self, start, end):
         '''
+
         Returns True if all conditions are met:
         1. There is a start piece of the player's colour
         2. There is no end piece, or end piece is not of player's colour
@@ -195,7 +197,33 @@ class Board:
         4. There is no moving over other pieces
         Returns False otherwise
         5. Special moves
+
         '''
+        def pawn_isvalid():
+          """
+          Extra validation for pawn capturing and en passant moves
+          Returns True if move is valid, else returns False
+          """
+          is_capture = start_piece.is_capture(start, end)
+          if is_capture and end_piece is None:
+            xcord = end[0]
+            ycord = start[1]
+            sidepiece = self.get_piece((xcord, ycord))
+            if sidepiece.name == 'pawn':
+              if not sidepiece.doublemoveprevturn:
+                return False
+              elif (xcord, ycord) == self.previousmove[1]:
+                self.move((xcord, ycord), end)
+                return True
+              else:
+                return False
+            else:
+              return False
+          elif not is_capture and end_piece is not None:
+            return False
+          else:
+            return True
+
         start_piece = self.get_piece(start)
         end_piece = self.get_piece(end)
         if self.castling(start, end):
@@ -207,7 +235,12 @@ class Board:
             return False
         elif not start_piece.isvalid(start, end):
             return False
+
+        elif start_piece.name == 'pawn':
+          if not pawn_isvalid():
+            return False
         elif not self.nojumpcheck(start, end):
+
             return False
         return True
         
@@ -515,26 +548,49 @@ class Rook(BasePiece):
 class Pawn(BasePiece):
     name = 'pawn'
     sym = {'white': '♙', 'black': '♟︎'}
+    doublemoveprevturn = False
     def __repr__(self):
         return f"Pawn('{self.name}')"
+    
 
     def isvalid(self, start: tuple, end: tuple):
-        '''Pawn can only move 1 step forward.
+        '''
+        Pawn can only move 1 step forward into empty space, or 1 step horizontally and 1 step forward while capturing.
+        Attribute self.doublemoveprevturn is True when the Pawn moves 2 spaces. Else self.doublemoveprevturn is False
+
         Ryan - PawnCapture enpassant
         '''
         x, y, dist = self.vector(start, end)
-        if x == 0:
-            if self.colour == 'black':
-                if start[1] ==  6:
-                    return (y == -1 or y == -2) 
-                return (y == -1)
-            elif self.colour == 'white':
-                if start[1] ==  1:
-                    return (y == 1 or y == 2)  
-                return (y == 1)
-            else:
-                return False
+        if x == -1 or x == 1 or x == 0:
+          if self.colour == 'black':
+            self.doublemoveprevturn = False
+            if start[1] ==  6:
+              if y == -2:
+                self.doublemoveprevturn = True
+              return (y == -1 or y == -2)
+            return (y == -1)
+          elif self.colour == 'white':
+            self.doublemoveprevturn = False
+            if start[1] ==  1:
+                if y == 2:
+                  self.doublemoveprevturn = True
+                return (y == 1 or y == 2)
+            return (y == 1)
+          else:
+            return False
+        else:
+            return False
+    def is_capture(self, start: tuple, end: tuple):
+      """
+      Returns True if pawn makes a horizontal move in any direction (a capturing move). Else returns False
+      """
+      x, y, dist = self.vector(start, end)
+      if x == -1 or x == 1:
+        return True
+      else:
         return False
+
+
 
 class MoveError(Exception):
   """
