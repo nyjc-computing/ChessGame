@@ -14,11 +14,15 @@ class Board:
     00  10  20  30  40  50  60  70
     '''
     def __init__(self, **kwargs):
-      """ 
-      Jian San
-
-      """
-      self.position = {}
+        self.position = {}
+        if 'debug' in kwargs.keys():
+            if kwargs['debug'] == True:
+                self.debug = True
+            else:
+                self.debug = False
+        else:
+            self.debug = False  
+        
 
     def coords(self):
         '''Return list of piece coordinates.'''
@@ -54,11 +58,12 @@ class Board:
         to ensure the move is valid.
         '''
         piece = self.get_piece(start)
+        piece.moved = True
         self.remove(start)
         self.add(end, piece)
 
     def start(self):
-        '''Set up the pieces and start the game.'''
+        '''Set up the pieces and start the game. Create CSV file movelog_file.'''
         colour = 'black'
         self.add((0, 7), Rook(colour))
         self.add((1, 7), Knight(colour))
@@ -84,6 +89,10 @@ class Board:
             self.add((x, 1), Pawn(colour))
         self.turn = 'white'
         self.winner = None
+
+        f = open('movelog_file', 'w'):
+        f.close()
+
         
     def display(self):
         '''
@@ -146,11 +155,21 @@ class Board:
             return (start, end)
 
         def printmove(start, end):
-            '''Print the player\'s move.'''
-            a,b = start
-            c,d = end
-            movedpiece = str(self.get_piece(start))
-            return f'{movedpiece} {a}{b} -> {c}{d}'
+            '''Print the player\'s move'''
+            if self.castling(start, end):
+                return f'{self.turn} castling.'
+            else:
+                a,b = start
+                c,d = end
+                movedpiece = str(self.get_piece(start))
+                return f'{movedpiece} {a}{b} -> {c}{d}'
+            
+        def movelog(start, end):
+            '''
+            Save all moves made into the CSV file movelog_file
+            '''
+            with open('movelog_file', 'a') as f:
+                f.write(f'\n{printmove(start, end)}')
 
         while True:
             inputstr = input(f'{self.turn.title()} player: ')
@@ -170,12 +189,15 @@ class Board:
 
     def valid_move(self, start, end):
         '''
-        Returns False if any of the conditions are met:
-        1. There is a start piece not of the player's colour
-        2. There is no start piece, no end piece, or end piece is of player's colour
-        3. The move is not valid for the selected piece
-        
-        Returns True otherwise
+
+        Returns True if all conditions are met:
+        1. There is a start piece of the player's colour
+        2. There is no end piece, or end piece is not of player's colour
+        3. The move is not invalid for the selected piece
+        4. There is no moving over other pieces
+        Returns False otherwise
+        5. Special moves
+
         '''
         def pawn_isvalid():
           """
@@ -204,17 +226,134 @@ class Board:
 
         start_piece = self.get_piece(start)
         end_piece = self.get_piece(end)
-        if start_piece is None or start_piece.colour != self.turn:
+        if self.castling(start, end):
+            print('valid move')
+            return True
+        elif start_piece is None or start_piece.colour != self.turn:
             return False
         elif end_piece is not None and end_piece.colour == self.turn:
             return False
         elif not start_piece.isvalid(start, end):
             return False
+
         elif start_piece.name == 'pawn':
           if not pawn_isvalid():
             return False
+        elif not self.nojumpcheck(start, end):
+
+            return False
         return True
-    
+        
+    def nojumpcheck(self, start, end):
+        '''
+        self.nojumpcheck(start, end)
+        
+        check if the piece moved will move over another piece
+        return boolean:
+        False if jumping over happens
+        else True
+        yuheng
+        '''
+        x = end[0]- start[0]
+        y = end[1]- start[1]
+        position_checking = start
+        nojump = True
+        if abs(x) == 1 or abs(y) == 1:
+            nojump = True
+        elif x == 0:
+            # moving vertically
+            for i in range(0, abs(y)-1):
+                position_checking = list(position_checking)
+                position_checking[1] += y/abs(y)
+                position_checking = tuple(position_checking)
+                if self.get_piece(position_checking) != None:
+                    nojump = False
+        elif y == 0:
+            # moving horizontally
+            for i in range(0, abs(x)-1):
+                position_checking = list(position_checking)
+                position_checking[0] += x/abs(x)
+                position_checking = tuple(position_checking)
+                if self.get_piece(position_checking) != None:
+                    nojump = False
+        else:
+            # moving diagonally
+            for i in range(0, abs(x)-1):
+                position_checking = list(position_checking)
+                position_checking[0] += x/abs(x)
+                position_checking[1] += y/abs(y)
+                position_checking = tuple(position_checking)
+                if self.get_piece(position_checking) != None:
+                    nojump = False
+        return nojump
+
+    def castling(self, start, end):
+        '''
+        special move: castling
+        1. The king and the chosen rook are on the player's first rank.
+        2. Neither the king nor the chosen rook has previously moved.
+        3. There are no pieces between the king and the chosen rook.
+        4. The king is not currently in check.
+        5. The king does not pass through a square that is attacked by an enemy piece.
+        returns boolean:
+        if castling move is valid return True
+        else return False
+        yuheng
+        '''
+        start_piece = self.get_piece(start)
+        end_piece = self.get_piece(end)
+        if start_piece == None or end_piece == None:
+            return False
+        elif start_piece.colour != end_piece.colour:
+            return False
+        elif start_piece.moved or end_piece.moved:
+            return False
+        elif not ((start_piece.name == 'king' and end_piece.name == 'rook') or (start_piece.name == 'rook' and end_piece.name == 'king')):
+            return False
+        elif not self.nojumpcheck(start, end):
+            return False
+        else:
+            if start_piece.name == 'king':
+                king_pos = start
+                rook_pos = end
+            else:
+                king_pos = end
+                rook_pos = start
+            if self.check(self.turn) == True:
+                return False
+            else:
+                x = rook_pos[0] - king_pos[0]
+                position_checking = king_pos
+                for i in range(0, 2):
+                    position_checking = list(position_checking)
+                    position_checking[0] += x/abs(x)
+                    print(type(position_checking[0]))
+                    position_checking = tuple(position_checking)
+                    self.add(position_checking, King(self.turn))
+                    if self.check(self.turn) == True:
+                        self.remove(position_checking)
+                        return False
+                    self.remove(position_checking)
+                return True
+
+    def castlingmove(self, start, end):
+        start_piece = self.get_piece(start)
+        if start_piece.name == 'king':
+            king_pos = start
+            rook_pos = end
+        else:
+            king_pos = end
+            rook_pos = start
+        x = rook_pos[0] - king_pos[0]
+        king_pos_end = list(king_pos)
+        king_pos_end[0] += 2*(x/abs(x))
+        king_pos_end = tuple(king_pos_end)
+        self.move(king_pos, king_pos_end)
+        rook_pos_end = list(rook_pos)
+        rook_pos_end[0] = king_pos_end[0] - x/abs(x)
+        rook_pos_end = tuple(rook_pos_end)
+        self.move(rook_pos, rook_pos_end)
+
     def winnercheck(self):
         '''check for winner'''
         no_of_kings = 0
@@ -222,30 +361,60 @@ class Board:
             if pieces.name == 'king':
               no_of_kings += 1
         if no_of_kings != 2:
-          self.winner = self.turn
+            self.winner = self.turn
     
     def promotioncheck(self):
         '''check for pawn promotion'''
         for coord , piece in self.position.items():
             if piece.name == "pawn" and (coord[1] == 0 or coord[1] == 7):
-                choice = input("choose what piece to promote to:")
                 self.position[coord] = Queen(piece.colour)
-                pass
 
-    def check(self):
-      """
-      Anson
-      """
+    def check(self, colour):
+        """
+        self.check(colour)
 
-      pass
+        the colour argument tells which king to check if it is checked.
+        return boolean 
+        Anson
+        """
+        # get all the pieces
+        if self.debug:
+            print(f"Now checking if the {colour} king is being checked")
+        isCheck = False
+        pieces_coords_list = list(self.coords())
+        print(pieces_coords_list)
+        own_pieces_list = []
+        opponent_pieces_list = []
+        for coord in pieces_coords_list:
+            piece = self.get_piece(coord)
+            if piece.colour == colour:
+                if type(piece) == King:
+                    own_king = piece
+                    own_king_coord = coord
 
-    
+            else:
+                if type(piece) == King:
+                    opponent_king = piece
+                    opponent_king_coord = coord
+                else:
+                    opponent_pieces_list.append((piece, coord))
+
+        # check all valid opponent start positions to check own king (opponent, end)
+        for (piece, start_coord) in opponent_pieces_list:
+            if piece.isvalid(start_coord, own_king_coord):
+                isCheck = True
+        if self.debug:
+            print(f"{colour} King is in check: {isCheck}")
+        return isCheck
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
-        self.remove(end)
-        self.move(start, end)
-        self.check()
+        if self.castling(start, end):
+            self.castlingmove(start, end)
+        else:
+            self.remove(end)
+            self.move(start, end)
+            print(f'moved is {self.get_piece(end).moved}')
         self.winnercheck()
         self.promotioncheck()
 
@@ -256,19 +425,20 @@ class Board:
                 self.turn = 'black'
             elif self.turn == 'black':
                 self.turn = 'white'
-        else:
-            pass
+        if self.check(self.turn):
+            print(f"{self.turn} King is in check")
 
 
 class BasePiece:
     name = 'piece'
-    def __init__(self, colour):
+    def __init__(self, colour, moved = False):
         if type(colour) != str:
             raise TypeError('colour argument must be str')
         elif colour.lower() not in {'white', 'black'}:
             raise ValueError('colour must be {white, black}')
         else:
             self.colour = colour
+            self.moved = moved
 
     def __repr__(self):
         return f'BasePiece({repr(self.colour)})'
@@ -278,12 +448,7 @@ class BasePiece:
 
     def symbol(self):
         return f'{self.sym[self.colour]}'
-
-    def nojump(self):
-      """
-      Yu Heng
-      """
-      pass
+    
 
     @staticmethod
     def vector(start, end):
@@ -428,7 +593,7 @@ class Pawn(BasePiece):
 
 
 class MoveError(Exception):
-  pass
   """
-  Hin
+  Raised when an invalid move is made.
   """
+    pass
