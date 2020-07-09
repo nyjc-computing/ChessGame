@@ -56,14 +56,23 @@ class Board:
         self.add(end, piece)
 
     def save(self):
+        '''creates a copy of the board'''
         import copy
         self.copy = copy.copy(self.position)
     
     def undo(self):
+        '''Reverts to last saved copy of the board'''
         self.position = self.copy
-
+    
+    def get_king(self,colour):
+        for i in self.position.items():
+            piece = i[1]
+            if piece.colour == colour and piece.name == 'king':
+                return i[0]
+    
     def start(self):
         '''Set up the pieces and start the game.'''
+
         colour = 'black'
         self.add((0, 7), Rook(colour))
         self.add((1, 7), Knight(colour))
@@ -155,6 +164,7 @@ class Board:
             return (start, end)
         
         def valid_piece(start):
+            '''Ensures that there is a start piece of the player's colour selected'''
             start_piece = self.get_piece(start)
             if start_piece is None or start_piece.colour != self.turn:
                 return False
@@ -173,7 +183,8 @@ class Board:
                 # print(f'valid_move: {self.valid_move(start, end)}')
                 # print(f'valid_piece: {valid_piece(start)}')
                 # print(f'uncheck: {self.uncheck(start, end)}')
-                if self.valid_move(start, end) and valid_piece(start) and self.uncheck(start,end):
+
+                if valid_piece(start) and self.valid_move(start, end) and self.uncheck(start,end):
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
@@ -182,9 +193,8 @@ class Board:
     def valid_move(self, start, end):
         '''
         Returns True if all conditions are met:
-        1. There is a start piece of the player's colour
-        2. There is no end piece, or end piece is not of player's colour
-        3. The move is not valid for the selected piece
+        1. There is no end piece, or end piece is the same colour as start piece
+        2. The move is not valid for the selected piece
         
         Returns False otherwise
         '''
@@ -200,15 +210,17 @@ class Board:
         return True
 
     def uncheck(self,start,end):
+        '''Returns False if the ally king will be checked after the input move is played'''
         self.save()
-    
+        colour = self.get_piece(start).colour
         self.move(start,end)
-        validation = not self.check(self.turn)
+        validation = not self.check(colour)
 
         self.undo()
         return validation
     
-    def nojump(self,start,end):
+    def path(self,start,end):
+        '''Returns a list of positions that the start piece will move accross to reach end'''
         x, y, dist = BasePiece.vector(start, end)
         if x == 0:
             x_dir = 0
@@ -221,54 +233,100 @@ class Board:
             y_dir = int(y/abs(y))
 
         x_pos,y_pos = start
-        valid = True
-        while valid:
+        x_pos += x_dir
+        y_pos += y_dir
+        output = []
+
+        while (x_pos,y_pos) != end:
+            output.append((x_pos,y_pos))
             x_pos += x_dir
             y_pos += y_dir
-            if (x_pos,y_pos) == end:
-                return True
-            valid = self.get_piece((x_pos,y_pos)) == None
+        
+        #print(f'path of {start}: {output}')
+        return output
+
+
+    def nojump(self,start,end):
+        '''Returns False if there is a piece between the start and end position'''
+        valid = True
+        for pos in self.path(start,end):
+            if self.get_piece(pos) != None:
+                valid = False
 
         return valid
-        
-
-    def end(self):
-        '''Checks if King piece is eliminated'''
-        d = self.pieces()
-        counter = 0
-        for each in d:
-            if each.name == 'king':
-                counter += 1
-                colour = each.colour
-        if counter == 1:
-            self.winner = colour
-        else:
-            pass
     
     def promotion(self,end):
+        '''When a Pawn has reached the end, it will be replaced with a Queen'''
         piece = self.get_piece(end)
         colour = piece.colour
         if type(piece) == Pawn and (end[1] == 0 or end[1] == 7):
             self.add(end,Queen(colour))
-    
-    def check(self,colour):
-        '''Checks if the king of the input colour is checked'''
-        #print(colour,end=' ')
-        for i in self.position.items():
-            piece = i[1]
-            if piece.colour == colour and piece.name == 'king':
-                king_pos = i[0]
 
-        for i in self.position.items():
-            piece = i[1]
-            if piece.colour != colour:
-                if self.valid_move(i[0], king_pos):
-                    print('check: True')
-                    return True
-        #print('check: False')
-        return False
+    def threaten(self,position,colour,**kwargs):
+        ''' Checks whether the input position is threatened by any piece of the input colour
+        If return_list=True, Returns a list of positions of pieces of input colour which threatens the input position'''
+        return_list = kwargs.get('return_list',False)
+        include_king = kwargs.get('include_king',True)
+        list_ = []
+        for item in self.position.items():
+            piece = item[1]
+            piece_position = item[0]
+            if piece.colour == colour and (include_king or piece.name != 'king'):
+                if self.valid_move(piece_position, position):
+                    #print(f'{item} threatens {position}')
+                    list_.append(piece_position)
+        boolean_ = list_ != []
+        if return_list:
+            return (boolean_,list_)
+        else:
+            return boolean_
+
+    def check(self,colour,**kwargs):
+        '''Checks if the king of the input colour is checked
+        If return_checks = True, will also return a list of the positions of pieces checking the king'''
+
+        return_checks = kwargs.get('return_checks',False)
+
+        king_pos = self.get_king(colour)
+        
+        if return_checks:
+            return self.threaten(king_pos,self.other_colour(colour),return_list=True)
+        else:
+            return self.threaten(king_pos,self.other_colour(colour))
     
+    def checkmate(self):
+        '''Will print a statement if the opponent king is in check and will end the game if the opponent king is in checkmate '''
+        check,checks = self.check(self.other_turn,return_checks = True)
+        if check:
+            #print(f'checks: {checks}')
+            king_pos = self.get_king(self.other_turn)
+            checkmate = True
+            for check_pos in checks:
+                block_positions = self.path(check_pos,king_pos)
+                block_positions.append(check_pos)
+                for block_pos in block_positions:
+                    if self.threaten(block_pos,self.other_turn,include_king=False):
+                        checkmate = False
+            if checkmate:
+                king_x,king_y = king_pos
+                for x in [(king_x-1),king_x,(king_x+1)]:
+                    for y in [(king_y-1),king_y,(king_y+1)]:
+                        if x in range(8) and y in range(8):
+                            pos = (x,y)
+                            if self.valid_move(king_pos,pos):
+                                if self.uncheck(king_pos,pos):
+                                    print((king_pos,pos))
+                                    checkmate = False
+                                    break
+            
+            if checkmate:
+                self.display()
+                self.winner = self.turn
+            else:
+                print(f'{self.other_turn} is checked')
+
     def printmove(self,start,end):
+        '''Print the move after its made'''
         a,b = start
         c,d = end
         print(f'{self.get_piece(end)} {a}{b} -> {c}{d}')
@@ -280,13 +338,12 @@ class Board:
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
-        self.end()
+        self.checkmate()
         self.promotion(end)
-        if self.check(self.other_turn):
-            print(f'{self.other_turn} is checked')
         self.printmove(start,end)
         
     def other_colour(self,colour):
+        '''Returns the colour that is not the current turn'''
         if colour == 'white':
             return 'black'
         else:
