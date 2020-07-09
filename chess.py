@@ -164,6 +164,7 @@ class Board:
             return (start, end)
         
         def valid_piece(start):
+            '''Ensures that there is a start piece of the player's colour selected'''
             start_piece = self.get_piece(start)
             if start_piece is None or start_piece.colour != self.turn:
                 return False
@@ -192,9 +193,8 @@ class Board:
     def valid_move(self, start, end):
         '''
         Returns True if all conditions are met:
-        1. There is a start piece of the player's colour
-        2. There is no end piece, or end piece is not of player's colour
-        3. The move is not valid for the selected piece
+        1. There is no end piece, or end piece is the same colour as start piece
+        2. The move is not valid for the selected piece
         
         Returns False otherwise
         '''
@@ -210,7 +210,7 @@ class Board:
         return True
 
     def uncheck(self,start,end):
-        '''Returns True if the king will be checked after the input move is played'''
+        '''Returns False if the ally king will be checked after the input move is played'''
         self.save()
         colour = self.get_piece(start).colour
         self.move(start,end)
@@ -220,7 +220,7 @@ class Board:
         return validation
     
     def path(self,start,end):
-        '''Returns a list of positions that the piece will move accorss'''
+        '''Returns a list of positions that the start piece will move accross to reach end'''
         x, y, dist = BasePiece.vector(start, end)
         if x == 0:
             x_dir = 0
@@ -247,28 +247,16 @@ class Board:
 
 
     def nojump(self,start,end):
-
+        '''Returns False if there is a piece between the start and end position'''
         valid = True
         for pos in self.path(start,end):
             if self.get_piece(pos) != None:
                 valid = False
 
         return valid
-
-    def end(self):
-        '''Checks if King piece is eliminated'''
-        d = self.pieces()
-        counter = 0
-        for each in d:
-            if each.name == 'king':
-                counter += 1
-                colour = each.colour
-        if counter == 1:
-            self.winner = colour
-        else:
-            pass
     
     def promotion(self,end):
+        '''When a Pawn has reached the end, it will be replaced with a Queen'''
         piece = self.get_piece(end)
         colour = piece.colour
         if type(piece) == Pawn and (end[1] == 0 or end[1] == 7):
@@ -296,7 +284,6 @@ class Board:
     def check(self,colour,**kwargs):
         '''Checks if the king of the input colour is checked
         If return_checks = True, will also return a list of the positions of pieces checking the king'''
-        #print(colour,end=' ')
 
         return_checks = kwargs.get('return_checks',False)
 
@@ -308,6 +295,7 @@ class Board:
             return self.threaten(king_pos,self.other_colour(colour))
     
     def checkmate(self):
+        '''Will print a statement if the opponent king is in check and will end the game if the opponent king is in checkmate '''
         check,checks = self.check(self.other_turn,return_checks = True)
         if check:
             #print(f'checks: {checks}')
@@ -338,6 +326,7 @@ class Board:
                 print(f'{self.other_turn} is checked')
 
     def printmove(self,start,end):
+        '''Print the move after its made'''
         a,b = start
         c,d = end
         print(f'{self.get_piece(end)} {a}{b} -> {c}{d}')
@@ -349,12 +338,12 @@ class Board:
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
-        self.end()
         self.checkmate()
         self.promotion(end)
         self.printmove(start,end)
         
     def other_colour(self,colour):
+        '''Returns the colour that is not the current turn'''
         if colour == 'white':
             return 'black'
         else:
