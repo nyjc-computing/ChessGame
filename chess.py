@@ -91,9 +91,9 @@ class Board:
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
         if self.turn == "white":
-          print("\033[1;30;47m") #black w white bg
-        if self.turn == 'black':
-          print("\033[1;37;40m") #white w blk bg
+            print("\033[1;30;47m")  # black w white bg
+        if self.turn == "black":
+            print("\033[1;37;40m")  # white w blk bg
         print("           [ column ]          ", end="\n")
         print("        0\\1\\2\\3\\4\\5\\6\\7\\       ")
         for row in range(7, -1, -1):
@@ -116,7 +116,6 @@ class Board:
         print("        0/1/2/3/4/5/6/7/       ")
         print("           [ column ]          ", end="\n")
         # print("\033[1;37;40m") #white w blk bg
-
 
     def prompt(self):
         """
@@ -186,7 +185,7 @@ class Board:
             return False
         elif end_piece is not None and end_piece.colour == self.turn:
             return False
-        elif start_piece.name == 'pawn':
+        elif start_piece.name == "pawn":
             if not start_piece.isvalid(start, end, end_piece):
                 return False
         elif not start_piece.isvalid(start, end):
@@ -211,7 +210,6 @@ class Board:
             self.winner = "black"
         self.promotion()
 
-    
     def check(self):
         self.checking = None
         for coord in self.coords():
@@ -395,8 +393,8 @@ class Pawn(BasePiece):
         return f"Pawn('{self.name}')"
 
     def isvalid(self, start: tuple, end: tuple, end_piece):
-        '''Pawn can only move 1 step forward.'''
-       
+        """Pawn can only move 1 step forward."""
+
     def pawnfirstmove(self, start, end):
         if self.colour == "black":
             if start[1] != 6:
@@ -423,11 +421,11 @@ class Pawn(BasePiece):
         elif abs(x) == 1:
             if end_piece == None:
                 return False
-            elif end_piece.name == 'pawn':
-                if self.colour == 'black':
-                    return (y == -1)
-                elif self.colour == 'white':
-                    return (y == 1)
+            elif end_piece.name == "pawn":
+                if self.colour == "black":
+                    return y == -1
+                elif self.colour == "white":
+                    return y == 1
             else:
                 return False
         return False
