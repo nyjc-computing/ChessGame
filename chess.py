@@ -170,9 +170,9 @@ class Board:
                 print('Invalid input. Move digits should be 0-7.')
             else:
                 start, end = split_and_convert(inputstr)
-                # print(f'valid_move: {self.valid_move(start, end)}')
-                # print(f'valid_piece: {valid_piece(start)}')
-                # print(f'uncheck: {self.uncheck(start, end)}')
+                print(f'valid_move: {self.valid_move(start, end)}')
+                print(f'valid_piece: {valid_piece(start)}')
+                print(f'uncheck: {self.uncheck(start, end)}')
                 if self.valid_move(start, end) and valid_piece(start) and self.uncheck(start,end):
                     return start, end
                 else:
@@ -208,7 +208,8 @@ class Board:
         self.undo()
         return validation
     
-    def nojump(self,start,end):
+    def path(self,start,end):
+        '''Returns a list of positions that the piece will move accorss'''
         x, y, dist = BasePiece.vector(start, end)
         if x == 0:
             x_dir = 0
@@ -221,13 +222,24 @@ class Board:
             y_dir = int(y/abs(y))
 
         x_pos,y_pos = start
-        valid = True
-        while valid:
+        x_pos += x_dir
+        y_pos += y_dir
+        output = []
+
+        while (x_pos,y_pos) != end:
+            output.append((x_pos,y_pos))
             x_pos += x_dir
             y_pos += y_dir
-            if (x_pos,y_pos) == end:
-                return True
-            valid = self.get_piece((x_pos,y_pos)) == None
+        
+        return output
+
+
+    def nojump(self,start,end):
+
+        valid = True
+        for pos in self.path(start,end):
+            if self.get_piece(pos) != None:
+                valid = False
 
         return valid
         
@@ -251,22 +263,33 @@ class Board:
         if type(piece) == Pawn and (end[1] == 0 or end[1] == 7):
             self.add(end,Queen(colour))
     
-    def check(self,colour):
-        '''Checks if the king of the input colour is checked'''
+    def check(self,colour,**kwargs):
+        '''Checks if the king of the input colour is checked
+        If return_checks = True, will also return a list of the positions of pieces checking the king'''
         #print(colour,end=' ')
+
+        return_checks = kwargs.get('return_checks',False)
+
         for i in self.position.items():
             piece = i[1]
             if piece.colour == colour and piece.name == 'king':
                 king_pos = i[0]
 
+        check = False
+        checks = []
         for i in self.position.items():
             piece = i[1]
+            position = i[0]
             if piece.colour != colour:
-                if self.valid_move(i[0], king_pos):
-                    print('check: True')
-                    return True
-        #print('check: False')
-        return False
+                if self.valid_move(position, king_pos):
+                    check = True
+                    if return_checks:
+                        checks.append(position)
+        
+        if return_checks:
+            return check,checks
+        else:
+            return check
     
     def printmove(self,start,end):
         a,b = start
