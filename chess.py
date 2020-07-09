@@ -94,8 +94,8 @@ class Board:
           print("\033[1;30;47m") #black w white bg
         if self.turn == 'black':
           print("\033[1;37;40m") #white w blk bg
-        print("           [ column ]", end="\n")
-        print("        0\\1\\2\\3\\4\\5\\6\\7\\")
+        print("           [ column ]          ", end="\n")
+        print("        0\\1\\2\\3\\4\\5\\6\\7\\       ")
         for row in range(7, -1, -1):
             print(f" [row {row}]", end="")
             # for i in range(0,8):
@@ -113,9 +113,10 @@ class Board:
                     print(f" [row {row}]")
                 else:  # Print a space between pieces
                     print(" ", end="")
-        print("        0/1/2/3/4/5/6/7/")
-        print("           [ column ]", end="\n")
+        print("        0/1/2/3/4/5/6/7/       ")
+        print("           [ column ]          ", end="\n")
         # print("\033[1;37;40m") #white w blk bg
+
 
     def prompt(self):
         """
