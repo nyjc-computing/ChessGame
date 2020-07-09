@@ -14,8 +14,9 @@ class Board:
     00  10  20  30  40  50  60  70
     """
 
-    def __init__(self):
+    def __init__(self, debug=False):
         self.position = {}
+        self.debug = debug
 
     def coords(self):
         """Return list of piece coordinates."""
@@ -90,6 +91,8 @@ class Board:
         """
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
+        if self.debug == True:
+            print("== DISPLAY ==")
         if self.turn == "white":
             print("\033[1;30;47m")  # black w white bg
         if self.turn == "black":
@@ -124,6 +127,8 @@ class Board:
         then another 2 ints
         e.g. 07 27
         """
+        if self.debug == True:
+            print("== PROMPT ==")
 
         def valid_format(inputstr):
             """
@@ -194,6 +199,8 @@ class Board:
 
     def update(self, start, end):
         """Update board information with the player's move."""
+        if self.debug == True:
+            print("== UPDATE ==")
         self.remove(end)
         self.move(start, end)
         self.win()
@@ -201,17 +208,17 @@ class Board:
         self.check()
 
     def win(self):
-        listpiece = list(self.pieces())
-        piecelist = []
-        for i in listpiece:
-            piecelist.append(str(i))
+        if self.debug == True:
+            print("== CHECKING FOR WINNER ==")
+        piecelist = [str(pieces) for pieces in self.pieces()]
         if "black king" not in piecelist:
             self.winner = "White"
         if "white king" not in piecelist:
             self.winner = "black"
 
     def check(self):
-        self.checking = None
+        if self.debug == True:
+            print(" == CHECKING IF KING IS CHECKED ==")
         for coord in self.coords():
             if "white king" in str(self.get_piece(coord)):
                 wkingcoord = coord
@@ -220,17 +227,17 @@ class Board:
         for coord in self.coords():
             if self.valid_move(coord, wkingcoord):
                 print("white is in check!")
-                self.checking = True
                 break
             elif self.valid_move(coord, bkingcoord):
                 print("black is in check!")
-                self.checking = True
                 break
 
     def promotion(self):
         """
         Check if last row contains opposing pawn and swap to queen if true
         """
+        if self.debug == True:
+            print("== CHECKING FOR PROMOTION ==")
         black_last_row = [
             (0, 7),
             (1, 7),
@@ -262,6 +269,8 @@ class Board:
 
     def next_turn(self):
         """Hand the turn over to the other player."""
+        if self.debug == True:
+            print("== NEXT TURN ==")
         if self.turn == "white":
             self.turn = "black"
         elif self.turn == "black":
