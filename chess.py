@@ -163,6 +163,8 @@ class Board:
             start_piece = self.get_piece(start)
             if start_piece is None or start_piece.colour != self.turn:
                 return False
+            else:
+                return True
 
         while True:
             inputstr = input(f'{self.turn.title()} player: ')
@@ -173,6 +175,9 @@ class Board:
                 print('Invalid input. Move digits should be 0-7.')
             else:
                 start, end = split_and_convert(inputstr)
+                print(f'valid_move: {self.valid_move(start, end)}')
+                print(f'valid_piece: {valid_piece(start)}')
+                print(f'uncheck: {self.uncheck(start, end)}')
                 if self.valid_move(start, end) and valid_piece(start) and self.uncheck(start,end):
                     return start, end
                 else:
