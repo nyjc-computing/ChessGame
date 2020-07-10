@@ -100,7 +100,7 @@ class Board:
         self.winner = None
         self.turn = 'white'
         self.other_turn = 'black'
-        
+
     def display(self):
         '''
         Displays the contents of the board.
@@ -410,6 +410,58 @@ class King(BasePiece):
         '''
         x, y, dist = self.vector(start, end)
         return (dist == 1) or (abs(x) == abs(y) == 1)
+
+        ''' 
+        Castling : Special move by King :
+
+        King can move two steps towards one of the Rook pieces and 
+        the Rook will 'jump over' the King piece to be adjacent to it
+
+        Can only be done if :
+        1) The King and the Rook have not been moved
+        2) The player is not checkmated 
+        3) Castling will not cause player to be checkmated
+        4) There are no piece between the King and the Rook
+        '''
+
+        # For black side , I need to check 
+        # i)   if coordinates '50' and '60' / '10' , '20' , '30' are empty
+        # ii)  if Rook pieces are at coordinates '70' / '00'
+        # iii) if checkmate has been triggered before the move is made
+        # iv)  if checkmate condition will be triggered if the move is made
+
+        # For white side , I need to check
+        # i)   if coordinates '57' , '67' / '17' , '27' , '37' are empty 
+        # ii)  if Rook pieces are at coordinates ' '77' / '07'
+        # iii) if checkmate has been triggered before the move is made
+        # iv)  if checkmate condition will be triggered if the move is made
+
+        if self.colour == 'black':
+            if start[1] == 4 and end[1] == 6:  
+                if self.get_piece('70') == 'Rook':   #condition (ii)
+                    if self.get_piece('50') == None and self.get_piece('60') == None: #condition (i)
+                        if not checkmate:          #condition (iii)
+                            return (x == 2)
+
+            elif start[1] == 4 and end[1] == 1:
+                if self.get_piece('00') == ' Rook':   #condition (ii)
+                    if self.get_piece('10') == None and (self.get_piece('20') == None and self.get_piece('30') == None):                          #condition (i)
+                        if not checkmate:           #condition (iii)
+                            return (x == -2)
+
+        if self.colour == 'white':
+            if start[1] == 4 and end[1] == 6:
+                if self.get_piece('77') == 'Rook':      # condition (ii)
+                    if self.get_piece('57') == None and self.get_piece('67') == None:   #condition (i)
+                        if not checkmate:             #condition (iii)
+                            return (x == 2)
+
+            elif start[1] == 4 and end[1] == 1:
+                if self.get_piece('07') == 'Rook':  #condition (ii)
+                    if (self.get_piece('17') == None and self.get_piece('27') == None) and self.get_piece('37') == None:
+                        if not checkmate:            #condiition (iii)
+                            return (x == -2) 
+                    
 
     
 class Queen(BasePiece):
