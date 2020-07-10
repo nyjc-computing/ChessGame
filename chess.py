@@ -100,6 +100,7 @@ class Board:
         self.winner = None
         self.turn = 'white'
         self.other_turn = 'black'
+        open('moves.txt', 'w').close()
         
     def display(self):
         '''
