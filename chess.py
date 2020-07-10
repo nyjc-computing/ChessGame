@@ -86,7 +86,25 @@ class Board:
             if self.valid_move(coord, end):
               checked = "black" if colour == "white" else "white"
               print(f"{checked} is checked")
+              
     
+    
+    def uncheck(self, colour):
+        '''
+        
+        '''
+        end = tuple()
+ 
+        while not end:
+            for coord, piece in zip(self.coords(), self.pieces()):
+                if piece.colour == colour and isinstance(piece, King):
+                    end = coord
+            for coord, piece in zip(self.coords(), self.pieces()):
+                if piece.colour != colour:
+                    if self.valid_move(coord, end):
+                        return False
+            return True
+                
     def log(self, piece, start, end):
       '''
       Print move
@@ -100,6 +118,33 @@ class Board:
       print(move)
       with open("moves.txt", "a") as f:
         f.write(move+"\n")
+
+    def moveclassifier(self,start,end):
+        start_piece = self.get_piece(start)
+        end_piece = self.get_piece(end)
+        if end_piece == None:
+            return 'move'
+        elif end_piece != None and end_piece.colour != self.turn:
+            return 'capture'
+
+
+    def promotion(self,coord,colour):
+        ''' 
+        promote a pawn into a rook
+        '''
+        print(
+          'please choose a piece you want to promote to,the input sould be one of the following:\nqueen knight bishop rook\n')
+        choices = {'queen':Queen(colour),
+                   'knight':Knight(colour),
+                   'bishop':Bishop(colour),
+                   'rook':Rook(colour)}
+        new = input()
+        if not new in ['queen','knight','bishhop','rook']:
+            print('wrong input. the input sould be one of the following:\n queen knight bishop rook\n')
+        else:
+            self.remove(coord)
+            self.add(coord,choices[new])        
+
 
 
 
@@ -233,6 +278,8 @@ class Board:
             return False
         elif not isinstance(start_piece, Knight) and self.blocked(start, end):
             return False
+        elif not self.uncheck(self.turn):
+            return False
         return True
 
     def update(self, start, end):
@@ -248,31 +295,12 @@ class Board:
           self.winner = color
         self.check(self.turn)
 
-        
         if end[1] == 0 or end[1] == 7:
              if self.get_piece(end).name == 'pawn':
                  colour = self.turn
                  self.promotion(end,colour)
         
         
-    def promotion(self,coord,colour):
-        ''' 
-        promote a pawn into a rook
-        '''
-        print(
-          'please choose a piece you want to promote to,the input sould be one of the following:\nqueen knight bishop rook\n')
-        choices = {'queen':Queen(colour),
-                   'knight':Knight(colour),
-                   'bishop':Bishop(colour),
-                   'rook':Rook(colour)}
-        new = input()
-        if not new in ['queen','knight','bishhop','rook']:
-            print('wrong input. the input sould be one of the following:\n queen knight bishop rook\n')
-        else:
-            pass
-            
-            self.remove(coord)
-            self.add(coord,choices[new])
 
         
     def next_turn(self):
