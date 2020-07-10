@@ -166,7 +166,7 @@ class Board:
                 c, d = end
                 movedpiece = str(self.get_piece(start))
                 return f'{movedpiece} {a}{b} -> {c}{d}'
-            
+
         def movelog(start, end):
             '''
             Save all moves made into the CSV file movelog_file
@@ -186,7 +186,7 @@ class Board:
                 if self.valid_move(start, end):
                     print(printmove(start, end))
                     self.previousmove = (start, end)
-                    print(self.moveclassifier(start,end))
+                    print(self.moveclassifier(start, end))
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
