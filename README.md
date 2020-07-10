@@ -114,7 +114,7 @@ In debug mode, the game output should display which step of the game it is at.
 
 You may add more steps to print to demarcate different processes (e.g. checkmating, checking for game winner, ...)
 
-### branch: **unchecking** (★)
+### branch: **unchecking** (★) Yirui
 (prerequisites: **checkmate**)
 
 If a player is in checkmate, their next move must bring them out of checkmate, otherwise the move is invalid.
@@ -131,7 +131,7 @@ Any `MoveError`s raised should be handled with `try-except` and the player promp
 
 Other team members may inherit from this class to create custom errors, e.g. `StartPieceIsNotOwnError`, `EmptyPositionError`, `MovementBlockedError`, etc where necessary. This may make move validation easier.
 
-### branch: **pawncapture** (★★) Yirui
+### branch: **pawncapture** (★★) 
 
 Add additional move validation to the `Pawn` class for **capturing** moves.
 
