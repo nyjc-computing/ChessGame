@@ -427,6 +427,15 @@ class Board:
                 self.turn = 'white'
         if self.check(self.turn):
             print(f"{self.turn} King is in check")
+    
+    def moveclassifier(self, start, end):
+        end_piece = self.get_piece(end)
+        if self.castling(start, end):
+            return "castling"
+        elif end_piece is not None:
+            return "capture"
+        else:
+            return "move"
 
 
 class BasePiece:
