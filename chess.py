@@ -1,5 +1,6 @@
 import copy
 
+
 class Board:
     '''
     The game board is represented as an 8×8 grid,
@@ -18,13 +19,12 @@ class Board:
     def __init__(self, **kwargs):
         self.position = {}
         if 'debug' in kwargs.keys():
-            if kwargs['debug'] == True:
+            if kwargs['debug']:
                 self.debug = True
             else:
                 self.debug = False
         else:
-            self.debug = False  
-        
+            self.debug = False
 
     def coords(self):
         '''Return list of piece coordinates.'''
@@ -33,7 +33,7 @@ class Board:
     def pieces(self):
         '''Return list of board pieces.'''
         return self.position.values()
-    
+
     def get_piece(self, coord):
         '''
         Return the piece at coord.
@@ -65,7 +65,9 @@ class Board:
         self.add(end, piece)
 
     def start(self):
-        '''Set up the pieces and start the game. Create CSV file movelog_file.'''
+        '''
+        Set up the pieces and start the game. Create CSV file movelog_file.
+        '''
         colour = 'black'
         self.add((0, 7), Rook(colour))
         self.add((1, 7), Knight(colour))
@@ -95,7 +97,6 @@ class Board:
         f = open('movelog_file', 'w')
         f.close()
 
-        
     def display(self):
         '''
         Displays the contents of the board.
@@ -111,12 +112,12 @@ class Board:
                     piece = self.get_piece(coord)
                     print(f'{piece.symbol()}', end='')
                 elif row == 8:
-                  if col == -1:
-                    print(' ', end='')
-                  else:
-                    print(f'{col}', end='')
+                    if col == -1:
+                        print(' ', end='')
+                    else:
+                        print(f'{col}', end='')
                 elif col == -1:
-                  print(f'{row}', end='')
+                    print(f'{row}', end='')
                 else:
                     piece = None
                     print(' ', end='')
@@ -141,14 +142,14 @@ class Board:
             return len(inputstr) == 5 and inputstr[2] == ' ' \
                 and inputstr[0:1].isdigit() \
                 and inputstr[3:4].isdigit()
-        
+
         def valid_num(inputstr):
             '''Ensure all inputted numerals are 0-7.'''
             for char in (inputstr[0:1] + inputstr[3:4]):
                 if char not in '01234567':
                     return False
             return True
-        
+
         def split_and_convert(inputstr):
             '''Convert 5-char inputstr into start and end tuples.'''
             start, end = inputstr.split(' ')
@@ -161,11 +162,11 @@ class Board:
             if self.castling(start, end):
                 return f'{self.turn} castling.'
             else:
-                a,b = start
-                c,d = end
+                a, b = start
+                c, d = end
                 movedpiece = str(self.get_piece(start))
                 return f'{movedpiece} {a}{b} -> {c}{d}'
-            
+
         def movelog(start, end):
             '''
             Save all moves made into the CSV file movelog_file
@@ -185,7 +186,7 @@ class Board:
                 if self.valid_move(start, end):
                     print(printmove(start, end))
                     self.previousmove = (start, end)
-                    print(self.moveclassifier(start,end))
+                    print(self.moveclassifier(start, end))
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
