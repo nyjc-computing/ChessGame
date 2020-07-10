@@ -198,6 +198,30 @@ class Board:
         
         Returns False otherwise
         '''
+        def pawn_isvalid():
+            '''
+            validation for pawn capture and enpassant
+            '''
+            iscapture = start_piece.iscapture(start, end)
+            if iscapture and end_piece is None:
+                xcord = end[0]
+                ycord = start[1]
+                sidepiece = self.get_piece((xcord, ycord))
+                if sidepiece.name == 'pawn':
+                    if not sidepiece.doublemoveprevturn:
+                        return False
+                    elif (xcord, ycord) == self.previousmove[1]:
+                        self.move((xcord, ycord), end)
+                        return True
+                    else:
+                        return False
+                else:
+                    return False
+            elif not iscapture and end_piece is not None:
+                return False
+            else:
+                return True
+        
         start_piece = self.get_piece(start)
         end_piece = self.get_piece(end)
         if end_piece is not None and end_piece.colour == start_piece.colour:
@@ -206,6 +230,9 @@ class Board:
             return False
         elif (start_piece.name == 'queen' or start_piece.name == 'bishop' or start_piece.name == 'rook'):
             if not self.nojump(start,end):
+                return False
+        elif start_piece.name == 'pawn':
+            if not pawn_isvalid():
                 return False
         return True
 
@@ -475,23 +502,40 @@ class Rook(BasePiece):
 class Pawn(BasePiece):
     name = 'pawn'
     sym = {'white': '♙', 'black': '♟︎'}
+    doublemoveprevturn = False
     def __repr__(self):
         return f"Pawn('{self.name}')"
 
     def isvalid(self, start: tuple, end: tuple):
-        '''Pawn can only move 1 step forward.'''
+        '''Pawn can only move 1 step forward or 1 step forward and 1 step horizontally when capturing enemy pieces. If pawn moves 2 steps, self.doublemoveprevturn is True'''
+
         x, y, dist = self.vector(start, end)
-        if x == 0:
+        if x == -1 or x == 1 or x == 0:
             if self.colour == 'black':
+                self.doublemoveprevturn = False
                 if start[1] == 6:
+                    if y == -2:
+                        self.doublemoveprevturn = True
                     return (y == -1 or y == -2)
-                else:
-                    return (y == -1)
+                return (y == -1)
             elif self.colour == 'white':
+                self.doublemoveprevturn = False
                 if start[1] == 1:
+                    if y == 2:
+                        self.doublemoveprevturn = True
                     return (y == 1 or y == 2)
-                else:
-                    return (y == 1)
+                return (y == 1)
             else:
                 return False
-        return False
+        else:
+            return False
+    
+    def iscapture(self, start: tuple, end: tuple):
+        '''
+        Return True if pawn captures an enemy piece, else returns False
+        '''
+        x, y, dist = self.vector(start, end)
+        if x == -1 or x == 1:
+            return True
+        else:
+            return False
