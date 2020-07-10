@@ -100,6 +100,7 @@ class Board:
         self.winner = None
         self.turn = 'white'
         self.other_turn = 'black'
+        open('moves.txt', 'w').close()
         
     def display(self):
         '''
@@ -360,6 +361,12 @@ class Board:
         a,b = start
         c,d = end
         print(f'{self.get_piece(end)} {a}{b} -> {c}{d}')
+        #movelog
+        f = open('moves.txt','a')
+        if self.winner is None:
+            f.write(f'{self.get_piece(end)} {a}{b} -> {c}{d}\n')
+        else:
+            f.close()
         pass
 
     def update(self, start, end):
