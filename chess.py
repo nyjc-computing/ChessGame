@@ -1,4 +1,4 @@
-class Board:
+class Board: 
     '''
     The game board is represented as an 8×8 grid,
     with each position on the grid described as
@@ -409,7 +409,6 @@ class King(BasePiece):
         horizontally, vertically, or diagonally.
         '''
         x, y, dist = self.vector(start, end)
-        return (dist == 1) or (abs(x) == abs(y) == 1)
 
         ''' 
         Castling : Special move by King :
@@ -425,42 +424,44 @@ class King(BasePiece):
         '''
 
         # For black side , I need to check 
-        # i)   if coordinates '50' and '60' / '10' , '20' , '30' are empty
+        # i)   if coordinates '50' and '60' / '10' , '20' , '30' are empty using 'nojump' method
         # ii)  if Rook pieces are at coordinates '70' / '00'
         # iii) if checkmate has been triggered before the move is made
         # iv)  if checkmate condition will be triggered if the move is made
 
         # For white side , I need to check
-        # i)   if coordinates '57' , '67' / '17' , '27' , '37' are empty 
+        # i)   if coordinates '57' , '67' / '17' , '27' , '37' are empty using 'nojump' method
         # ii)  if Rook pieces are at coordinates ' '77' / '07'
         # iii) if checkmate has been triggered before the move is made
         # iv)  if checkmate condition will be triggered if the move is made
+        print(f'{self.colour} king\'s starting position:{start} , {self.colour} king\'s ending position:{end}')
 
-        if self.colour == 'black':
-            if start[1] == 4 and end[1] == 6:  
-                if self.get_piece('70') == 'Rook':   #condition (ii)
-                    if self.get_piece('50') == None and self.get_piece('60') == None: #condition (i)
-                        if not checkmate:          #condition (iii)
-                            return (x == 2)
+        if (start[1] == 4 and end[1] == 6) or (start[1] == 4 and end[1] == 1):
 
-            elif start[1] == 4 and end[1] == 1:
-                if self.get_piece('00') == ' Rook':   #condition (ii)
-                    if self.get_piece('10') == None and (self.get_piece('20') == None and self.get_piece('30') == None):                          #condition (i)
-                        if not checkmate:           #condition (iii)
-                            return (x == -2)
+            if self.colour == 'black':
+                if start[1] == 4 and end[1] == 6:  
+                    if type(self.get_piece('70')) == Rook:   #condition (ii)
+                        if self.nojump(50,60) == True:            #condition(i)
+                            return (dist == 2) or (abs(x) == abs(y) == 2)
+ 
 
-        if self.colour == 'white':
-            if start[1] == 4 and end[1] == 6:
-                if self.get_piece('77') == 'Rook':      # condition (ii)
-                    if self.get_piece('57') == None and self.get_piece('67') == None:   #condition (i)
-                        if not checkmate:             #condition (iii)
-                            return (x == 2)
+                elif start[1] == 4 and end[1] == 1:
+                    if type(self.get_piece('00')) == Rook:   #condition (ii)
+                        if self.nojump(10,30) == True:            #condition (i)
+                            return (dist == 2) or (abs(x) == abs(y) == 2)
 
-            elif start[1] == 4 and end[1] == 1:
-                if self.get_piece('07') == 'Rook':  #condition (ii)
-                    if (self.get_piece('17') == None and self.get_piece('27') == None) and self.get_piece('37') == None:
-                        if not checkmate:            #condiition (iii)
-                            return (x == -2) 
+            if self.colour == 'white':
+                if start[1] == 4 and end[1] == 6:
+                    if type(self.get_piece('77')) == Rook:      # condition (ii)
+                        if self.nojump(57,67) == True:               #condition (i)
+                            return (dist == 2) or (abs(x) == abs(y) == 2)
+
+                elif start[1] == 4 and end[1] == 1:
+                    if type(self.get_piece('07')) == Rook:  #condition (ii)
+                        if self.nojump(17,37) == True:             #condition (i)
+                            return (dist == 2) or (abs(x) == abs(y) == 2)
+        else:
+            return (dist == 1) or (abs(x) == abs(y) == 1)
                     
 
     
