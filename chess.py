@@ -183,6 +183,7 @@ class Board:
                 if self.valid_move(start, end):
                     print(printmove(start, end))
                     self.previousmove = (start, end)
+                    print(self.moveclassifier(start,end))
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
@@ -406,6 +407,20 @@ class Board:
         if self.debug:
             print(f"{colour} King is in check: {isCheck}")
         return isCheck
+    
+    def moveclassifier(self, start, end):
+        """
+        a method that classifies and returns the type of move being made.
+        """
+        end_piece = self.get_piece(end)
+        if self.castling(start, end):
+            return 'castling'
+        elif end_piece is not None:
+            return 'capture'
+        else:
+            return 'move'
+    
+            
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
