@@ -185,6 +185,11 @@ class Board:
                 # print(f'uncheck: {self.uncheck(start, end)}')
 
                 if valid_piece(start) and self.valid_move(start, end) and self.uncheck(start,end):
+                    start_piece = self.get_piece(start)
+                    if start_piece.name == 'pawn':
+                        print('pawn')
+                        start_piece.update_doublemove(start,end)
+
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
@@ -210,11 +215,10 @@ class Board:
                 if sidepiece.name == 'pawn':
                     if not sidepiece.doublemoveprevturn:
                         return False
-                    elif (xcord, ycord) == self.previousmove[1]:
-                        self.move((xcord, ycord), end)
-                        return True
+                    
                     else:
-                        return False
+                        self.remove((xcord,ycord))
+                        return True
                 else:
                     return False
             elif not iscapture and end_piece is not None:
@@ -506,24 +510,52 @@ class Pawn(BasePiece):
     def __repr__(self):
         return f"Pawn('{self.name}')"
 
+    def update_doublemove(self,start,end):
+        x, y, dist = self.vector(start, end)
+        print(f'update_doublemove {start} {end}' )
+        if abs(y) == 2:
+            self.doublemoveprevturn = True
+        else:
+            self.doublemoveprevturn = False
+    
+    def enpassant():
+            '''
+            validation for pawn capture and enpassant
+            '''
+            iscapture = start_piece.iscapture(start, end)
+            if iscapture and end_piece is None:
+                xcord = end[0]
+                ycord = start[1]
+                sidepiece = self.get_piece((xcord, ycord))
+                if sidepiece.name == 'pawn':
+                    if not sidepiece.doublemoveprevturn:
+                        return False
+                    
+                    else:
+                        self.remove((xcord,ycord))
+                        return True
+                else:
+                    return False
+            elif not iscapture and end_piece is not None:
+                return False
+            else:
+                return True
+
     def isvalid(self, start: tuple, end: tuple):
         '''Pawn can only move 1 step forward or 1 step forward and 1 step horizontally when capturing enemy pieces. If pawn moves 2 steps, self.doublemoveprevturn is True'''
 
         x, y, dist = self.vector(start, end)
+        print(f'{start} self.doublemoveprevturn: {self.doublemoveprevturn}')
         if x == -1 or x == 1 or x == 0:
             if self.colour == 'black':
-                self.doublemoveprevturn = False
                 if start[1] == 6:
                     if y == -2:
-                        self.doublemoveprevturn = True
-                    return (y == -1 or y == -2)
+                        return (y == -1 or y == -2)
                 return (y == -1)
             elif self.colour == 'white':
-                self.doublemoveprevturn = False
                 if start[1] == 1:
                     if y == 2:
-                        self.doublemoveprevturn = True
-                    return (y == 1 or y == 2)
+                        return (y == 1 or y == 2)
                 return (y == 1)
             else:
                 return False
