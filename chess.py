@@ -166,7 +166,7 @@ class Board:
                 c, d = end
                 movedpiece = str(self.get_piece(start))
                 return f'{movedpiece} {a}{b} -> {c}{d}'
-
+            
         def movelog(start, end):
             '''
             Save all moves made into the CSV file movelog_file
@@ -186,14 +186,13 @@ class Board:
                 if self.valid_move(start, end):
                     print(printmove(start, end))
                     self.previousmove = (start, end)
-                    print(self.moveclassifier(start, end))
+                    print(self.moveclassifier(start,end))
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
 
     def valid_move(self, start, end):
         '''
-
         Returns True if all conditions are met:
         1. There is a start piece of the player's colour
         2. There is no end piece, or end piece is not of player's colour
@@ -202,6 +201,7 @@ class Board:
         Returns False otherwise
         5. Special moves
         '''
+        
         def pawn_isvalid():
           """
           Extra validation for pawn capturing and en passant moves
@@ -230,7 +230,8 @@ class Board:
         start_piece = self.get_piece(start)
         end_piece = self.get_piece(end)
         if self.castling(start, end):
-            print('valid move')
+            if self.debug:
+                print(f'Castling from {start} -> {end} is a valid move')
             return True
         elif start_piece is None or start_piece.colour != self.turn:
             return False
@@ -292,15 +293,15 @@ class Board:
 
     def castling(self, start, end):
         '''
+        Check if castling move is valid. 
+        Returns a boolean: True if valid, False otherwise
+
         special move: castling
         1. The king and the chosen rook are on the player's first rank.
         2. Neither the king nor the chosen rook has previously moved.
         3. There are no pieces between the king and the chosen rook.
         4. The king is not currently in check.
         5. The king does not pass through a square that is attacked by an enemy piece.
-        returns boolean:
-        if castling move is valid return True
-        else return False
         yuheng
         '''
         start_piece = self.get_piece(start)
@@ -330,7 +331,6 @@ class Board:
                 for i in range(0, 2):
                     position_checking = list(position_checking)
                     position_checking[0] += x/abs(x)
-                    print(type(position_checking[0]))
                     position_checking = tuple(position_checking)
                     self.add(position_checking, King(self.turn))
                     if self.check(self.turn) == True:
@@ -340,6 +340,9 @@ class Board:
                 return True
 
     def castlingmove(self, start, end):
+        """
+        To conduct castling
+        """
         start_piece = self.get_piece(start)
         if start_piece.name == 'king':
             king_pos = start
@@ -375,10 +378,10 @@ class Board:
     def separate_pieces(self):
         """
         Separates the coords list into white and black pieces.
-        and identify the king
+        and identify the coordinates of the king
 
-        result is a tuple, with four element,
-        list of white pieces and coordinates, list of black pieces and coordinate, white king coord, black king coords
+        Returns a tuple, with four element:
+        (list of white pieces and coordinates, list of black pieces and coordinate, white king coord, black king coords)
         """
         pieces_coords_list = list(self.coords())
         white_pieces_list = []
@@ -530,7 +533,8 @@ class Board:
                 valid_move_set.add(coord)
 
         # See if any piece can block it.
-        print('\nSee if any move can block it')
+        if self.debug:
+            print('\nSee if any move can block it')
         for piece, coord in own_pieces_list:
             for move in valid_move_set:
                 if self.valid_move(coord, move) and not self.temp_check(colour, coord, move):
@@ -568,7 +572,8 @@ class Board:
                 self.turn = 'black'
             elif self.turn == 'black':
                 self.turn = 'white'
-        print(f'\nChecking before prompting the {self.turn} player')
+        if self.debug:
+            print(f'\nChecking before prompting the {self.turn} player')
         self.find_attacking_pieces(self.turn)
         if self.checkmate(self.turn):
             self.winner = 'white' if self.turn == 'black' else 'black'
