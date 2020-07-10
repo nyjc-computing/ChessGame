@@ -330,6 +330,9 @@ class Board:
         a,b = start
         c,d = end
         print(f'{self.get_piece(end)} {a}{b} -> {c}{d}')
+        #movelog
+        with open('moves.txt','a+') as f:
+            f.write(f'{self.get_piece(end)} {a}{b} -> {c}{d}\n')
         pass
 
     def update(self, start, end):
