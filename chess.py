@@ -210,6 +210,9 @@ class Board:
                 if sidepiece.name == 'pawn':
                     if not sidepiece.doublemoveprevturn:
                         return False
+                    elif (xcord, ycord) == self.previousmove[1]:
+                        self.move((xcord, ycord), end)
+                        return True
                     else:
                         return False
                 else:
