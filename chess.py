@@ -332,11 +332,11 @@ class Board:
         c,d = end
         print(f'{self.get_piece(end)} {a}{b} -> {c}{d}')
         #movelog
+        f = open('moves.txt','a')
         if self.winner is None:
-            f = open('moves.txt','a')
             f.write(f'{self.get_piece(end)} {a}{b} -> {c}{d}\n')
         else:
-            f = close('moves.txt')
+            f.close()
         pass
 
     def update(self, start, end):
