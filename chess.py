@@ -90,7 +90,7 @@ class Board:
         self.turn = 'white'
         self.winner = None
 
-        f = open('movelog_file', 'w'):
+        f = open('movelog_file', 'w')
         f.close()
 
         
@@ -596,4 +596,4 @@ class MoveError(Exception):
   """
   Raised when an invalid move is made.
   """
-    pass
+pass
