@@ -182,7 +182,9 @@ class Board:
                 print('Invalid input. Move digits should be 0-7.')
             else:
                 start, end = split_and_convert(inputstr)
-                if self.valid_move(start, end):
+                if self.temp_check(self.turn, start, end):
+                    print(f"Invalid move, {self.turn} King is in check")
+                elif self.valid_move(start, end):
                     print(printmove(start, end))
                     self.previousmove = (start, end)
                     print(self.moveclassifier(start,end))
@@ -446,12 +448,14 @@ class Board:
         tempBoard = Board(debug = self.debug)
         tempBoard.start()
         tempBoard.position = copy.deepcopy(self.position)
-        tempBoard.update(start,end)
+        if tempBoard.valid_move(start,end):
+            tempBoard.update(start,end)
         if self.debug:
             print(f"\nprint updated tempBoard display: \n")
             tempBoard.display()
         if tempBoard.check(colour):
             return True
+        return False
 
 
     def checkmate(self, colour):
