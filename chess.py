@@ -336,7 +336,7 @@ class Board:
             f = open('moves.txt','a')
             f.write(f'{self.get_piece(end)} {a}{b} -> {c}{d}\n')
         else:
-            f.close()
+            f = close('moves.txt')
         pass
 
     def update(self, start, end):
