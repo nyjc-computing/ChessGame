@@ -567,12 +567,15 @@ class Board:
                 self.turn = 'black'
             elif self.turn == 'black':
                 self.turn = 'white'
+        if self.check(self.turn):
+            print(f"{self.turn} King is in check")
         print(f'\nChecking before prompting the {self.turn} player')
         self.find_attacking_pieces(self.turn)
         if self.checkmate(self.turn):
             self.winner = 'white' if self.turn == 'black' else 'black'
         elif self.check(self.turn):
                 print(f"{self.turn} King is in check")
+
 
 
 class BasePiece:
