@@ -1,5 +1,6 @@
 import copy
 
+
 class Board:
     '''
     The game board is represented as an 8×8 grid,
@@ -18,13 +19,12 @@ class Board:
     def __init__(self, **kwargs):
         self.position = {}
         if 'debug' in kwargs.keys():
-            if kwargs['debug'] == True:
+            if kwargs['debug']:
                 self.debug = True
             else:
                 self.debug = False
         else:
-            self.debug = False  
-        
+            self.debug = False
 
     def coords(self):
         '''Return list of piece coordinates.'''
@@ -33,7 +33,7 @@ class Board:
     def pieces(self):
         '''Return list of board pieces.'''
         return self.position.values()
-    
+
     def get_piece(self, coord):
         '''
         Return the piece at coord.
@@ -65,7 +65,9 @@ class Board:
         self.add(end, piece)
 
     def start(self):
-        '''Set up the pieces and start the game. Create CSV file movelog_file.'''
+        '''
+        Set up the pieces and start the game. Create CSV file movelog_file.
+        '''
         colour = 'black'
         self.add((0, 7), Rook(colour))
         self.add((1, 7), Knight(colour))
@@ -95,7 +97,6 @@ class Board:
         f = open('movelog_file', 'w')
         f.close()
 
-        
     def display(self):
         '''
         Displays the contents of the board.
@@ -111,12 +112,12 @@ class Board:
                     piece = self.get_piece(coord)
                     print(f'{piece.symbol()}', end='')
                 elif row == 8:
-                  if col == -1:
-                    print(' ', end='')
-                  else:
-                    print(f'{col}', end='')
+                    if col == -1:
+                        print(' ', end='')
+                    else:
+                        print(f'{col}', end='')
                 elif col == -1:
-                  print(f'{row}', end='')
+                    print(f'{row}', end='')
                 else:
                     piece = None
                     print(' ', end='')
@@ -141,14 +142,14 @@ class Board:
             return len(inputstr) == 5 and inputstr[2] == ' ' \
                 and inputstr[0:1].isdigit() \
                 and inputstr[3:4].isdigit()
-        
+
         def valid_num(inputstr):
             '''Ensure all inputted numerals are 0-7.'''
             for char in (inputstr[0:1] + inputstr[3:4]):
                 if char not in '01234567':
                     return False
             return True
-        
+
         def split_and_convert(inputstr):
             '''Convert 5-char inputstr into start and end tuples.'''
             start, end = inputstr.split(' ')
@@ -161,11 +162,11 @@ class Board:
             if self.castling(start, end):
                 return f'{self.turn} castling.'
             else:
-                a,b = start
-                c,d = end
+                a, b = start
+                c, d = end
                 movedpiece = str(self.get_piece(start))
                 return f'{movedpiece} {a}{b} -> {c}{d}'
-            
+
         def movelog(start, end):
             '''
             Save all moves made into the CSV file movelog_file
@@ -187,14 +188,13 @@ class Board:
                 elif self.valid_move(start, end):
                     print(printmove(start, end))
                     self.previousmove = (start, end)
-                    print(self.moveclassifier(start,end))
+                    print(self.moveclassifier(start, end))
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
 
     def valid_move(self, start, end):
         '''
-
         Returns True if all conditions are met:
         1. There is a start piece of the player's colour
         2. There is no end piece, or end piece is not of player's colour
@@ -203,6 +203,7 @@ class Board:
         Returns False otherwise
         5. Special moves
         '''
+        
         def pawn_isvalid():
           """
           Extra validation for pawn capturing and en passant moves
@@ -231,7 +232,8 @@ class Board:
         start_piece = self.get_piece(start)
         end_piece = self.get_piece(end)
         if self.castling(start, end):
-            print('valid move')
+            if self.debug:
+                print(f'Castling from {start} -> {end} is a valid move')
             return True
         elif start_piece is None or start_piece.colour != self.turn:
             return False
@@ -293,15 +295,15 @@ class Board:
 
     def castling(self, start, end):
         '''
+        Check if castling move is valid. 
+        Returns a boolean: True if valid, False otherwise
+
         special move: castling
         1. The king and the chosen rook are on the player's first rank.
         2. Neither the king nor the chosen rook has previously moved.
         3. There are no pieces between the king and the chosen rook.
         4. The king is not currently in check.
         5. The king does not pass through a square that is attacked by an enemy piece.
-        returns boolean:
-        if castling move is valid return True
-        else return False
         yuheng
         '''
         start_piece = self.get_piece(start)
@@ -331,7 +333,6 @@ class Board:
                 for i in range(0, 2):
                     position_checking = list(position_checking)
                     position_checking[0] += x/abs(x)
-                    print(type(position_checking[0]))
                     position_checking = tuple(position_checking)
                     self.add(position_checking, King(self.turn))
                     if self.check(self.turn) == True:
@@ -341,6 +342,9 @@ class Board:
                 return True
 
     def castlingmove(self, start, end):
+        """
+        To conduct castling
+        """
         start_piece = self.get_piece(start)
         if start_piece.name == 'king':
             king_pos = start
@@ -376,10 +380,10 @@ class Board:
     def separate_pieces(self):
         """
         Separates the coords list into white and black pieces.
-        and identify the king
+        and identify the coordinates of the king
 
-        result is a tuple, with four element,
-        list of white pieces and coordinates, list of black pieces and coordinate, white king coord, black king coords
+        Returns a tuple, with four element:
+        (list of white pieces and coordinates, list of black pieces and coordinate, white king coord, black king coords)
         """
         pieces_coords_list = list(self.coords())
         white_pieces_list = []
@@ -533,7 +537,8 @@ class Board:
                 valid_move_set.add(coord)
 
         # See if any piece can block it.
-        print('\nSee if any move can block it')
+        if self.debug:
+            print('\nSee if any move can block it')
         for piece, coord in own_pieces_list:
             for move in valid_move_set:
                 if self.valid_move(coord, move) and not self.temp_check(colour, coord, move):
@@ -573,7 +578,8 @@ class Board:
                 self.turn = 'white'
         if self.check(self.turn):
             print(f"{self.turn} King is in check")
-        print(f'\nChecking before prompting the {self.turn} player')
+        if self.debug:
+            print(f'\nChecking before prompting the {self.turn} player')
         self.find_attacking_pieces(self.turn)
         if self.checkmate(self.turn):
             self.winner = 'white' if self.turn == 'black' else 'black'
