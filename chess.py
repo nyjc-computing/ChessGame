@@ -194,6 +194,16 @@ class Board:
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
 
+    def moveclassifier(self, start, end):
+        '''
+        a method that classfies and returns the move made
+        '''
+        end_piece = self.get_piece(end)
+        if end_piece is not None:
+            return 'capture'
+        else:
+            return 'move'
+
 
     def valid_move(self, start, end):
         '''
