@@ -42,7 +42,7 @@ See [grading.md](grading.md)
 
 The game code in `main.py` *should not be modified* (except for **moveerror** branch which will need to add keyword arguments when creating the game board).
 
-### branch: **labels** (★)
+### branch: **labels** (★) Yiming
 
 Add row and column labels to make it easier for the player to count positions. These labels should appear when `display()` is called.
 
@@ -61,23 +61,22 @@ Add row and column labels to make it easier for the player to count positions. T
 
 You may modify the code for `display()` as long as the displayed board remains identical.
 
-### branch: **winner** (★)
+### branch: **winner** (★) ALFIYAN
 
 Update the game so that it ends when a winner emerges.
 
 If a player’s `King` piece is eliminated in any round, the opponent player wins.
 
-### branch: **pawnfirstmove** (★)
-
+### branch: **pawnfirstmove** (★) ISAAC
 In chess, the pawn may move two steps on *its first move*. Regardless of whether it took one or two steps on the first move, it may only move one step on subsequent moves.
 
-### branch: **printmove** (★★)
+### branch: **printmove** (★★) Anoop (X)
 
 Print the player's move after `prompt()`, before `next_turn()`
 
 **Example:** `white pawn 01 -> 02`
 
-### branch: **promotion** (★★)
+### branch: **promotion** (★★) Yirui
 
 Add additional code to check for **promotion** during `update()`. In chess, when a `Pawn` reaches the opposite side of the board, it may be promoted to a `Rook`, `Knight`, `Bishop`, or `Queen`.
 
@@ -91,7 +90,7 @@ The turn ends only after the piece is promoted.
 
 Teams may propose any other features as bonus additions if they are not mentioned here.
 
-### branch: **check** (★★)
+### branch: **check** (★★) Anoop (X)
 
 Print a message if any player is checked at the end of the turn.
 
@@ -99,7 +98,7 @@ Print a message if any player is checked at the end of the turn.
 
 Check can be determined by taking the start position of each opponent piece on the board, taking the player’s King as the end position, and checking if this is a valid move for the opponent piece.
 
-### branch: **debug** (★)
+### branch: **debug** (★) Anoop (X)
 
 Add a `debug mode` to the game.
 
@@ -115,7 +114,7 @@ In debug mode, the game output should display which step of the game it is at.
 
 You may add more steps to print to demarcate different processes (e.g. checkmating, checking for game winner, ...)
 
-### branch: **unchecking** (★)
+### branch: **unchecking** (★) 
 (prerequisites: **checkmate**)
 
 If a player is in checkmate, their next move must bring them out of checkmate, otherwise the move is invalid.
@@ -132,13 +131,13 @@ Any `MoveError`s raised should be handled with `try-except` and the player promp
 
 Other team members may inherit from this class to create custom errors, e.g. `StartPieceIsNotOwnError`, `EmptyPositionError`, `MovementBlockedError`, etc where necessary. This may make move validation easier.
 
-### branch: **pawncapture** (★★)
+### branch: **pawncapture** (★★) 
 
 Add additional move validation to the `Pawn` class for **capturing** moves.
 
 A capturing move by a `Pawn` involves moving one step forward and one step to the left or right to capture another piece. A `Pawn` may only capture through such a capturing move, and never by moving only forward without a left or right step.
 
-### branch: **moveclassifier** (★★)
+### branch: **moveclassifier** (★★) Yirui
 
 Add a method that classifies and returns the type of move being made.
 
@@ -149,7 +148,7 @@ Possible options:
 
 The output from this may improve your code for the `update()` method, and for tasks such as **pawncapture** and **castling**
 
-### branch: **nojump** (★★★)
+### branch: **nojump** (★★★) Anoop (X)
 
 In chess, pieces may not jump over another piece while moving to the end position. The Knight is the only piece that may do so.
 
@@ -177,7 +176,7 @@ Castling may only happen if:
 
 If a white pawn is on row 4 (or a black pawn on row 5), 
 
-### branch: **movelog** (★)
+### branch: **movelog** (★) Anoop (X)
 (prerequisites: **printmove**)
 
 As the game progresses, save each player’s move to a text file, `moves.txt`.
