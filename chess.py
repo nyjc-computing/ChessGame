@@ -13,6 +13,7 @@ class Board:
     01  11  21  31  41  51  61  71
     00  10  20  30  40  50  60  70
     '''
+
     def __init__(self):
         self.position = {}
 
@@ -23,7 +24,7 @@ class Board:
     def pieces(self):
         '''Return list of board pieces.'''
         return self.position.values()
-    
+
     def get_piece(self, coord):
         '''
         Return the piece at coord.
@@ -33,6 +34,7 @@ class Board:
 
     def add(self, coord, piece):
         '''Add a piece at coord.'''
+        self.log(f'== PIECE {piece} ADDED AT {coord} ==')
         self.position[coord] = piece
 
     def remove(self, coord):
@@ -52,9 +54,17 @@ class Board:
         piece = self.get_piece(start)
         self.remove(start)
         self.add(end, piece)
+        print(self.get_piece(end), f'{start[0]}{start[1]} -> {end[0]}{end[1]}')
 
     def start(self):
         '''Set up the pieces and start the game.'''
+        i = input("Start game with debug mode? (T or F)")
+        while i not in ('T', 'F'):
+            i = input("Start game with debug mode? (T or F)")
+        if i == "T":
+            self.debug = True
+        else:
+            self.debug = False
         colour = 'black'
         self.add((0, 7), Rook(colour))
         self.add((1, 7), Knight(colour))
@@ -78,15 +88,16 @@ class Board:
         self.add((7, 0), Rook(colour))
         for x in range(0, 8):
             self.add((x, 1), Pawn(colour))
-        
+
         self.winner = None
         self.turn = 'white'
-        
+
     def display(self):
         '''
         Displays the contents of the board.
         Each piece is represented by a coloured symbol.
         '''
+        self.log("== DISPLAY ==")
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
         for row in range(7, -1, -1):
@@ -98,9 +109,9 @@ class Board:
                 else:
                     piece = None
                     print(' ', end='')
-                if col == 7:     # Put line break at the end
+                if col == 7:  # Put line break at the end
                     print('')
-                else:            # Print a space between pieces
+                else:  # Print a space between pieces
                     print(' ', end='')
 
     def prompt(self):
@@ -110,6 +121,7 @@ class Board:
         then another 2 ints
         e.g. 07 27
         '''
+
         def valid_format(inputstr):
             '''
             Ensure input is 5 characters: 2 numerals,
@@ -117,16 +129,16 @@ class Board:
             followed by 2 numerals
             '''
             return len(inputstr) == 5 and inputstr[2] == ' ' \
-                and inputstr[0:2].isdigit() \
-                and inputstr[3:5].isdigit()
-        
+                   and inputstr[0:1].isdigit() \
+                   and inputstr[3:4].isdigit()
+
         def valid_num(inputstr):
             '''Ensure all inputted numerals are 0-7.'''
             for char in (inputstr[0:2] + inputstr[3:5]):
                 if char not in '01234567':
                     return False
             return True
-        
+
         def split_and_convert(inputstr):
             '''Convert 5-char inputstr into start and end tuples.'''
             start, end = inputstr.split(' ')
@@ -134,6 +146,7 @@ class Board:
             end = (int(end[0]), int(end[1]))
             return (start, end)
 
+        self.log("== PROMPT ==")
         while True:
             inputstr = input(f'{self.turn.title()} player: ')
             if not valid_format(inputstr):
@@ -154,7 +167,7 @@ class Board:
         1. There is a start piece of the player's colour
         2. There is no end piece, or end piece is not of player's colour
         3. The move is not valid for the selected piece
-        
+
         Returns False otherwise
         '''
         start_piece = self.get_piece(start)
@@ -169,19 +182,70 @@ class Board:
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
+        self.log("== UPDATE ==")
         self.remove(end)
         self.move(start, end)
+        self.promotion(end)
+        self.win()
+
+    def win(self):
+        """
+        Checks for a winner
+        """
+        self.log("== FINDING GAME WINNER ==")
+        list_pieces = self.pieces()
+        piece_list = [str(i) for i in list_pieces]
+        if 'white king' not in piece_list:
+            self.winner = 'Black'
+        elif 'black king' not in piece_list:
+            self.winner = 'White'
+        else:
+            self.log("== WINNER NOT FOUND, CONTINUING... ==")
+            self.winner = None
+
+    def promotion(self, end):
+        """
+        Checks for available pawns to be promoted and prompts player for choice of promotion.
+        """
+        self.log("== CHECKING FOR PROMOTION ==")
+        if end[1] in (0, 7):
+            piece = self.get_piece(end)
+            if str(piece) in ("black pawn", "white pawn"):
+                colour = piece.colour
+                new_piece = input("Enter Rook, Knight, Bishop or Queen: ")
+                new_piece = new_piece.lower()
+                while not new_piece in ("rook", "knight", "bishop", "queen"):
+                    print("Invalid option")
+                    new_piece = input("Enter Rook, Knight, Bishop or Queen: ")
+                    new_piece = new_piece.lower()
+                if new_piece == "rook":
+                    self.remove(end)
+                    self.add(end, Rook(colour))
+                elif new_piece == "bishop":
+                    self.remove(end)
+                    self.add(end, Bishop(colour))
+                elif new_piece == "knight":
+                    self.remove(end)
+                    self.add(end, Knight(colour))
+                else:
+                    self.remove(end)
+                    self.add(end, Queen(colour))
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
+        self.log("== NEXT TURN ==")
         if self.turn == 'white':
             self.turn = 'black'
         elif self.turn == 'black':
             self.turn = 'white'
 
+    def log(self, message):
+        if self.debug:
+            print(message)
 
 class BasePiece:
     name = 'piece'
+
     def __init__(self, colour):
         if type(colour) != str:
             raise TypeError('colour argument must be str')
@@ -206,7 +270,7 @@ class BasePiece:
         - x, the number of spaces moved horizontally,
         - y, the number of spaces moved vertically,
         - dist, the total number of spaces moved.
-        
+
         positive integers indicate upward or rightward direction,
         negative integers indicate downward or leftward direction.
         dist is always positive.
@@ -220,6 +284,7 @@ class BasePiece:
 class King(BasePiece):
     name = 'king'
     sym = {'white': '♔', 'black': '♚'}
+
     def __repr__(self):
         return f"King('{self.name}')"
 
@@ -231,10 +296,11 @@ class King(BasePiece):
         x, y, dist = self.vector(start, end)
         return (dist == 1) or (abs(x) == abs(y) == 1)
 
-    
+
 class Queen(BasePiece):
     name = 'queen'
     sym = {'white': '♕', 'black': '♛'}
+
     def __repr__(self):
         return f"Queen('{self.name}')"
 
@@ -245,13 +311,14 @@ class Queen(BasePiece):
         '''
         x, y, dist = self.vector(start, end)
         return (abs(x) == abs(y) != 0) \
-            or ((abs(x) == 0 and abs(y) != 0) \
-            or (abs(y) == 0 and abs(x) != 0))
+               or ((abs(x) == 0 and abs(y) != 0) \
+                   or (abs(y) == 0 and abs(x) != 0))
 
 
 class Bishop(BasePiece):
     name = 'bishop'
     sym = {'white': '♗', 'black': '♝'}
+
     def __repr__(self):
         return f"Bishop('{self.name}')"
 
@@ -264,6 +331,7 @@ class Bishop(BasePiece):
 class Knight(BasePiece):
     name = 'knight'
     sym = {'white': '♘', 'black': '♞'}
+
     def __repr__(self):
         return f"Knight('{self.name}')"
 
@@ -279,6 +347,7 @@ class Knight(BasePiece):
 class Rook(BasePiece):
     name = 'rook'
     sym = {'white': '♖', 'black': '♜'}
+
     def __repr__(self):
         return f"Rook('{self.name}')"
 
@@ -289,23 +358,60 @@ class Rook(BasePiece):
         '''
         x, y, dist = self.vector(start, end)
         return (abs(x) == 0 and abs(y) != 0) \
-            or (abs(y) == 0 and abs(x) != 0) 
+               or (abs(y) == 0 and abs(x) != 0)
 
 
 class Pawn(BasePiece):
     name = 'pawn'
-    sym = {'white': '♙', 'black': '♟︎'}
+    sym = {'white': '♙', 'black': '♟'}
+
     def __repr__(self):
         return f"Pawn('{self.name}')"
 
+
     def isvalid(self, start: tuple, end: tuple):
-        '''Pawn can only move 1 step forward.'''
-        x, y, dist = self.vector(start, end)
-        if x == 0:
-            if self.colour == 'black':
-                return (y == -1)
-            elif self.colour == 'white':
-                return (y == 1)
+        '''Pawn can only always move 1 step forward and 2 steps during the first move.'''
+        if self.colour == "black":
+            if start[1] == 6:
+                first_move = True
             else:
-                return False
-        return False
+                first_move = False
+        else:
+            if start[1] == 1:
+                first_move = True
+            else:
+                first_move = False
+        x, y, dist = self.vector(start, end)
+        if not first_move:
+            if x == 0:
+                if self.colour == 'black':
+                    return (y == -1)
+                elif self.colour == 'white':
+                    return (y == 1)
+                else:
+                    return False
+            return False
+        else:
+            if x == 0:
+                print("Confirm to move one or two steps")
+                choice = input("Enter one or two: ")
+                while choice.lower() not in ("one", "two"):
+                    print("Invalid option")
+                    choice = input("Enter one or two: ")
+
+                if choice.lower() == "one":
+                    if self.colour == 'black':
+                        return (y == -1)
+                    elif self.colour == 'white':
+                        return (y == 1)
+                    else:
+                        return False
+
+                elif choice.lower() == 'two':
+                    if self.colour == 'black':
+                        return (y == -2)
+                    elif self.colour == 'white':
+                        return (y == 2)
+                    else:
+                        return False
+            return False
