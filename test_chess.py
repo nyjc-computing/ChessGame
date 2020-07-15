@@ -68,13 +68,13 @@ class TestCoreReqs(unittest.TestCase):
         '''Identify game winner'''
         game = gameSetupWithKings()
         game.add((4, 5), Rook('white'))
-        game.turn = 'white'
+        game.turn, game.other_turn = 'white', 'black'
         game.update((4, 5), (4, 7))
         self.assertEqual(game.winner, 'white')
 
         game = gameSetupWithKings()
         game.add((4, 2), Rook('black'))
-        game.turn = 'black'
+        game.turn, game.other_turn = 'black', 'white'
         game.update((4, 2), (4, 0))
         self.assertEqual(game.winner, 'black')
 
@@ -83,7 +83,7 @@ class TestCoreReqs(unittest.TestCase):
         for col in range(7):
             game = gameSetupWithKings()
             game.add((col, 1), Pawn('white'))
-            game.turn = 'white'
+            game.turn, game.other_turn = 'white', 'black'
             self.assertTrue(game.valid_move((col, 1), (col, 3)))
             game.update((col, 1), (col, 3))
             self.assertEqual(game.get_piece((col, 3)).colour, 'white')
@@ -92,7 +92,7 @@ class TestCoreReqs(unittest.TestCase):
 
             game = gameSetupWithKings()
             game.add((col, 6), Pawn('black'))
-            game.turn = 'black'
+            game.turn, game.other_turn = 'black', 'white'
             self.assertTrue(game.valid_move((col, 6), (col, 4)))
             game.update((col, 6), (col, 4))
             self.assertEqual(game.get_piece((col, 4)).colour, 'black')
@@ -106,14 +106,14 @@ class TestCoreReqs(unittest.TestCase):
             if i == 4:
                 continue
             game.add((i, 6), Pawn('white'))
-            game.turn = 'white'
+            game.turn, game.other_turn = 'white', 'black'
             game.update((i, 6), (i, 7))
             self.assertEqual(game.get_piece((i, 7)).colour, 'white')
             self.assertEqual(game.get_piece((i, 7)).name, 'queen')
 
             game = gameSetupWithKings()
             game.add((i, 1), Pawn('black'))
-            game.turn = 'white'
+            game.turn, game.other_turn = 'black', 'white'
             game.update((i, 1), (i, 0))
             self.assertEqual(game.get_piece((i, 0)).colour, 'black')
             self.assertEqual(game.get_piece((i, 0)).name, 'queen')
@@ -139,7 +139,7 @@ class TestBonusReqs(unittest.TestCase):
         game = gameSetupWithKings()
         game.add((0,3), Pawn('white'))
         game.add((1,4), Pawn('black'))
-        game.turn = 'white'
+        game.turn, game.other_turn = 'white', 'black'
         game.update((0, 3), (1, 4))
         self.assertEqual(game.get_piece((1, 4)).colour, 'white')
     
@@ -148,7 +148,7 @@ class TestBonusReqs(unittest.TestCase):
         game = gameSetupWithKings()
         game.add((3, 4), Pawn('white'))
         game.add((4, 6), Pawn('black'))
-        game.turn = 'black'
+        game.turn, game.other_turn = 'black', 'white'
         game.update((4, 6), (4, 4))
         game.update((3, 4), (4, 5))
         self.assertEqual(game.get_piece((4, 5)).colour, 'white')
@@ -157,7 +157,7 @@ class TestBonusReqs(unittest.TestCase):
         game = gameSetupWithKings()
         game.add((3, 1), Pawn('white'))
         game.add((4, 3), Pawn('black'))
-        game.turn = 'white'
+        game.turn, game.other_turn = 'white', 'black'
         game.update((3, 1), (3, 3))
         game.update((4, 3), (3, 2))
         self.assertEqual(game.get_piece((3, 2)).colour, 'black')
@@ -165,21 +165,20 @@ class TestBonusReqs(unittest.TestCase):
 
     def test_rook_castling(self):
         '''Rook can castle'''
-        for colour, row in zip(['white', 'black'], [0, 7]):
-            # TODO: make castling a King move
+        for col in [0, 7]:
             game = gameSetupWithKings()
-            game.add((0, row), Rook(colour))
-            game.turn = colour
-            game.update((4, row), (2, row))
-            self.assertEqual(game.get_piece((3, row)).name, 'rook')
-            self.assertEqual(game.get_piece((2, row)).name, 'king')
+            game.add((col, 0), Rook('white'))
+            game.turn, game.other_turn = 'white', 'black'
+            game.update((4, 0), (2, 0))
+            self.assertEqual(game.get_piece((3, 0)).name, 'rook')
+            self.assertEqual(game.get_piece((2, 0)).name, 'king')
 
             game = gameSetupWithKings()
-            game.add((7, row), Rook(colour))
-            game.turn = colour
-            game.update((4, row), (6, row))
-            self.assertEqual(game.get_piece((5, row)).name, 'rook')
-            self.assertEqual(game.get_piece((6, row)).name, 'king')
+            game.add((col, 7), Rook('black'))
+            game.turn, game.other_turn = 'black', 'white'
+            game.update((4, 7), (6, 7))
+            self.assertEqual(game.get_piece((5, 7)).name, 'rook')
+            self.assertEqual(game.get_piece((6, 7)).name, 'king')
 
     def test_no_jump(self):
         '''Pieces cannot jump over pieces of same colour'''
@@ -188,7 +187,7 @@ class TestBonusReqs(unittest.TestCase):
         game.add((4, 4), Rook('white'))
         game.add((4, 6), King('black'))
         game.add((4, 3), Rook('black'))
-        game.turn = 'white'
+        game.turn, game.other_turn = 'white', 'black'
         self.assertFalse(game.valid_move((4, 4), (4, 0)))
         self.assertFalse(game.valid_move((4, 3), (4, 7)))
 
