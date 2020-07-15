@@ -1,9 +1,17 @@
+<<<<<<< HEAD
 import unittest
+=======
+import os, unittest
+>>>>>>> e84f514ff2d87de27339fa684ab084e967dcad3a
 
 from chess import Board, King, Queen, Bishop, Knight, Rook, Pawn
 
 def gameSetupWithKings():
+<<<<<<< HEAD
     game = Board()
+=======
+    game = Board(debug=True)
+>>>>>>> e84f514ff2d87de27339fa684ab084e967dcad3a
     game.add((4, 0), King('white'))
     game.add((4, 7), King('black'))
     return game
@@ -120,7 +128,11 @@ class TestCoreReqs(unittest.TestCase):
     
     def test_quick_game(self):
         '''Row/col labels, player move, check message'''
+<<<<<<< HEAD
         game = Board()
+=======
+        game = Board(debug=True)
+>>>>>>> e84f514ff2d87de27339fa684ab084e967dcad3a
         game.start()
         for start, end in [
                            ((4, 1), (4, 2)),
@@ -193,7 +205,30 @@ class TestBonusReqs(unittest.TestCase):
         self.assertFalse(game.valid_move((4, 3), (4, 7)))
 
     def test_next_move_uncheck(self):
-        pass
+        game = gameSetupWithKings()
+        game.add((0, 1), Rook('black'))
+        game.turn = 'white'
+        game.update((0, 1), (0, 0))
+        # white king is in check, next move must bring it out of check
+        self.assertFalse(game.valid_move((4, 0), (3, 0)))
+        self.assertTrue(game.valid_move((4, 0), (4, 1)))
+
+        game = gameSetupWithKings()
+        game.add((0, 6), Rook('white'))
+        game.turn = 'black'
+        game.update((0, 6), (0, 7))
+        # black king is in check, next move must bring it out of check
+        self.assertFalse(game.valid_move((4, 7), (3, 7)))
+        self.assertTrue(game.valid_move((4, 7), (4, 6)))
 
     def test_move_logging(self):
-        pass
+        game = Board()
+        game.start()
+        game.update((4, 1), (4, 2))
+        game.display()
+        game.next_turn()
+        if 'movelog.txt' in os.listdir():
+            with open('movelog.txt', 'r') as f:
+                line = f.readline()
+                self.assertTrue('41' in line and '42' in line)
+>>>>>>> e84f514ff2d87de27339fa684ab084e967dcad3a
