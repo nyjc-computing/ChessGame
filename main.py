@@ -1,5 +1,11 @@
 from chess import Board, King, Queen, Bishop, Knight, Rook, Pawn
 
+def testGame():
+    import os
+    os.system('python3 -m unittest -v test_chess.TestCoreReqs')
+    os.system('python3 -m unittest -v test_chess.TestBonusReqs')
+testGame()
+
 game = Board()
 game.start()
 while game.winner is None:

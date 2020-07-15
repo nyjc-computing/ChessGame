@@ -3,7 +3,7 @@ import unittest
 from chess import Board, King, Queen, Bishop, Knight, Rook, Pawn
 
 def gameSetupWithKings():
-    game = Board(debug=True)
+    game = Board()
     game.add((4, 0), King('white'))
     game.add((4, 7), King('black'))
     return game
@@ -120,7 +120,7 @@ class TestCoreReqs(unittest.TestCase):
     
     def test_quick_game(self):
         '''Row/col labels, player move, check message'''
-        game = Board(debug=True)
+        game = Board()
         game.start()
         for start, end in [
                            ((4, 1), (4, 2)),
@@ -183,7 +183,7 @@ class TestBonusReqs(unittest.TestCase):
 
     def test_no_jump(self):
         '''Pieces cannot jump over pieces of same colour'''
-        game = Board(debug=True)
+        game = Board()
         game.add((4, 1), King('white'))
         game.add((4, 4), Rook('white'))
         game.add((4, 6), King('black'))
