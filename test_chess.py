@@ -128,11 +128,7 @@ class TestCoreReqs(unittest.TestCase):
     
     def test_quick_game(self):
         '''Row/col labels, player move, check message'''
-<<<<<<< HEAD
-        game = Board()
-=======
         game = Board(debug=True)
->>>>>>> e84f514ff2d87de27339fa684ab084e967dcad3a
         game.start()
         for start, end in [
                            ((4, 1), (4, 2)),
