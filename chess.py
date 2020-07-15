@@ -58,7 +58,7 @@ class Board:
     def start(self):
         """Set up the pieces and start the game."""
         colour = "black"
-        self.add((0, 7), Pawn(colour))
+        self.add((0, 7), Rook(colour))
         self.add((1, 7), Knight(colour))
         self.add((2, 7), Bishop(colour))
         self.add((3, 7), Queen(colour))
