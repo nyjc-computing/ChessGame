@@ -1,13 +1,9 @@
-<<<<<<< HEAD
-import unittest
-=======
 import os, unittest
->>>>>>> e84f514ff2d87de27339fa684ab084e967dcad3a
 
 from chess import Board, King, Queen, Bishop, Knight, Rook, Pawn
 
 def gameSetupWithKings():
-    game = Board(debug=True)
+    game = Board()
     game.add((4, 0), King('white'))
     game.add((4, 7), King('black'))
     return game
@@ -124,7 +120,7 @@ class TestCoreReqs(unittest.TestCase):
     
     def test_quick_game(self):
         '''Row/col labels, player move, check message'''
-        game = Board(debug=True)
+        game = Board()
         game.start()
         for start, end in [
                            ((4, 1), (4, 2)),
