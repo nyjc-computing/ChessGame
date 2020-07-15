@@ -1,3 +1,5 @@
+
+
 # ChessGame
 
 A repository for a chess game in Python (Assignment 12).
@@ -191,4 +193,3 @@ white 01 -> 02
 black 06 -> 05
 ...
 ```
-
