@@ -1,17 +1,9 @@
-<<<<<<< HEAD
-import unittest
-=======
 import os, unittest
->>>>>>> e84f514ff2d87de27339fa684ab084e967dcad3a
 
 from chess import Board, King, Queen, Bishop, Knight, Rook, Pawn
 
 def gameSetupWithKings():
-<<<<<<< HEAD
     game = Board()
-=======
-    game = Board(debug=True)
->>>>>>> e84f514ff2d87de27339fa684ab084e967dcad3a
     game.add((4, 0), King('white'))
     game.add((4, 7), King('black'))
     return game
@@ -227,4 +219,3 @@ class TestBonusReqs(unittest.TestCase):
             with open('movelog.txt', 'r') as f:
                 line = f.readline()
                 self.assertTrue('41' in line and '42' in line)
->>>>>>> e84f514ff2d87de27339fa684ab084e967dcad3a
