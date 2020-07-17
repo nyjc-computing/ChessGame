@@ -79,7 +79,7 @@ class Board:
         end = tuple()
         while not end:
           for coord, piece in zip(self.coords(), self.pieces()):
-            if piece.colour != colour and isinstance(piece, King):
+            if piece.colour != colour and piece.name == "king":
               end = coord
         for coord, piece in zip(self.coords(), self.pieces()):
           if piece.colour == colour:
@@ -276,7 +276,7 @@ class Board:
             return False
         elif not start_piece.isvalid(start, end):
             return False
-        elif not isinstance(start_piece, Knight) and self.blocked(start, end):
+        elif start_piece.name != "knight" and self.blocked(start, end):
             return False
         elif not self.uncheck(self.turn):
             return False
