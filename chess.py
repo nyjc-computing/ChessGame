@@ -19,6 +19,14 @@ class Board:
     def coords(self):
         '''Return list of piece coordinates.'''
         return self.position.keys()
+    
+    def get_coords(self,name,colour):
+        pieces=[]
+        for i in self.coords():
+            if self.get_piece(i).name==name:
+                if self.get_piece(i).colour==colour:
+                    pieces.append(i)
+        return pieces
 
     def pieces(self):
         '''Return list of board pieces.'''
@@ -97,7 +105,7 @@ class Board:
         self.winner = None
         self.turn = 'white'
         
-     def display(self,debug = True):
+    def display(self,debug = True):
         '''
         Displays the contents of the board.
         Each piece is represented by a coloured symbol.
