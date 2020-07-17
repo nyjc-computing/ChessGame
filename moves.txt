@@ -1,3 +1,0 @@
-white pawn 41 -> 43
-black pawn 36 -> 34
-white pawn 43 -> 34

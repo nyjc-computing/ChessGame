@@ -190,9 +190,6 @@ class Board:
                     print('Invalid input. Move digits should be 0-7.')
                 else:
                     start, end = split_and_convert(inputstr)
-                    # print(f'valid_move: {self.valid_move(start, end)}')
-                    # print(f'valid_piece: {valid_piece(start)}')
-                    # print(f'uncheck: {self.move_will_check_own_king(start, end)}')
 
                     if is_own_piece(start) and self.valid_move(start, end) and self.move_will_check_own_king(start,end):
                         start_piece = self.get_piece(start)
@@ -317,7 +314,6 @@ class Board:
     def get_threat_coords_for(self,input_coords,colour,**kwargs):
         ''' Checks whether the input_coords is threatened by any piece of the input colour
         If return_list=True, Returns a list of input_coords of pieces of input colour which threatens the input_coords'''
-        return_list = kwargs.get('return_list',False)
         include_king = kwargs.get('include_king',True)
         list_ = []
         for coord in self.coords():
@@ -326,11 +322,7 @@ class Board:
                 if self.valid_move(coord, input_coords):
                     #print(f'{item} threatens {input_coords}')
                     list_.append(coord)
-        boolean_ = list_ != []
-        if return_list:
-            return (boolean_,list_)
-        else:
-            return boolean_
+        return list_
 
     def is_king_checked(self,colour,**kwargs):
         '''Checks if the king of the input colour is checked
@@ -339,42 +331,38 @@ class Board:
         return_checks = kwargs.get('return_checks',False)
 
         king_pos = self.get_king(colour)
-        
+        checks = self.get_threat_coords_for(king_pos,self.other_colour(colour))
         if return_checks:
-            return self.get_threat_coords_for(king_pos,self.other_colour(colour),return_list=True)
+            return (checks != []),checks
         else:
-            return self.get_threat_coords_for(king_pos,self.other_colour(colour))
+            return (checks != [])
     
-    def checkmate(self):
-        '''Will print a statement if the opponent king is in check and will end the game if the opponent king is in checkmate '''
-        check,checks = self.is_king_checked(self.other_turn,return_checks = True)
-        if check:
-            #print(f'checks: {checks}')
-            king_pos = self.get_king(self.other_turn)
-            checkmate = True
-            for check_pos in checks:
-                block_positions = self.coords_moving_between(check_pos,king_pos)
-                block_positions.append(check_pos)
-                for block_pos in block_positions:
-                    if self.get_threat_coords_for(block_pos,self.other_turn,include_king=False):
-                        checkmate = False
-            if checkmate:
-                king_x,king_y = king_pos
-                for x in [(king_x-1),king_x,(king_x+1)]:
-                    for y in [(king_y-1),king_y,(king_y+1)]:
-                        if x in range(8) and y in range(8):
-                            coords = (x,y)
-                            if self.valid_move(king_pos,pos):
-                                if self.move_will_check_own_king(king_pos,coords):
-                                    print((king_pos,pos))
-                                    checkmate = False
-                                    break
-            
-            if checkmate:
-                self.display()
-                self.winner = self.turn
-            else:
-                print(f'{self.other_turn} is checked')
+    def checkmate(self,checks):
+        #print(f'checks: {checks}')
+        king_pos = self.get_king(self.other_turn)
+        checkmate = True
+        for check_pos in checks:
+            block_positions = self.coords_moving_between(check_pos,king_pos)
+            block_positions.append(check_pos)
+            for block_pos in block_positions:
+                if self.get_threat_coords_for(block_pos,self.other_turn,include_king=False) != []:
+                    checkmate = False
+        if checkmate:
+            king_x,king_y = king_pos
+            for x in [(king_x-1),king_x,(king_x+1)]:
+                 for y in [(king_y-1),king_y,(king_y+1)]:
+                    if x in range(8) and y in range(8):
+                        coords = (x,y)
+                        if self.valid_move(king_pos,coords):
+                            if self.move_will_check_own_king(king_pos,coords):
+                                print((king_pos,coords))
+                                checkmate = False
+                                break
+        return checkmate        
+
+    def end(self):
+        self.display()
+        self.winner = self.turn
 
     def printmove(self,start,end):
         '''Print the move after its made'''
@@ -391,7 +379,12 @@ class Board:
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
-        self.checkmate()
+        check,checks = self.is_king_checked(self.other_turn,return_checks = True)
+        if check:
+            if self.checkmate(checks):
+                self.end()
+            else:
+                print(f'{self.other_turn} is checked')
         self.promotion(end)
         self.printmove(start,end)
         
