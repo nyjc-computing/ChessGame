@@ -112,21 +112,17 @@ class Board:
             checked = opponent_colour
             print(f"{checked} is checked.")
 
-    def uncheck(self, colour):
+    def uncheck(self, player_colour):
         '''
-        
+        Checks possibility of movement between player king without being checked.
         '''
-        end = tuple()
- 
-        while not end:
-            for coord, piece in zip(self.coords(), self.pieces()):
-                if piece.colour == colour and isinstance(piece, King):
-                    end = coord
-            for coord, piece in zip(self.coords(), self.pieces()):
-                if piece.colour != colour:
-                    if self.valid_move(coord, end):
-                        return False
-            return True
+        opponent_colour = "black" if player_colour == "white" else "white"
+        player_king_coord = self.get_coords(colour=player_colour, name="king")[0]
+
+        for coord in self.get_coords(colour=opponent_colour):
+          if self.valid_move(coord, player_king_coord):
+            return False
+        return True
                 
     def log(self, piece, start, end):
       '''
