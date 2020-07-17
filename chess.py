@@ -58,15 +58,15 @@ class Board:
         Promote the 'Pawn' piece to a 'Queen' piece when the 'Pawn' piece reaches the opposite end
         '''
         if self.get_piece(end).name == "pawn" and (end[1] == 0 or end[1] == 7):
-            if self.get_piece(end).colour == 'black':
-                self.remove(end)
-                self.add(end,Queen(black))
-            else:
-                self.remove(end)
-                self.add(end,Queen(white))
+            self.promote(self.get_piece(end), end)
 
-        
-        
+    def promote(self, piece, end):
+        if piece.colour == 'black':
+            self.remove(end)
+            self.add(end,Queen('black'))
+        else:
+            self.remove(end)
+            self.add(end,Queen('white')) 
 
     def start(self):
         '''Set up the pieces and start the game.'''
@@ -97,90 +97,72 @@ class Board:
         self.winner = None
         self.turn = 'white'
         
-    def display(self):
+     def display(self,debug = True):
         '''
         Displays the contents of the board.
         Each piece is represented by a coloured symbol.
         '''
+        if debug == True:
+            print('== DISPLAY ==')
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
-        
         for row in range(7, -1, -1):
-            if row == 7:
-                print('a b c d e f g h')
             for col in range(8):
-                coord = (col , row)  # tuple
-                
+                coord = (col, row)  # tuple
                 if coord in self.coords():
                     piece = self.get_piece(coord)
                     print(f'{piece.symbol()}', end='')
-                #  elif col == 0 and row == 2:
-                #     print('2')
-                # elif col == 0 and row == 3:
-                #     print('3')
-                # elif col == 0 and row == 4:
-                #     print('4')
                 else:
                     piece = None
                     print(' ', end='')
-
-                if col == 7 and row == 7:     # Put line break at the end
-                    print(' 8')
-                elif col == 7 and row == 6:
-                    print(' 7')
-                elif col == 7 and row == 5:
-                    print(' 6')
-                elif col == 7 and row == 4:
-                    print(' 5')
-                elif col == 7 and row == 3:
-                    print(' 4')
-                elif col == 7 and row == 2:
-                    print(' 3')
-                elif col == 7 and row == 1:
-                    print(' 2')
-                elif col == 7 and row == 0:
-                    print(' 1')
-                
-                
+                if col == 7:     # Put line break at the end
+                    print('')
                 else:            # Print a space between pieces
                     print(' ', end='')
 
-    def prompt(self):
+    def prompt(self,debug = True):
         '''
         Input format should be two ints,
         followed by a space,
         then another 2 ints
         e.g. 07 27
         '''
-        def valid_input(inputstr):
+        print('== PROMPT ==')
+        
+        def valid_format(inputstr):
             '''
             Ensure input is 5 characters: 2 numerals,
             followed by a space,
             followed by 2 numerals
             '''
             return len(inputstr) == 5 and inputstr[2] == ' ' \
-                and inputstr[0] in ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h') \
-                and inputstr[3] in ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h') \
-                and inputstr[1] in ('1', '2', '3', '4', '5', '6', '7', '8') \
-                and inputstr[4] in ('1', '2', '3', '4', '5', '6', '7', '8')
+                and inputstr[0:1].isdigit() \
+                and inputstr[3:4].isdigit()
+        
+        def valid_num(inputstr):
+            '''Ensure all inputted numerals are 0-7.'''
+            for char in (inputstr[0:1] + inputstr[3:4]):
+                if char not in '01234567':
+                    return False
+            return True
         
         def split_and_convert(inputstr):
             '''Convert 5-char inputstr into start and end tuples.'''
             start, end = inputstr.split(' ')
-            k = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
-            start = (k[start[0]] - 1, int(start[1]) - 1)
-            end = (k[end[0]] - 1, int(end[1]) - 1)
+            start = (int(start[0]), int(start[1]))
+            end = (int(end[0]), int(end[1]))
             return (start, end)
 
         while True:
             inputstr = input(f'{self.turn.title()} player: ')
-            if not valid_input(inputstr):
+            if not valid_format(inputstr):
                 print('Invalid input. Please enter your move in the '
-                      'following format: -_ -_, _ represents a digit from 1 to 8, - represents a letter from a-b')
+                      'following format: __ __, _ represents a digit.')
+            elif not valid_num(inputstr):
+                print('Invalid input. Move digits should be 0-7.')
             else:
                 start, end = split_and_convert(inputstr)
                 if self.valid_move(start, end):
-                    print(f'{self.get_piece(start)} to {end}')
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
@@ -204,8 +186,9 @@ class Board:
             return False
         return True
 
-    def update(self, start, end):
+    def update(self, start, end,debug = True):
         '''Update board information with the player's move.'''
+        print('== UPDATE ==')
         self.remove(end)
         self.move(start, end)
         #this part is for the winner
@@ -242,16 +225,20 @@ class Board:
                 if self.valid_move(i,w_goal):
                     print('The black king is in check')
                     return True
-                
 
-
-    def next_turn(self):
+    def next_turn(self,debug = True):
         '''Hand the turn over to the other player.'''
+        if debug == True:
+            print('== NEXT TURN ==')
+            
         if self.turn == 'white':
             self.turn = 'black'
         elif self.turn == 'black':
             self.turn = 'white'
 
+        
+
+ 
 
 class BasePiece:
     name = 'piece'
