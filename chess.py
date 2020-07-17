@@ -192,12 +192,12 @@ class Board:
                     start, end = split_and_convert(inputstr)
                     # print(f'valid_move: {self.valid_move(start, end)}')
                     # print(f'valid_piece: {valid_piece(start)}')
-                    # print(f'uncheck: {self.uncheck(start, end)}')
+                    # print(f'uncheck: {self.move_will_check_own_king(start, end)}')
 
-                    if is_own_piece(start) and self.valid_move(start, end) and self.uncheck(start,end):
+                    if is_own_piece(start) and self.valid_move(start, end) and self.move_will_check_own_king(start,end):
                         start_piece = self.get_piece(start)
                         if start_piece.name == 'pawn':
-                            start_piece.update_doublemove(start,end)
+                            start_piece.update_Pawndoublemove(start,end)
                         return start, end
                     else:
                         raise MoveError(self.get_piece(start), 'Invalid move')
@@ -510,6 +510,7 @@ class Knight(BasePiece):
 
 
 class Rook(BasePiece):
+    #abc
     name = 'rook'
     sym = {'white': '♖', 'black': '♜'}
     def __repr__(self):
