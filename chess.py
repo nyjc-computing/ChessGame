@@ -222,6 +222,9 @@ class Board:
             return False
         elif not start_piece.isvalid(start, end):
             return False
+        elif start_piece.name != 'knight':
+            if check_spaces_btw(start, end):
+               return False 
         elif self.check(start_piece.colour):
             self.move(start, end)
             if self.check(start_piece.colour):
