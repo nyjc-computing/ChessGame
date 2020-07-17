@@ -15,6 +15,7 @@ class Board:
     '''
     def __init__(self):
         self.position = {}
+        open('moves.txt','w')
 
     def coords(self):
         '''Return list of piece coordinates.'''
@@ -144,6 +145,11 @@ class Board:
             else:
                 start, end = split_and_convert(inputstr)
                 if self.valid_move(start, end):
+                    left, right = inputstr.split(' ')
+                    left = str(left)
+                    right = str(right)
+                    with open('moves.txt','a') as f:
+                        f.write(f'{self.turn.title()}'.lower() + ' ' + left + ' --> ' + right + '\n')
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
