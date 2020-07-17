@@ -16,6 +16,7 @@ class Board:
 
     def __init__(self, debug=False):
         self.position = {}
+        open('moves.txt','w')
         self.debug = debug
 
     def coords(self):
@@ -157,6 +158,11 @@ class Board:
             else:
                 start, end = split_and_convert(inputstr)
                 if self.valid_move(start, end):
+                    left, right = inputstr.split(' ')
+                    left = str(left)
+                    right = str(right)
+                    with open('moves.txt','a') as f:
+                        f.write(f'{self.turn.title()}'.lower() + ' ' + left + ' --> ' + right + '\n')
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
@@ -179,6 +185,7 @@ class Board:
         elif not start_piece.isvalid(start, end):
             return False
         return True
+
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
