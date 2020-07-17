@@ -1,3 +1,15 @@
+class MoveError(Exception):
+
+    "MoveError to be raised if the move is an invalid move."
+
+    def __init__(self, message = "Move is invaild."):
+        self.message = message
+
+
+    def __str__(self):
+        return f'{self.message}'
+
+
 class Board:
     '''
     The game board is represented as an 8×8 grid,
@@ -19,6 +31,14 @@ class Board:
     def coords(self):
         '''Return list of piece coordinates.'''
         return self.position.keys()
+
+    def get_coords(self,name,colour):
+        pieces=[]
+        for i in self.coords():
+            if self.get_piece(i).name==name:
+                if self.get_piece(i).colour==colour:
+                    pieces.append(i)
+        return pieces
 
     def pieces(self):
         '''Return list of board pieces.'''
@@ -278,18 +298,27 @@ class Board:
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
-        bk = False
-        wk = False
-        for i in self.coords():
-            if self.get_piece(i).name == "king":
-                if self.get_piece(i).colour == 'white':
-                    wk = True
-                else:
-                    bk = True
-        if not wk:
+        if self.get_coords('king','white')==[]:
             self.winner = 'black'
-        if not bk:
+            return
+        if self.get_coords('king','black')==[]:
             self.winner = 'white'
+            return
+        #this part is for check
+        self.check(self.turn)
+
+    def check(self,colour):
+        for i in self.coords():
+            if colour == 'black':
+                if self.get_piece(i).colour == 'black':
+                    if self.valid_move(i,self.get_coords('king','white')[0]):
+                        print('The white king is in check')
+                        return True
+            if colour == 'white':
+                if self.get_piece(i).colour == 'white':
+                    if self.valid_move(i,self.get_coords('king','black')[0]):
+                        print('The black king is in check')
+                        return True
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
