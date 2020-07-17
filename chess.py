@@ -183,12 +183,13 @@ class Board:
                 print('Invalid input. Move digits should be 0-7.')
             else:
                 start, end = split_and_convert(inputstr)
-                if self.temp_check(self.turn, start, end):
-                    print(f"Invalid move, {self.turn} King is in check")
-                elif self.valid_move(start, end):
+                # if self.temp_check(self.turn, start, end):
+                #     print(f"Invalid move, {self.turn} King is in check")
+                if self.valid_move(start, end):
                     print(printmove(start, end))
                     self.previousmove = (start, end)
                     print(self.moveclassifier(start, end))
+                    movelog(start, end)
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
