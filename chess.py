@@ -119,14 +119,6 @@ class Board:
       with open("moves.txt", "a") as f:
         f.write(move+"\n")
 
-    def moveclassifier(self,start,end):
-        start_piece = self.get_piece(start)
-        end_piece = self.get_piece(end)
-        if end_piece == None:
-            return 'move'
-        elif end_piece != None and end_piece.colour != self.turn:
-            return 'capture'
-
 
     def promotion(self,coord,colour,new):
         ''' 
