@@ -77,7 +77,10 @@ class Board:
         piece = self.get_piece(start)
         self.remove(start)
         self.add(end, piece)
+        piece_ = self.get_piece(end)
+        piece_.moved = True
         self.log(piece, start, end)
+        self.get_piece(end)
 
     def blocked(self, start, end):
         '''
@@ -315,11 +318,14 @@ class Board:
         dead = self.get_piece(end)
         self.remove(end)
         self.move(start, end)
-        if dead.name == "king":
-          self.winner = start_piece.colour
-          print(f'Game over. {self.winner} player wins!')
-        else:
-          self.check(self.turn)
+
+        if dead != None:
+            if dead.name == "king":
+              self.winner = start_piece.colour
+              print(f'Game over. {self.winner} player wins!')
+            else:
+               self.check(self.turn)
+
 
         if end[1] == 0 or end[1] == 7:
             if self.get_piece(end).name == 'pawn':
@@ -379,6 +385,7 @@ class BasePiece:
 class King(BasePiece):
     name = 'king'
     sym = {'white': '♔', 'black': '♚'}
+    moved = False
     def __repr__(self):
         return f"King('{self.name}')"
 
@@ -394,6 +401,7 @@ class King(BasePiece):
 class Queen(BasePiece):
     name = 'queen'
     sym = {'white': '♕', 'black': '♛'}
+    moved = False
     def __repr__(self):
         return f"Queen('{self.name}')"
 
@@ -411,6 +419,7 @@ class Queen(BasePiece):
 class Bishop(BasePiece):
     name = 'bishop'
     sym = {'white': '♗', 'black': '♝'}
+    moved = False
     def __repr__(self):
         return f"Bishop('{self.name}')"
 
@@ -423,6 +432,7 @@ class Bishop(BasePiece):
 class Knight(BasePiece):
     name = 'knight'
     sym = {'white': '♘', 'black': '♞'}
+    moved = False
     def __repr__(self):
         return f"Knight('{self.name}')"
 
@@ -438,6 +448,7 @@ class Knight(BasePiece):
 class Rook(BasePiece):
     name = 'rook'
     sym = {'white': '♖', 'black': '♜'}
+    moved = False
     def __repr__(self):
         return f"Rook('{self.name}')"
 
@@ -454,6 +465,7 @@ class Rook(BasePiece):
 class Pawn(BasePiece):
     name = 'pawn'
     sym = {'white': '♙', 'black': '♟︎'}
+    moved = False
     def __repr__(self):
         return f"Pawn('{self.name}')"
 
@@ -471,8 +483,8 @@ class Pawn(BasePiece):
                 return False
         return False
 
+
 class newPawn(BasePiece):
-    name = 'pawn'
     sym = {'white': '♙', 'black': '♟︎'}
     def __repr__(self):
         return f"Pawn('{self.name}')"
