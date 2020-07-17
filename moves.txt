@@ -1,6 +1,8 @@
-white pawn 51 -> 52
-black pawn 46 -> 45
-white pawn 61 -> 62
-black pawn 45 -> 44
-white pawn 62 -> 63
-black queen 37 -> 73
+white pawn 01 -> 02
+black knight 17 -> 25
+white pawn 11 -> 12
+black knight 25 -> 33
+white pawn 12 -> 13
+black knight 33 -> 21
+white pawn 71 -> 72
+black knight 21 -> 40

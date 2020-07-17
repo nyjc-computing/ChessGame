@@ -240,12 +240,13 @@ class Board:
 
         if self.debug:
           print("== UPDATE ==")
-
+        start_piece = self.get_piece(start)
         dead = self.remove(end)
         self.move(start, end)
         if isinstance(dead, King):
-          color = str(end_piece).split(" ")[0]
+          color = str(start_piece).split(" ")[0]
           self.winner = color
+          print(f'Game over. {self.winner} player wins!')
         self.check(self.turn)
 
     def next_turn(self):
