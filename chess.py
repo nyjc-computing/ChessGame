@@ -58,7 +58,7 @@ class Board:
         print(self.get_piece(end), f'{start[0]}{start[1]} -> {end[0]}{end[1]}')
 
     def start(self):
-        '''Set up the pieces and start the game.'''01
+        '''Set up the pieces and start the game.'''
         colour = 'black'
         self.add((0, 7), Rook(colour))
         self.add((1, 7), Knight(colour))
