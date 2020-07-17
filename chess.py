@@ -60,10 +60,10 @@ class Board:
         if self.get_piece(end).name == "pawn" and (end[1] == 0 or end[1] == 7):
             if self.get_piece(end).colour == 'black':
                 self.remove(end)
-                self.add(end,Queen(black))
+                self.add(end,Queen('black'))
             else:
                 self.remove(end)
-                self.add(end,Queen(white))
+                self.add(end,Queen('white'))
 
         
         
