@@ -510,6 +510,7 @@ class Knight(BasePiece):
 
 
 class Rook(BasePiece):
+    #abc
     name = 'rook'
     sym = {'white': '♖', 'black': '♜'}
     def __repr__(self):
