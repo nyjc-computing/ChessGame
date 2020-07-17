@@ -485,6 +485,7 @@ class Pawn(BasePiece):
 
 
 class newPawn(BasePiece):
+    name = 'pawn'
     sym = {'white': '♙', 'black': '♟︎'}
     def __repr__(self):
         return f"Pawn('{self.name}')"
