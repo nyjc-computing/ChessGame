@@ -197,7 +197,7 @@ class Board:
                     if is_own_piece(start) and self.valid_move(start, end) and self.move_will_check_own_king(start,end):
                         start_piece = self.get_piece(start)
                         if start_piece.name == 'pawn':
-                            start_piece.update_doublemove(start,end)
+                            start_piece.update_Pawndoublemove(start,end)
                         return start, end
                     else:
                         raise MoveError(self.get_piece(start), 'Invalid move')
