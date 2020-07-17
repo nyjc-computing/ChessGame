@@ -17,6 +17,10 @@ class Board:
         self.position = {}
         self.debug = debug
 
+    def debug_message(self, message):
+      if self.debug:
+        print(message)
+
     def coords(self):
         '''Return list of piece coordinates.'''
         return self.position.keys()
@@ -75,6 +79,7 @@ class Board:
         to ensure the move is valid.
         '''
         piece = self.get_piece(start)
+        print(piece.name)
         self.remove(start)
         self.add(end, piece)
         piece_ = self.get_piece(end)
@@ -100,10 +105,11 @@ class Board:
             return True
         return False
 
-    def check(self, player_colour):
+    def check(self):
         '''
         Checks possibility of movement between pieces of players to opponent king.
         '''
+        player_colour = self.turn
         opponent_colour = "black" if player_colour == "white" else "white"
         opponent_king_coord = self.get_coords(colour=opponent_colour, name="king")[0]
 
@@ -112,10 +118,11 @@ class Board:
             checked = opponent_colour
             print(f"{checked} is checked.")
 
-    def uncheck(self, player_colour):
+    def uncheck(self):
         '''
         Checks possibility of movement between player king without being checked.
         '''
+        player_colour = self.turn
         opponent_colour = "black" if player_colour == "white" else "white"
         player_king_coord = self.get_coords(colour=player_colour, name="king")[0]
 
@@ -123,50 +130,46 @@ class Board:
           if self.valid_move(coord, player_king_coord):
             return False
         return True
-                
+       
     def log(self, piece, start, end):
       '''
       Print move
       Log moves to moves.txt
       '''
-      def combine(l):
-        return "".join([str(x) for x in l])
-
-      start, end = combine(start), combine(end)
-      move = f"{piece} {start} -> {end}"
+      x0,y0 = start
+      x1,y1 = end
+      move = f"{piece} {x0}{y0} -> {x1}{y1}"
       print(move)
       with open("moves.txt", "a") as f:
         f.write(move+"\n")
 
+    def promotion_prompt():
+      choices = {
+          'queen': Queen(),
+          'knight': Knight(),
+          'bishop': Bishop(),
+          'rook': Rook(),
+        }
 
-    def promotion(self,coord,colour,new):
-        ''' 
-        promote a pawn into a rook
-        '''
-        choices = {'queen':Queen(colour),
-                   'knight':Knight(colour),
-                   'bishop':Bishop(colour),
-                   'rook':Rook(colour)}
-        self.remove(coord)
-        self.add(coord,choices[new])    
+      while True:
+        player_input = input("Choose a piece to promote to (queen, knight, bishop, rook): ").strip().lower()
+        
+        if player_input in choices.keys():
+          return choices[player_input]
+        else:
+          print("Incorrect input.")
 
-    
-    def prompt_for_piece_promotion(self):
-        '''
-        get input of what the pawn will be promoted to
-        '''
-        invalid = True
-        while invalid:
-            print(
-                'please choose a piece you want to promote to,the input sould be one of the following:\nqueen knight bishop rook\n')
-            
-            new = input()
-            
-            if not new in ['queen','knight','bishop','rook']:
-                print('wrong input. the input sould be one          of the following:\n queen knight            bishop rook\n')
-            else:
-                invalid = False
-        return new
+    def promotion(self, end):
+      if end[1] in (0,7) and end_piece.name == "pawn":
+        end_piece = self.get_piece(end)
+        player_colour = self.turn
+        self.remove(end)
+        new_piece = self.promotion_prompt()
+        self.add(end, new_piece(player_colour))
+
+    def win(self, end_piece):
+        if end_piece and end_piece.name == "king":
+          self.winner = self.turn
 
     def start(self):
         '''Set up the pieces and start the game.'''
@@ -206,8 +209,7 @@ class Board:
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
 
-        if self.debug:
-          print("== DISPLAY ==")
+        self.debug_message("== DISPLAY ==")
         
         for row in range(7, -1, -1):#print the indicating number for column and row
           if row == 7:
@@ -238,8 +240,7 @@ class Board:
         then another 2 ints
         e.g. 07 27
         '''
-        if self.debug:
-          print("== PROMPT ==")
+        self.debug_message("== PROMPT ==")
 
         def valid_format(inputstr):
             '''
@@ -298,42 +299,28 @@ class Board:
             return False
         elif start_piece.name != "knight" and self.blocked(start, end):
             return False
-        elif not self.uncheck(self.turn):
+        elif not self.uncheck():
             return False
         return True
+
 
     def update(self, start, end):
         '''
         Update board information with the player's move.
         '''
+        self.debug_message("== UPDATE ==")
 
-        if self.debug:
-          print("== UPDATE ==")
-
-        start_piece = self.get_piece(start)
-        dead = self.get_piece(end)
+        end_piece = self.get_piece(end) 
         self.remove(end)
         self.move(start, end)
-
-        if dead != None:
-            if dead.name == "king":
-              self.winner = start_piece.colour
-              print(f'Game over. {self.winner} player wins!')
-            else:
-               self.check(self.turn)
+        self.promotion(end)
+        self.win(end_piece)
+        self.check()
 
 
-        if end[1] == 0 or end[1] == 7:
-            if self.get_piece(end).name == 'pawn':
-                colour = self.turn
-                new = self.prompt_for_piece_promotion()
-                self.promotion(end,colour,new)
-        
-        
     def next_turn(self):
         '''Hand the turn over to the other player.'''
-        if self.debug:
-          print("== NEXT TURN ==")
+        self.debug_message("== NEXT TURN ==")
 
         if self.turn == 'white':
             self.turn = 'black'
