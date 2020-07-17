@@ -316,6 +316,7 @@ class Board:
         self.move(start, end)
         if dead.name == "king":
           self.winner = start_piece.colour
+          print(f'Game over. {self.winner} player wins!')
         else:
           self.check(self.turn)
 
@@ -325,8 +326,6 @@ class Board:
                 new = self.prompt_for_piece_promotion()
                 self.promotion(end,colour,new)
         
-        
-
         
     def next_turn(self):
         '''Hand the turn over to the other player.'''
