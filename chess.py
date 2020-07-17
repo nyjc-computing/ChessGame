@@ -1,13 +1,3 @@
-class MoveError(Exception):
-
-    "MoveError to be raised if the move is an invalid move."
-
-    def __init__(self, message = "Move is invaild."):
-        self.message = message
-        
-
-    def __str__(self):
-        return f'{self.message}'
 class Board:
     '''
     The game board is represented as an 8×8 grid,
@@ -23,21 +13,12 @@ class Board:
     01  11  21  31  41  51  61  71
     00  10  20  30  40  50  60  70
     '''
-    def __init__(self, **kwargs):
+    def __init__(self):
         self.position = {}
-        self.debug = kwargs.get('debug', False)
 
     def coords(self):
         '''Return list of piece coordinates.'''
         return self.position.keys()
-    
-    def get_coords(self,name,colour):
-        pieces=[]
-        for i in self.coords():
-            if self.get_piece(i).name==name:
-                if self.get_piece(i).colour==colour:
-                    pieces.append(i)
-        return pieces
 
     def pieces(self):
         '''Return list of board pieces.'''
@@ -121,21 +102,46 @@ class Board:
         Displays the contents of the board.
         Each piece is represented by a coloured symbol.
         '''
-        if self.debug:
-            print('== DISPLAY ==')
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
+        
         for row in range(7, -1, -1):
+            if row == 7:
+                print('a b c d e f g h')
             for col in range(8):
-                coord = (col, row)  # tuple
+                coord = (col , row)  # tuple
+                
                 if coord in self.coords():
                     piece = self.get_piece(coord)
                     print(f'{piece.symbol()}', end='')
+                #  elif col == 0 and row == 2:
+                #     print('2')
+                # elif col == 0 and row == 3:
+                #     print('3')
+                # elif col == 0 and row == 4:
+                #     print('4')
                 else:
                     piece = None
                     print(' ', end='')
-                if col == 7:     # Put line break at the end
-                    print('')
+
+                if col == 7 and row == 7:     # Put line break at the end
+                    print(' 8')
+                elif col == 7 and row == 6:
+                    print(' 7')
+                elif col == 7 and row == 5:
+                    print(' 6')
+                elif col == 7 and row == 4:
+                    print(' 5')
+                elif col == 7 and row == 3:
+                    print(' 4')
+                elif col == 7 and row == 2:
+                    print(' 3')
+                elif col == 7 and row == 1:
+                    print(' 2')
+                elif col == 7 and row == 0:
+                    print(' 1')
+                
+                
                 else:            # Print a space between pieces
                     print(' ', end='')
 
@@ -146,43 +152,35 @@ class Board:
         then another 2 ints
         e.g. 07 27
         '''
-        if self.debug:
-            print('== PROMPT ==')
-        
-        def valid_format(inputstr):
+        def valid_input(inputstr):
             '''
             Ensure input is 5 characters: 2 numerals,
             followed by a space,
             followed by 2 numerals
             '''
             return len(inputstr) == 5 and inputstr[2] == ' ' \
-                and inputstr[0:1].isdigit() \
-                and inputstr[3:4].isdigit()
-        
-        def valid_num(inputstr):
-            '''Ensure all inputted numerals are 0-7.'''
-            for char in (inputstr[0:1] + inputstr[3:4]):
-                if char not in '01234567':
-                    return False
-            return True
+                and inputstr[0] in ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h') \
+                and inputstr[3] in ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h') \
+                and inputstr[1] in ('1', '2', '3', '4', '5', '6', '7', '8') \
+                and inputstr[4] in ('1', '2', '3', '4', '5', '6', '7', '8')
         
         def split_and_convert(inputstr):
             '''Convert 5-char inputstr into start and end tuples.'''
             start, end = inputstr.split(' ')
-            start = (int(start[0]), int(start[1]))
-            end = (int(end[0]), int(end[1]))
+            k = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8}
+            start = (k[start[0]] - 1, int(start[1]) - 1)
+            end = (k[end[0]] - 1, int(end[1]) - 1)
             return (start, end)
 
         while True:
             inputstr = input(f'{self.turn.title()} player: ')
-            if not valid_format(inputstr):
+            if not valid_input(inputstr):
                 print('Invalid input. Please enter your move in the '
-                      'following format: __ __, _ represents a digit.')
-            elif not valid_num(inputstr):
-                print('Invalid input. Move digits should be 0-7.')
+                      'following format: -_ -_, _ represents a digit from 1 to 8, - represents a letter from a-b')
             else:
                 start, end = split_and_convert(inputstr)
                 if self.valid_move(start, end):
+                    print(f'{self.get_piece(start)} to {end}')
                     return start, end
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
@@ -208,44 +206,28 @@ class Board:
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
-        if self.debug:
-            print('== UPDATE ==')
         self.remove(end)
         self.move(start, end)
-        #this part is for the winner
-        if self.get_coords('king','white')==[]:
-            self.winner = 'black'
-        if self.get_coords('king','black')==[]:
-            self.winner = 'white'
-        #this part is for check
-        self.check(self.turn)
-
-    def check(self,colour):
+        bk = False
+        wk = False
         for i in self.coords():
-            if colour == 'black':
-                if self.get_piece(i).colour == 'black':
-                    if self.valid_move(i,self.get_coords('king','white')):
-                        print('The white king is in check')
-                        return True
-            if colour == 'white':
+            if self.get_piece(i).name == "king":
                 if self.get_piece(i).colour == 'white':
-                    if self.valid_move(i,self.get_coords('king','black')):
-                        print('The black king is in check')
-                        return True
+                    wk = True
+                else:
+                    bk = True
+        if not wk:
+            self.winner = 'black'
+        if not bk:
+            self.winner = 'white'
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
-        if self.debug:
-            print('== NEXT TURN ==')
-            
         if self.turn == 'white':
             self.turn = 'black'
         elif self.turn == 'black':
             self.turn = 'white'
 
-        
-
- 
 
 class BasePiece:
     name = 'piece'
