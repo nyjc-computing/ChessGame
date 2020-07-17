@@ -1,6 +1,6 @@
 from chess import Board, King, Queen, Bishop, Knight, Rook, Pawn
 
-game = Board(debug=True)
+game = Board(debug=False)
 game.start()
 while game.winner is None:
     game.display()

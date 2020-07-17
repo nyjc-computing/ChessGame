@@ -178,11 +178,15 @@ class Board:
         '''
         start_piece = self.get_piece(start)
         end_piece = self.get_piece(end)
+        if end_piece == None:
+            empty = True
+        else:
+            empty = False
         if start_piece is None or start_piece.colour != self.turn:
             return False
         elif end_piece is not None and end_piece.colour == self.turn:
             return False
-        elif not start_piece.isvalid(start, end):
+        elif not start_piece.isvalid(start, end, empty):
             return False
         return True
 
@@ -286,6 +290,7 @@ class BasePiece:
         y = end[1] - start[1]
         dist = abs(x) + abs(y)
         return x, y, dist
+    
 
 
 class King(BasePiece):
@@ -295,7 +300,7 @@ class King(BasePiece):
     def __repr__(self):
         return f"King('{self.name}')"
 
-    def isvalid(self, start: tuple, end: tuple):
+    def isvalid(self, start: tuple, end: tuple, empty):
         '''
         King can move one step in any direction
         horizontally, vertically, or diagonally.
@@ -311,7 +316,7 @@ class Queen(BasePiece):
     def __repr__(self):
         return f"Queen('{self.name}')"
 
-    def isvalid(self, start: tuple, end: tuple):
+    def isvalid(self, start: tuple, end: tuple, empty):
         '''
         Queen can move any number of steps horizontally,
         vertically, or diagonally.
@@ -329,7 +334,7 @@ class Bishop(BasePiece):
     def __repr__(self):
         return f"Bishop('{self.name}')"
 
-    def isvalid(self, start: tuple, end: tuple):
+    def isvalid(self, start: tuple, end: tuple, empty):
         '''Bishop can move any number of steps diagonally.'''
         x, y, dist = self.vector(start, end)
         return (abs(x) == abs(y) != 0)
@@ -342,7 +347,7 @@ class Knight(BasePiece):
     def __repr__(self):
         return f"Knight('{self.name}')"
 
-    def isvalid(self, start: tuple, end: tuple):
+    def isvalid(self, start: tuple, end: tuple, empty):
         '''
         Knight moves 2 spaces in any direction, and
         1 space perpendicular to that direction, in an L-shape.
@@ -358,7 +363,7 @@ class Rook(BasePiece):
     def __repr__(self):
         return f"Rook('{self.name}')"
 
-    def isvalid(self, start: tuple, end: tuple):
+    def isvalid(self, start: tuple, end: tuple, empty):
         '''
         Rook can move any number of steps horizontally
         or vertically.
@@ -376,7 +381,7 @@ class Pawn(BasePiece):
         return f"Pawn('{self.name}')"
 
 
-    def isvalid(self, start: tuple, end: tuple):
+    def isvalid(self, start: tuple, end: tuple, empty):
         '''Pawn can only always move 1 step forward and 2 steps during the first move.'''
         if self.colour == "black":
             if start[1] == 6:
@@ -389,30 +394,37 @@ class Pawn(BasePiece):
             else:
                 first_move = False
         x, y, dist = self.vector(start, end)
+
         if not first_move:
-            if x == 0:
-                if self.colour == 'black':
-                    return (y == -1)
-                elif self.colour == 'white':
-                    return (y == 1)
-                else:
-                    return False
-            return False
-        else:
-            if x == 0:
-                if dist == 1:
+            if abs(x) < 2:
+                if (empty and x == 0) or (not empty and abs(x) == 1):
                     if self.colour == 'black':
                         return (y == -1)
                     elif self.colour == 'white':
                         return (y == 1)
                     else:
                         return False
+                return False
+            return False
+        else:
+            if x == 0:
+                if dist == 1:
+                    if (empty and x == 0) or (not empty and abs(x) == 1):
+                        if self.colour == 'black':
+                            return (y == -1)
+                        elif self.colour == 'white':
+                            return (y == 1)
+                        else:
+                            return False
+                    return False
 
                 elif dist == 2:
-                    if self.colour == 'black':
-                        return (y == -2)
-                    elif self.colour == 'white':
-                        return (y == 2)
-                    else:
-                        return False
+                    if empty:
+                        if self.colour == 'black':
+                            return (y == -2)
+                        elif self.colour == 'white':
+                            return (y == 2)
+                        else:
+                            return False
+                    return False
             return False
