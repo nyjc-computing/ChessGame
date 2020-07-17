@@ -32,6 +32,30 @@ class Board:
         '''
         return self.position.get(coord, None)
 
+    def get_coords(self, **kwargs):
+        '''
+        Return pieces of specified colour and name
+        '''
+        coords = []
+        
+        colour = kwargs.get("colour", False)
+        name = kwargs.get("name", False)
+
+        for coord, piece in zip(self.coords(), self.pieces():
+          if colour and name:
+            if piece.colour == colour and piece.name == name:
+              coords.append(coord)
+          elif colour:
+            if piece.colour == colour:
+              coords.append(coord)
+          elif name:
+            if piece.name == name:
+              coords.append(coord)
+          else:
+            print("get_coords() requires atleast 1 argument")
+
+        return coords
+
     def add(self, coord, piece):
         '''Add a piece at coord.'''
         self.position[coord] = piece
@@ -72,23 +96,18 @@ class Board:
             blocked = True
         return blocked
 
-    def check(self, colour):
+    def check(self, player_colour):
         '''
-        
+        Checks possibility of movement between pieces of players to opponent king.
         '''
-        end = tuple()
-        while not end:
-          for coord, piece in zip(self.coords(), self.pieces()):
-            if piece.colour != colour and piece.name == "king":
-              end = coord
-        for coord, piece in zip(self.coords(), self.pieces()):
-          if piece.colour == colour:
-            if self.valid_move(coord, end):
-              checked = "black" if colour == "white" else "white"
-              print(f"{checked} is checked")
-              
-    
-    
+        opponent_colour = "black" if player_colour == "white" else "white"
+        opponent_king_coord = self.get_coords(colour=opponent_colour, name="king")[0]
+
+        for coord in self.get_coords(colour=player_colour):
+          if self.valid_move(coord, opponent_king_coord):
+            checked = opponent_colour
+            print(f"{checked} is checked.")
+
     def uncheck(self, colour):
         '''
         
@@ -156,9 +175,6 @@ class Board:
             else:
                 invalid = False
         return new
-
-
-
 
     def start(self):
         '''Set up the pieces and start the game.'''
