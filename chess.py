@@ -1,3 +1,10 @@
+class MoveError(Exception):
+    def __init__(self, piece, message):
+        self.message = message
+        self.piece = piece
+    
+    def __str__(self):
+        return f'{self.piece} -> {self.message}'
 class Board:
     '''
     The game board is represented as an 8×8 grid,
@@ -173,26 +180,29 @@ class Board:
                 return True
 
         while True:
-            inputstr = input(f'{self.turn.title()} player: ')
-            if not valid_format(inputstr):
-                print('Invalid input. Please enter your move in the '
-                      'following format: __ __, _ represents a digit.')
-            elif not valid_num(inputstr):
-                print('Invalid input. Move digits should be 0-7.')
-            else:
-                start, end = split_and_convert(inputstr)
-                # print(f'valid_move: {self.valid_move(start, end)}')
-                # print(f'valid_piece: {valid_piece(start)}')
-                # print(f'uncheck: {self.uncheck(start, end)}')
-
-                if valid_piece(start) and self.valid_move(start, end) and self.uncheck(start,end):
-                    start_piece = self.get_piece(start)
-                    if start_piece.name == 'pawn':
-                        start_piece.update_doublemove(start,end)
-
-                    return start, end
+            try:
+                inputstr = input(f'{self.turn.title()} player: ')
+                if not valid_format(inputstr):
+                    print('Invalid input. Please enter your move in the '
+                        'following format: __ __, _ represents a digit.')
+                elif not valid_num(inputstr):
+                    print('Invalid input. Move digits should be 0-7.')
                 else:
-                    print(f'Invalid move for {self.get_piece(start)}.')
+                    start, end = split_and_convert(inputstr)
+                    # print(f'valid_move: {self.valid_move(start, end)}')
+                    # print(f'valid_piece: {valid_piece(start)}')
+                    # print(f'uncheck: {self.uncheck(start, end)}')
+
+                    if valid_piece(start) and self.valid_move(start, end) and self.uncheck(start,end):
+                        start_piece = self.get_piece(start)
+                        if start_piece.name == 'pawn':
+                            start_piece.update_doublemove(start,end)
+
+                       return start, end
+                    else:
+                        raise MoveError(self.get_piece(start), 'Invalid move')
+            except MoveError:
+                print(f'Invalid move for {self.get_piece(start)}')
 
     def moveclassifier(self, start, end):
         '''
