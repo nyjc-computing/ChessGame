@@ -92,18 +92,32 @@ class Board:
         Checks coordinates between start and end.
         Returns true if pieces present between else false.
         '''
-        x = end[0] - start[0]
-        y = end[1] - start[1]
-        dir_ = tuple([int(e/abs(e)) if e else 0 for e in (x,y)])
-        vector = start
+        blocked = False
 
+        for coord in self.tween_coords(start, end):
+          if self.get_piece(coord):
+            blocked = True
+
+        return blocked
+
+    def tween_coords(self, start, end):
+        '''
+        Returns list of coordinates between start and end
+        '''
+        x, y, _ = BasePiece.vector(start, end)
+        x_dir = int(x/abs(x)) if x else 0
+        y_dir = int(y/abs(y)) if y else 0
+        x_pos, y_pos = start
+
+        result = []
         while True:
-          vector = tuple([sum(x) for x in zip(vector, dir_)])
-          if vector == end:
+          x_pos, y_pos += x_dir, y_dir
+          if (x_pos, y_pos) == end:
             break
-          elif self.get_piece(vector):
-            return True
-        return False
+          result.append((x_pos, y_pos))
+
+        return result
+
 
     def check(self):
         '''
