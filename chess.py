@@ -111,7 +111,8 @@ class Board:
 
         result = []
         while True:
-          x_pos, y_pos += x_dir, y_dir
+          x_pos += x_dir
+          y_pos += y_dir
           if (x_pos, y_pos) == end:
             break
           result.append((x_pos, y_pos))
