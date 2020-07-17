@@ -200,39 +200,25 @@ class Board:
         self.remove(end)
         self.move(start, end)
         #this part is for the winner
-        bk = False
-        wk = False
-        for i in self.coords():
-            if self.get_piece(i).name == "king":
-                if self.get_piece(i).colour == 'white':
-                    wk = True
-                else:
-                    bk = True
-        if not wk:
+        if self.get_coords('king','white')==[]:
             self.winner = 'black'
-        if not bk:
+        if self.get_coords('king','black')==[]:
             self.winner = 'white'
         #this part is for check
         self.check(self.turn)
 
     def check(self,colour):
         for i in self.coords():
-            if self.get_piece(i).name == "king":
-                if self.get_piece(i).colour == 'white':
-                    b_goal=i
+            if colour == 'black':
                 if self.get_piece(i).colour == 'black':
-                    w_goal=i
-
-        if colour == 'black':
-            if self.get_piece(i).colour == 'black':
-                if self.valid_move(i,b_goal):
-                    print('The white king is in check')
-                    return True
-        if colour == 'white':
-            if self.get_piece(i).colour == 'white':
-                if self.valid_move(i,w_goal):
-                    print('The black king is in check')
-                    return True
+                    if self.valid_move(i,self.get_coords('king','white')):
+                        print('The white king is in check')
+                        return True
+            if colour == 'white':
+                if self.get_piece(i).colour == 'white':
+                    if self.valid_move(i,self.get_coords('king','black')):
+                        print('The black king is in check')
+                        return True
 
     def next_turn(self,debug = True):
         '''Hand the turn over to the other player.'''
