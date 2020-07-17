@@ -41,7 +41,7 @@ class Board:
         colour = kwargs.get("colour", False)
         name = kwargs.get("name", False)
 
-        for coord, piece in zip(self.coords(), self.pieces():
+        for coord, piece in zip(self.coords(), self.pieces()):
           if colour and name:
             if piece.colour == colour and piece.name == name:
               coords.append(coord)
