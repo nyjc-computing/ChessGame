@@ -188,7 +188,7 @@ class Board:
                 if is_own_piece(start) and self.valid_move(start, end) and self.move_will_check_own_king(start,end):
                     start_piece = self.get_piece(start)
                     if start_piece.name == 'pawn':
-                        start_piece.update_doublemove(start,end)
+                        start_piece.update_Pawndoublemove(start,end)
 
                     return start, end
                 else:
@@ -223,7 +223,7 @@ class Board:
                 ycord = start[1]
                 sidepiece = self.get_piece((xcord, ycord))
                 if sidepiece.name == 'pawn':
-                    if not sidepiece.doublemoveprevturn:
+                    if not sidepiece.moved:
                         return False
                     
                     else:
@@ -405,6 +405,7 @@ class Board:
 
 class BasePiece:
     name = 'piece'
+    moved = False
     def __init__(self, colour):
         if type(colour) != str:
             raise TypeError('colour argument must be str')
@@ -518,19 +519,18 @@ class Rook(BasePiece):
 class Pawn(BasePiece):
     name = 'pawn'
     sym = {'white': '♙', 'black': '♟︎'}
-    doublemoveprevturn = False
     def __repr__(self):
         return f"Pawn('{self.name}')"
 
-    def update_doublemove(self,start,end):
+    def update_Pawndoublemove(self,start,end):
         x, y, dist = self.vector(start, end)
         if abs(y) == 2:
-            self.doublemoveprevturn = True
+            self.moved = True
         else:
-            self.doublemoveprevturn = False
+            self.moved = False
 
     def isvalid(self, start: tuple, end: tuple):
-        '''Pawn can only move 1 step forward or 1 step forward and 1 step horizontally when capturing enemy pieces. If pawn moves 2 steps, self.doublemoveprevturn is True'''
+        '''Pawn can only move 1 step forward or 1 step forward and 1 step horizontally when capturing enemy pieces. If pawn moves 2 steps, self.moved is True'''
 
         x, y, dist = self.vector(start, end)
         if x == -1 or x == 1 or x == 0:
