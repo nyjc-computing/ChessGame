@@ -222,6 +222,15 @@ class Board:
             return False
         elif not start_piece.isvalid(start, end):
             return False
+        #no jump code here :D
+        elif self.check(start_piece.colour):
+            self.move(start, end)
+            if self.check(start_piece.colour):
+                self.move(end, start)
+                print(f'The {start_piece.colour} king is still in check')
+                return False
+            self.move(end, start)
+
         return True
 
     def update(self, start, end):
