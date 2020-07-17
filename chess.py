@@ -89,15 +89,16 @@ class Board:
         '''
         x = end[0] - start[0]
         y = end[1] - start[1]
-        dir_ = tuple((e//e if e>0 else -e//e) if e else 0 for e in (x,y))
+        dir_ = tuple([int(e/abs(e)) if e else 0 for e in (x,y)])
         vector = start
 
-        blocked = False
-        while vector != end:
-          vector = tuple(sum(x) for x in zip(vector, dir_))
-          if self.get_piece(vector):
-            blocked = True
-        return blocked
+        while True:
+          vector = tuple([sum(x) for x in zip(vector, dir_)])
+          if vector == end:
+            break
+          elif self.get_piece(vector):
+            return True
+        return False
 
     def check(self, player_colour):
         '''
@@ -317,11 +318,14 @@ class Board:
         dead = self.get_piece(end)
         self.remove(end)
         self.move(start, end)
+
         if dead != None:
             if dead.name == "king":
-                self.winner = start_piece.colour
+              self.winner = start_piece.colour
+              print(f'Game over. {self.winner} player wins!')
             else:
-                self.check(self.turn)
+               self.check(self.turn)
+
 
         if end[1] == 0 or end[1] == 7:
             if self.get_piece(end).name == 'pawn':
@@ -329,8 +333,6 @@ class Board:
                 new = self.prompt_for_piece_promotion()
                 self.promotion(end,colour,new)
         
-        
-
         
     def next_turn(self):
         '''Hand the turn over to the other player.'''
