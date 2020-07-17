@@ -175,6 +175,10 @@ class Board:
                 start, end = split_and_convert(inputstr)
                 if self.valid_move(start, end):
                     print(printmove())
+                    with open("moves.txt", "w+") as f:
+                        f.write(
+                            f"{self.turn} {start[0]}{start[1]} -> {end[0]}{end[1]}\n"
+                        )
                     return start, end
                 else:
                     print(f"Invalid move for {self.get_piece(start)}.")
