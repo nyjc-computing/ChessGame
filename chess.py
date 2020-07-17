@@ -158,9 +158,9 @@ class Board:
             return (start, end)
 
         def printmove():
-            start_str = "".join([str(x) for x in start])
-            end_str = "".join([str(x) for x in end])
-            return f"{str(self.get_piece(start))} {start_str} -> {end_str}"
+            return (
+                f"{str(self.get_piece(start))} {start[0]}{start[1]} -> {end[0]}{end[1]}"
+            )
 
         while True:
             inputstr = input(f"{self.turn.title()} player: ")
@@ -175,7 +175,7 @@ class Board:
                 start, end = split_and_convert(inputstr)
                 if self.valid_move(start, end):
                     print(printmove())
-                    with open("moves.txt", "w+") as f:
+                    with open("moves.txt", "a+") as f:
                         f.write(
                             f"{self.turn} {start[0]}{start[1]} -> {end[0]}{end[1]}\n"
                         )
