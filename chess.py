@@ -377,13 +377,7 @@ class Pawn(BasePiece):
             return False
         else:
             if x == 0:
-                print("Confirm to move one or two steps")
-                choice = input("Enter one or two: ")
-                while choice.lower() not in ("one", "two"):
-                    print("Invalid option")
-                    choice = input("Enter one or two: ")
-
-                if choice.lower() == "one":
+                if dist == 1:
                     if self.colour == 'black':
                         return (y == -1)
                     elif self.colour == 'white':
@@ -391,7 +385,7 @@ class Pawn(BasePiece):
                     else:
                         return False
 
-                elif choice.lower() == 'two':
+                elif dist == 2:
                     if self.colour == 'black':
                         return (y == -2)
                     elif self.colour == 'white':
