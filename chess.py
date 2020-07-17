@@ -97,11 +97,16 @@ class Board:
         Displays the contents of the board.
         Each piece is represented by a coloured symbol.
         '''
-        self.log("== DISPLAY ==")
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
-        for row in range(7, -1, -1):
-            for col in range(8):
+        for row in range(8, -1, -1):
+            for col in range(0,8):
+                if row == 8 and col == 0:
+                    print('  ', end = '')
+                if row == 8:
+                    print(col,end = '')
+                if col == 0 and row != 8:
+                    print(row, end = ' ')
                 coord = (col, row)  # tuple
                 if coord in self.coords():
                     piece = self.get_piece(coord)
@@ -109,10 +114,11 @@ class Board:
                 else:
                     piece = None
                     print(' ', end='')
-                if col == 7:  # Put line break at the end
+                if col == 7:     # Put line break at the end
                     print('')
-                else:  # Print a space between pieces
-                    print(' ', end='')
+                else:            # Print a space between pieces
+                    if row != 8:
+                        print(' ', end='')
 
     def prompt(self):
         '''
