@@ -144,7 +144,7 @@ class Board:
         '''
         get input of what the pawn will be promoted to
         '''
-        invalid = Ture
+        invalid = True
         while invalid:
             print(
                 'please choose a piece you want to promote to,the input sould be one of the following:\nqueen knight bishop rook\n')
