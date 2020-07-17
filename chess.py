@@ -330,6 +330,7 @@ class Board:
 
 class BasePiece:
     name = 'piece'
+    moved = False
     def __init__(self, colour):
         if type(colour) != str:
             raise TypeError('colour argument must be str')
@@ -368,7 +369,6 @@ class BasePiece:
 class King(BasePiece):
     name = 'king'
     sym = {'white': '♔', 'black': '♚'}
-    moved = False
     def __repr__(self):
         return f"King('{self.name}')"
 
@@ -384,7 +384,6 @@ class King(BasePiece):
 class Queen(BasePiece):
     name = 'queen'
     sym = {'white': '♕', 'black': '♛'}
-    moved = False
     def __repr__(self):
         return f"Queen('{self.name}')"
 
@@ -402,7 +401,6 @@ class Queen(BasePiece):
 class Bishop(BasePiece):
     name = 'bishop'
     sym = {'white': '♗', 'black': '♝'}
-    moved = False
     def __repr__(self):
         return f"Bishop('{self.name}')"
 
@@ -415,7 +413,6 @@ class Bishop(BasePiece):
 class Knight(BasePiece):
     name = 'knight'
     sym = {'white': '♘', 'black': '♞'}
-    moved = False
     def __repr__(self):
         return f"Knight('{self.name}')"
 
@@ -431,7 +428,6 @@ class Knight(BasePiece):
 class Rook(BasePiece):
     name = 'rook'
     sym = {'white': '♖', 'black': '♜'}
-    moved = False
     def __repr__(self):
         return f"Rook('{self.name}')"
 
@@ -448,7 +444,6 @@ class Rook(BasePiece):
 class Pawn(BasePiece):
     name = 'pawn'
     sym = {'white': '♙', 'black': '♟︎'}
-    moved = False
     def __repr__(self):
         return f"Pawn('{self.name}')"
 
@@ -460,12 +455,12 @@ class Pawn(BasePiece):
                 if self.moved:
                     return (y == -1)
                 else:
-                    return (y == -2)
+                    return (y == -1) or (y == -2)
             elif self.colour == 'white':
                 if self.moved:
                     return (y == 1)
                 else:
-                    return (y == 2)
+                    return (y == 1) or (y == 2)
             else:
                 return False
         return False
