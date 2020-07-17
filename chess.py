@@ -18,6 +18,7 @@ class Board:
         self.position = {}
         open('moves.txt','w')
         self.debug = debug
+        self.winner = None
 
     def coords(self):
         '''Return list of piece coordinates.'''
@@ -33,6 +34,18 @@ class Board:
         Returns None if no piece at coord.
         '''
         return self.position.get(coord, None)
+    
+    def find_piece(self, name, colour):
+        '''
+        Return the coord of a specific piece
+        '''
+        coord = None
+        for el in self.position:
+            if self.get_piece(el).name == 'king':
+                if self.get_piece(el).colour  == colour:
+                    coord = el
+                    break
+        return coord
 
     def add(self, coord, piece):
         '''Add a piece at coord.'''
@@ -84,7 +97,7 @@ class Board:
         for x in range(0, 8):
             self.add((x, 1), Pawn(colour))
 
-        self.winner = None
+        
         self.turn = 'white'
 
     def display(self):
@@ -192,25 +205,32 @@ class Board:
 
 
     def update(self, start, end):
-        '''Update board information with the player's move.'''
+        '''
+        Update board information with the player's move.
+        '''
         self.log("== UPDATE ==")
         self.remove(end)
         self.move(start, end)
         self.promotion(end)
+        self.checkmate(end)
         self.win()
-        self.checkmate()
+
 
     def win(self):
         """
         Checks for a winner
         """
         self.log("== FINDING GAME WINNER ==")
-        list_pieces = self.pieces()
-        piece_list = [str(i) for i in list_pieces]
-        if 'white king' not in piece_list:
-            self.winner = 'Black'
-        elif 'black king' not in piece_list:
-            self.winner = 'White'
+        white_king = self.find_piece('king', 'white')
+        black_king = self.find_piece('king', 'black')
+        if white_king is None:
+            piece = self.get_piece(black_king)
+            self.winner = piece.colour
+            self.log("== BLACK WON ==")
+        elif black_king is None:
+            piece = self.get_piece(white_king)
+            self.winner = piece.colour
+            self.log("== WHITE WON ==")
         else:
             self.log("== WINNER NOT FOUND, CONTINUING... ==")
             self.winner = None
@@ -228,7 +248,9 @@ class Board:
                 self.add(end, Queen(colour))
 
     def next_turn(self):
-        '''Hand the turn over to the other player.'''
+        '''
+        Hand the turn over to the other player.
+        '''
         self.log("== NEXT TURN ==")
         if self.turn == 'white':
             self.turn = 'black'
@@ -236,23 +258,25 @@ class Board:
             self.turn = 'white'
 
     def log(self, message):
+        '''
+        Prints debug messages.
+        '''
         if self.debug:
             print(message)
     
-    def checkmate(self):
-        for coord in self.coords():
-            if 'white king' == str(self.get_piece(coord)):
-                whiteking = coord
-            elif 'black king' == str(self.get_piece(coord)):
-                blackking = coord
-        for coord in self.coords():
-            if self.valid_move(coord,whiteking):
-                print("White is checkmated!")
-                break
-            if self.valid_move(coord,blackking):
-                print("Black is checkmated!")
-                break
-        
+    def checkmate(self, end):
+        '''
+        Determines if a player has been checkmated.
+        '''
+        piece = self.get_piece(end)
+        if piece.colour == 'black':
+            colour = 'White'
+        else:
+            colour = 'Black'
+        king_coord = self.find_piece('king', colour.lower())
+        if not king_coord is None:
+            if piece.isvalid(end, king_coord, None):
+                print(f"{colour} is checkmated!")
 
 class BasePiece:
     name = 'piece'
@@ -382,7 +406,9 @@ class Pawn(BasePiece):
 
 
     def isvalid(self, start: tuple, end: tuple, empty):
-        '''Pawn can only always move 1 step forward and 2 steps during the first move.'''
+        '''
+        Pawn can only always move 1 step forward and 2 steps during the first move. Pawn can only capture diagonally forward.
+        '''
         if self.colour == "black":
             if start[1] == 6:
                 first_move = True
