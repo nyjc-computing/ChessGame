@@ -128,22 +128,34 @@ class Board:
             return 'capture'
 
 
-    def promotion(self,coord,colour):
+    def promotion(self,coord,colour,new):
         ''' 
         promote a pawn into a rook
         '''
-        print(
-          'please choose a piece you want to promote to,the input sould be one of the following:\nqueen knight bishop rook\n')
         choices = {'queen':Queen(colour),
                    'knight':Knight(colour),
                    'bishop':Bishop(colour),
                    'rook':Rook(colour)}
-        new = input()
-        if not new in ['queen','knight','bishhop','rook']:
-            print('wrong input. the input sould be one of the following:\n queen knight bishop rook\n')
-        else:
-            self.remove(coord)
-            self.add(coord,choices[new])        
+        self.remove(coord)
+        self.add(coord,choices[new])    
+
+    
+    def prompt_for_piece_promotion(self):
+        '''
+        get input of what the pawn will be promoted to
+        '''
+        invalid = Ture
+        while invalid:
+            print(
+                'please choose a piece you want to promote to,the input sould be one of the following:\nqueen knight bishop rook\n')
+            
+            new = input()
+            
+            if not new in ['queen','knight','bishop','rook']:
+                print('wrong input. the input sould be one          of the following:\n queen knight            bishop rook\n')
+            else:
+                invalid = False
+        return new
 
 
 
@@ -283,7 +295,9 @@ class Board:
         return True
 
     def update(self, start, end):
-        '''Update board information with the player's move.'''
+        '''
+        Update board information with the player's move.
+        '''
 
         if self.debug:
           print("== UPDATE ==")
@@ -296,9 +310,10 @@ class Board:
         self.check(self.turn)
 
         if end[1] == 0 or end[1] == 7:
-             if self.get_piece(end).name == 'pawn':
-                 colour = self.turn
-                 self.promotion(end,colour)
+            if self.get_piece(end).name == 'pawn':
+                colour = self.turn
+                new = self.prompt_for_piece_promotion()
+                self.promotion(end,colour,new)
         
         
 
