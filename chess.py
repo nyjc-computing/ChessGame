@@ -314,9 +314,10 @@ class Board:
         dead = self.get_piece(end)
         self.remove(end)
         self.move(start, end)
-        if isinstance(dead, King):
+        if dead.name == "king":
           self.winner = start_piece.colour
-        self.check(self.turn)
+        else:
+          self.check(self.turn)
 
         if end[1] == 0 or end[1] == 7:
             if self.get_piece(end).name == 'pawn':
