@@ -114,7 +114,7 @@ In debug mode, the game output should display which step of the game it is at.
 
 You may add more steps to print to demarcate different processes (e.g. checkmating, checking for game winner, ...)
 
-### branch: **unchecking** (★) 
+### branch: **unchecking** (★) X
 (prerequisites: **checkmate**)
 
 If a player is in checkmate, their next move must bring them out of checkmate, otherwise the move is invalid.
