@@ -42,7 +42,7 @@ class Board:
         Does nothing if there is no piece at coord.
         '''
         if coord in self.coords():
-            return self.position.pop(coord)
+            del self.position[coord]
 
     def move(self, start, end):
         '''
@@ -241,11 +241,12 @@ class Board:
         if self.debug:
           print("== UPDATE ==")
 
-        dead = self.remove(end)
+        start_piece = self.get_piece(start)
+        dead = self.get_piece(end)
+        self.remove(end)
         self.move(start, end)
         if isinstance(dead, King):
-          color = str(end_piece).split(" ")[0]
-          self.winner = color
+          self.winner = start_piece.colour
         self.check(self.turn)
 
     def next_turn(self):
