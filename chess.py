@@ -222,7 +222,9 @@ class Board:
             return False
         elif not start_piece.isvalid(start, end):
             return False
-        #no jump code here :D
+        elif start_piece.name != 'knight':
+            if check_spaces_btw(start, end):
+               return False 
         elif self.check(start_piece.colour):
             self.move(start, end)
             if self.check(start_piece.colour):
@@ -232,6 +234,71 @@ class Board:
             self.move(end, start)
 
         return True
+
+    def check_spaces_btw(self,start,end):
+        obstical = False
+        if start[0] == end[0]: 
+            #check if piece moves vertically
+            if start[1]>end[1]:
+                #moves down
+                for i in range(end[1]+1,start[1]):
+                    if self.get_coords((start[0],i) != None:
+                        obstical = True
+            else:
+                #moves up
+                for i in range(start[1]+1,end[1]):
+                    if self.get_coords((start[0],i) != None:
+                        obstical = True
+        elif start[1] == end[1]: 
+            #check if piece moves horizontally
+            if start[0]>end[0]:
+                #moves left
+                for i in range(end[0]+1,start[0]):
+                    if self.get_coords((i,start[1]) != None:
+                        obstical = True
+            else:
+                #moves right
+                for i in range(start[1]+1,end[1]):
+                    if self.get_coords((i,start[1]) != None:
+                        obstical = True
+        else:                  
+            #at this point the piece is moving
+            x=start[0]
+            y=start[1]
+            if start[0]>end[0]:
+                #move left
+                if start[1]>end[1]:
+                    #move down
+                    for i in range(start[0],end[0]):
+                        x-=1
+                        y-=1
+                        if self.get_coords((x,y)) != None:
+                            obstical = True
+                else:
+                    #move up
+                    for i in range(start[0],end[0]):
+                        x-=1
+                        y+=1
+                        if self.get_coords((x,y)) != None:
+                            obstical = True
+            else:
+                #move right
+                if start[1]>end[1]:
+                    #move down
+                    for i in range(start[0],end[0]):
+                        x+=1
+                        y-=1
+                        if self.get_coords((x,y)) != None:
+                            obstical = True
+                else:
+                    #move up
+                    for i in range(start[0],end[0]):
+                        x+=1
+                        y+=1
+                        if self.get_coords((x,y)) != None:
+                            obstical = True
+        return obstical
+
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
