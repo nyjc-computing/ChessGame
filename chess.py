@@ -169,8 +169,9 @@ class Board:
             else:
                 start, end = split_and_convert(inputstr)
                 if self.valid_move(start, end):
-                    startcoord, endcoord = inputstr.split(" ")
-                    print(f"{self.get_piece(start)} {startcoord} --> {endcoord}")
+                    start_str = "".join([str(x) for x in start])
+                    end_str = "".join([str(x) for x in end])
+                    print(f"{str(self.get_piece(start))} {start_str} -> {end_str}")
                     return start, end
                 else:
                     print(f"Invalid move for {self.get_piece(start)}.")
