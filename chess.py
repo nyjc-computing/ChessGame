@@ -32,6 +32,30 @@ class Board:
         '''
         return self.position.get(coord, None)
 
+    def get_coords(self, **kwargs):
+        '''
+        Return pieces of specified colour and name
+        '''
+        coords = []
+        
+        colour = kwargs.get("colour", False)
+        name = kwargs.get("name", False)
+
+        for coord, piece in zip(self.coords(), self.pieces():
+          if colour and name:
+            if piece.colour == colour and piece.name == name:
+              coords.append(coord)
+          elif colour:
+            if piece.colour == colour:
+              coords.append(coord)
+          elif name:
+            if piece.name == name:
+              coords.append(coord)
+          else:
+            print("get_coords() requires atleast 1 argument")
+
+        return coords
+
     def add(self, coord, piece):
         '''Add a piece at coord.'''
         self.position[coord] = piece
@@ -42,7 +66,7 @@ class Board:
         Does nothing if there is no piece at coord.
         '''
         if coord in self.coords():
-            return self.position.pop(coord)
+            del self.position[coord]
 
     def move(self, start, end):
         '''
@@ -72,21 +96,34 @@ class Board:
             blocked = True
         return blocked
 
-    def check(self, colour):
+    def check(self, player_colour):
+        '''
+        Checks possibility of movement between pieces of players to opponent king.
+        '''
+        opponent_colour = "black" if player_colour == "white" else "white"
+        opponent_king_coord = self.get_coords(colour=opponent_colour, name="king")[0]
+
+        for coord in self.get_coords(colour=player_colour):
+          if self.valid_move(coord, opponent_king_coord):
+            checked = opponent_colour
+            print(f"{checked} is checked.")
+
+    def uncheck(self, colour):
         '''
         
         '''
         end = tuple()
+ 
         while not end:
-          for coord, piece in zip(self.coords(), self.pieces()):
-            if piece.colour != colour and isinstance(piece, King):
-              end = coord
-        for coord, piece in zip(self.coords(), self.pieces()):
-          if piece.colour == colour:
-            if self.valid_move(coord, end):
-              checked = "black" if colour == "white" else "white"
-              print(f"{checked} is checked")
-    
+            for coord, piece in zip(self.coords(), self.pieces()):
+                if piece.colour == colour and isinstance(piece, King):
+                    end = coord
+            for coord, piece in zip(self.coords(), self.pieces()):
+                if piece.colour != colour:
+                    if self.valid_move(coord, end):
+                        return False
+            return True
+                
     def log(self, piece, start, end):
       '''
       Print move
@@ -102,6 +139,34 @@ class Board:
         f.write(move+"\n")
 
 
+    def promotion(self,coord,colour,new):
+        ''' 
+        promote a pawn into a rook
+        '''
+        choices = {'queen':Queen(colour),
+                   'knight':Knight(colour),
+                   'bishop':Bishop(colour),
+                   'rook':Rook(colour)}
+        self.remove(coord)
+        self.add(coord,choices[new])    
+
+    
+    def prompt_for_piece_promotion(self):
+        '''
+        get input of what the pawn will be promoted to
+        '''
+        invalid = True
+        while invalid:
+            print(
+                'please choose a piece you want to promote to,the input sould be one of the following:\nqueen knight bishop rook\n')
+            
+            new = input()
+            
+            if not new in ['queen','knight','bishop','rook']:
+                print('wrong input. the input sould be one          of the following:\n queen knight            bishop rook\n')
+            else:
+                invalid = False
+        return new
 
     def start(self):
         '''Set up the pieces and start the game.'''
@@ -231,24 +296,37 @@ class Board:
             return False
         elif not start_piece.isvalid(start, end):
             return False
-        elif not isinstance(start_piece, Knight) and self.blocked(start, end):
+        elif start_piece.name != "knight" and self.blocked(start, end):
+            return False
+        elif not self.uncheck(self.turn):
             return False
         return True
 
     def update(self, start, end):
-        '''Update board information with the player's move.'''
+        '''
+        Update board information with the player's move.
+        '''
 
         if self.debug:
           print("== UPDATE ==")
-        start_piece = self.get_piece(start)
-        dead = self.remove(end)
-        self.move(start, end)
-        if isinstance(dead, King):
-          color = str(start_piece).split(" ")[0]
-          self.winner = color
-          print(f'Game over. {self.winner} player wins!')
-        self.check(self.turn)
 
+        start_piece = self.get_piece(start)
+        dead = self.get_piece(end)
+        self.remove(end)
+        self.move(start, end)
+        if dead.name == "king":
+          self.winner = start_piece.colour
+          print(f'Game over. {self.winner} player wins!')
+        else:
+          self.check(self.turn)
+
+        if end[1] == 0 or end[1] == 7:
+            if self.get_piece(end).name == 'pawn':
+                colour = self.turn
+                new = self.prompt_for_piece_promotion()
+                self.promotion(end,colour,new)
+        
+        
     def next_turn(self):
         '''Hand the turn over to the other player.'''
         if self.debug:
@@ -373,6 +451,26 @@ class Rook(BasePiece):
 
 
 class Pawn(BasePiece):
+    name = 'pawn'
+    sym = {'white': '♙', 'black': '♟︎'}
+    def __repr__(self):
+        return f"Pawn('{self.name}')"
+
+    def isvalid(self, start: tuple, end: tuple):
+        '''Pawn can only move 1 step forward.'''
+        x, y, dist = self.vector(start, end)
+        if x == 0:
+            if self.colour == 'black':
+                self.__class__ = newPawn
+                return (y == -1 or y == -2)
+            elif self.colour == 'white':
+                self.__class__ = newPawn
+                return (y == 1 or y == 2)
+            else:
+                return False
+        return False
+
+class newPawn(BasePiece):
     name = 'pawn'
     sym = {'white': '♙', 'black': '♟︎'}
     def __repr__(self):

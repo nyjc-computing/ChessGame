@@ -90,7 +90,7 @@ The turn ends only after the piece is promoted.
 
 Teams may propose any other features as bonus additions if they are not mentioned here.
 
-### branch: **check** (★★)
+### branch: **check** (★★) Anoop (X)
 
 Print a message if any player is checked at the end of the turn.
 
@@ -114,7 +114,7 @@ In debug mode, the game output should display which step of the game it is at.
 
 You may add more steps to print to demarcate different processes (e.g. checkmating, checking for game winner, ...)
 
-### branch: **unchecking** (★)
+### branch: **unchecking** (★) 
 (prerequisites: **checkmate**)
 
 If a player is in checkmate, their next move must bring them out of checkmate, otherwise the move is invalid.
@@ -131,13 +131,13 @@ Any `MoveError`s raised should be handled with `try-except` and the player promp
 
 Other team members may inherit from this class to create custom errors, e.g. `StartPieceIsNotOwnError`, `EmptyPositionError`, `MovementBlockedError`, etc where necessary. This may make move validation easier.
 
-### branch: **pawncapture** (★★)
+### branch: **pawncapture** (★★) 
 
 Add additional move validation to the `Pawn` class for **capturing** moves.
 
 A capturing move by a `Pawn` involves moving one step forward and one step to the left or right to capture another piece. A `Pawn` may only capture through such a capturing move, and never by moving only forward without a left or right step.
 
-### branch: **moveclassifier** (★★)
+### branch: **moveclassifier** (★★) Yirui
 
 Add a method that classifies and returns the type of move being made.
 
