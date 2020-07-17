@@ -227,7 +227,8 @@ class Board:
             '''
             validation for pawn capture and enpassant
             '''
-            iscapture = start_piece.iscapture(start, end)
+            x, y, dist = start_piece.vector(start, end)
+            iscapture = (x == -1 or x == 1)
             if iscapture and end_piece is None:
                 xcord = end[0]
                 ycord = start[1]
@@ -564,7 +565,4 @@ class Pawn(BasePiece):
         Return True if pawn captures an enemy piece, else returns False
         '''
         x, y, dist = self.vector(start, end)
-        if x == -1 or x == 1:
-            return True
-        else:
-            return False
+        return x == -1 or x == 1
