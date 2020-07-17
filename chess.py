@@ -184,6 +184,10 @@ class Board:
             self.winner = 'White'
         else:
             self.winner = None
+
+    def movelog(self):
+        moves = open('moves.txt','w+')
+        
     
     def winner(self): 
         pass
