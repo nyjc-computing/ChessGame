@@ -1,4 +1,4 @@
-from chess import Board, King, Queen, Bishop, Knight, Rook, Pawn
+from chess import Board, King, Queen, Bishop, Knight, Rook, Pawn, MoveError
 
 game = Board()
 game.start()
