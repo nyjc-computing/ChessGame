@@ -210,26 +210,10 @@ class Board:
         self.log("== CHECKING FOR PROMOTION ==")
         if end[1] in (0, 7):
             piece = self.get_piece(end)
-            if str(piece) in ("black pawn", "white pawn"):
-                colour = piece.colour
-                new_piece = input("Enter Rook, Knight, Bishop or Queen: ")
-                new_piece = new_piece.lower()
-                while not new_piece in ("rook", "knight", "bishop", "queen"):
-                    print("Invalid option")
-                    new_piece = input("Enter Rook, Knight, Bishop or Queen: ")
-                    new_piece = new_piece.lower()
-                if new_piece == "rook":
-                    self.remove(end)
-                    self.add(end, Rook(colour))
-                elif new_piece == "bishop":
-                    self.remove(end)
-                    self.add(end, Bishop(colour))
-                elif new_piece == "knight":
-                    self.remove(end)
-                    self.add(end, Knight(colour))
-                else:
-                    self.remove(end)
-                    self.add(end, Queen(colour))
+            colour = piece.colour
+            if piece.name == Pawn(colour).name:
+                self.remove(end)
+                self.add(end, Queen(colour))
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
