@@ -193,6 +193,7 @@ class Board:
         self.move(start, end)
         self.promotion(end)
         self.win()
+        self.checkmate()
 
     def win(self):
         """
@@ -248,6 +249,21 @@ class Board:
     def log(self, message):
         if self.debug:
             print(message)
+    
+    def checkmate(self):
+        for coord in self.coords():
+            if 'white king' == str(self.get_piece(coord)):
+                whiteking = coord
+            elif 'black king' == str(self.get_piece(coord)):
+                blackking = coord
+        for coord in self.coords():
+            if self.valid_move(coord,whiteking):
+                print("White is checkmated!")
+                break
+            if self.valid_move(coord,blackking):
+                print("Black is checkmated!")
+                break
+        
 
 class BasePiece:
     name = 'piece'
