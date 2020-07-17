@@ -1,3 +1,13 @@
+class MoveError(Exception):
+
+    "MoveError to be raised if the move is an invalid move."
+
+    def __init__(self, message = "Move is invaild."):
+        self.message = message
+        
+
+    def __str__(self):
+        return f'{self.message}'
 class Board:
     '''
     The game board is represented as an 8×8 grid,
