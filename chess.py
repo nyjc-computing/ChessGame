@@ -72,10 +72,11 @@ class Board:
         self.position = self.copy
     
     def get_king(self,colour):
-        for i in self.position.items():
-            piece = i[1]
+        '''Return the coordinates of King piece'''
+        for coord in self.coords():
+            piece = self.get_piece(coord)
             if piece.colour == colour and piece.name == 'king':
-                return i[0]
+                return coord
     
     def start(self):
         '''Set up the pieces and start the game.'''
@@ -312,19 +313,18 @@ class Board:
         if type(piece) == Pawn and (end[1] == 0 or end[1] == 7):
             self.add(end,Queen(colour))
 
-    def get_threat_coords_for(self,position,colour,**kwargs):
-        ''' Checks whether the input position is threatened by any piece of the input colour
-        If return_list=True, Returns a list of positions of pieces of input colour which threatens the input position'''
+    def get_threat_coords_for(self,input_coords,colour,**kwargs):
+        ''' Checks whether the input_coords is threatened by any piece of the input colour
+        If return_list=True, Returns a list of input_coords of pieces of input colour which threatens the input_coords'''
         return_list = kwargs.get('return_list',False)
         include_king = kwargs.get('include_king',True)
         list_ = []
-        for item in self.position.items():
-            piece = item[1]
-            piece_position = item[0]
+        for coord in self.coords():
+            piece = self.get_piece(coord)
             if piece.colour == colour and (include_king or piece.name != 'king'):
-                if self.valid_move(piece_position, position):
-                    #print(f'{item} threatens {position}')
-                    list_.append(piece_position)
+                if self.valid_move(coord, input_coords):
+                    #print(f'{item} threatens {input_coords}')
+                    list_.append(coord)
         boolean_ = list_ != []
         if return_list:
             return (boolean_,list_)

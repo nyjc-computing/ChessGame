@@ -1,3 +1,0 @@
-white pawn 01 -> 03
-black pawn 06 -> 04
-white pawn 11 -> 13
