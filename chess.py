@@ -581,10 +581,10 @@ class Board:
         if self.debug:
             print(f'\nChecking before prompting the {self.turn} player')
         self.find_attacking_pieces(self.turn)
-        if self.checkmate(self.turn):
-            self.winner = 'white' if self.turn == 'black' else 'black'
-        elif self.check(self.turn):
-                print(f"{self.turn} King is in check")
+        # if self.checkmate(self.turn):
+        #     self.winner = 'white' if self.turn == 'black' else 'black'
+        if self.check(self.turn):
+            print(f"{self.turn} King is in check")
 
 
 
