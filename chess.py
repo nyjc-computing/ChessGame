@@ -86,15 +86,16 @@ class Board:
         '''
         x = end[0] - start[0]
         y = end[1] - start[1]
-        dir_ = tuple((e//e if e>0 else -e//e) if e else 0 for e in (x,y))
+        dir_ = tuple([int(e/abs(e)) if e else 0 for e in (x,y)])
         vector = start
 
-        blocked = False
-        while vector != end:
-          vector = tuple(sum(x) for x in zip(vector, dir_))
-          if self.get_piece(vector):
-            blocked = True
-        return blocked
+        while True:
+          vector = tuple([sum(x) for x in zip(vector, dir_)])
+          if vector == end:
+            break
+          elif self.get_piece(vector):
+            return True
+        return False
 
     def check(self, player_colour):
         '''
