@@ -14,8 +14,9 @@ class Board:
     00  10  20  30  40  50  60  70
     '''
 
-    def __init__(self):
+    def __init__(self, debug=False):
         self.position = {}
+        self.debug = debug
 
     def coords(self):
         '''Return list of piece coordinates.'''
@@ -57,14 +58,7 @@ class Board:
         print(self.get_piece(end), f'{start[0]}{start[1]} -> {end[0]}{end[1]}')
 
     def start(self):
-        '''Set up the pieces and start the game.'''
-        i = input("Start game with debug mode? (T or F)")
-        while i not in ('T', 'F'):
-            i = input("Start game with debug mode? (T or F)")
-        if i == "T":
-            self.debug = True
-        else:
-            self.debug = False
+        '''Set up the pieces and start the game.'''01
         colour = 'black'
         self.add((0, 7), Rook(colour))
         self.add((1, 7), Knight(colour))
