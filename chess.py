@@ -41,7 +41,7 @@ class Board:
         '''
         coord = None
         for el in self.position:
-            if self.get_piece(el).name == 'king':
+            if self.get_piece(el).name == name:
                 if self.get_piece(el).colour  == colour:
                     coord = el
                     break
