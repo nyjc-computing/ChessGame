@@ -185,7 +185,7 @@ class Board:
                 # print(f'is_own_piece: {is_own_piece(start)}')
                 # print(f'move_will_check_own_king: {self.move_will_check_own_king(start, end)}')
 
-                if valid_piece(start) and self.valid_move(start, end) and self.move_will_check_own_king(start,end):
+                if is_own_piece(start) and self.valid_move(start, end) and self.move_will_check_own_king(start,end):
                     start_piece = self.get_piece(start)
                     if start_piece.name == 'pawn':
                         start_piece.update_doublemove(start,end)
