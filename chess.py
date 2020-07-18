@@ -13,6 +13,7 @@ class Board:
     01  11  21  31  41  51  61  71
     00  10  20  30  40  50  60  70
     '''
+    counter = 0
     def __init__(self, debug=False):
         self.position = {}
         self.debug = debug
@@ -21,13 +22,11 @@ class Board:
       if self.debug:
         print(message)
 
-    def save(self):
-      '''Creates a copy of board positions'''
-      self.copy = dict(self.position)
-
-    def undo(self):
-      '''Restore positions to last copy'''
-      self.position = self.copy
+    def test(self):
+      '''to be removed'''
+      self.add((0, 1), Rook('black'))
+      self.turn = 'white'
+      self.update((0, 1), (0, 0))
 
     def coords(self):
         '''Return list of piece coordinates.'''
@@ -97,8 +96,13 @@ class Board:
         self.add(end, piece)
         piece_ = self.get_piece(end)
         piece_.moved = True
-        self.log(piece, start, end)
         self.get_piece(end)
+
+    def get_colours(self):
+      player_colour = self.turn
+      opponent_colour = "black" if player_colour == "white" else "white"
+
+      return player_colour, opponent_colour
 
     def blocked(self, start, end):
         '''
@@ -136,42 +140,51 @@ class Board:
         '''
         Checks possibility of movement between pieces of players to opponent king.
         '''
-        player_colour = self.turn
-        opponent_colour = "black" if player_colour == "white" else "white"
+        player_colour, opponent_colour = self.get_colours()
         opponent_king_coord = self.get_coords_specific(colour=opponent_colour, name="king")
 
         #not ideal solution but automated tests break if i reference self.winner to check if game is ended before check() 
         if opponent_king_coord is None:
           return
 
+        checkers = []
         for coord in self.get_coords(colour=player_colour):
           if self.valid_move(coord, opponent_king_coord):
-            print(f"{opponent_colour} is checked.")
-            return True
+            checkers.append(coord)
+        return checkers
+
+    '''
+    def save(self):
+        \'\'\'Save current positions\'\'\'
+        from copy import copy
+        self.copy = copy(self.position)
+
+    def load(self):
+        \'\'\'Load last saved positions\'\'\'
+        self.position = self.copy
 
     def uncheck(self, start, end):
-        '''
+        \'\'\'
         Checks possibility of movement without being checked.
-        '''
-        self.save()
-        self.move(start, end)
-
+        \'\'\'
+        self.next_turn()
         valid = True
         if self.check():
-          valid = False
-
-        self.undo()
+          self.move(start, end)
+          if self.check():
+            valid = False
+          self.move(end, start)
         return valid
-
-
-       
-    def log(self, piece, start, end):
+    '''
+    
+    def log(self, start, end):
       '''
       Print move
       Log moves to moves.txt
       '''
       x0,y0 = start
       x1,y1 = end
+      piece = self.get_piece(start)
       move = f"{piece} {x0}{y0} -> {x1}{y1}"
       print(move)
       with open("moves.txt", "a") as f:
@@ -196,7 +209,7 @@ class Board:
     def promotion(self, end):
       end_piece = self.get_piece(end)
       if end[1] in (0,7) and end_piece.name == "pawn":
-        player_colour = self.turn
+        player_colour, _ = self.get_colours()
         self.remove(end)
         new_piece = self.promotion_prompt(player_colour)
         self.add(end, new_piece)
@@ -267,6 +280,8 @@ class Board:
             else:            # Print a space between pieces
                 print(' ', end='')
 
+        print(f"[Turn {self.counter}]")
+
     def prompt(self):
         '''
         Input format should be two ints,
@@ -302,6 +317,7 @@ class Board:
         
         while True:
             inputstr = input(f'{self.turn.title()} player: ')
+            self.display()
             if not valid_format(inputstr):
                 print('Invalid input. Please enter your move in the '
                       'following format: __ __, _ represents a digit.')
@@ -333,8 +349,10 @@ class Board:
             return False
         elif start_piece.name != "knight" and self.blocked(start, end):
             return False
+        '''
         elif not self.uncheck(start, end):
             return False
+        '''
         return True
 
     def update(self, start, end):
@@ -343,16 +361,23 @@ class Board:
         '''
         self.debug_message("== UPDATE ==")
 
+        player_colour, opponent_colour = self.get_colours()
         end_piece = self.get_piece(end) 
         self.remove(end)
+        self.log(start, end)
         self.move(start, end)
         self.promotion(end)
         self.win(end_piece)
-        self.check()
+        if self.check():
+          print(f"{opponent_colour} is checked!")
         
-    def next_turn(self):
+    def next_turn(self, log=True):
         '''Hand the turn over to the other player.'''
-        self.debug_message("== NEXT TURN ==")
+        
+        if log:
+          self.debug_message("== NEXT TURN ==")
+          self.counter += 1
+
         if self.turn == 'white':
             self.turn = 'black'
         elif self.turn == 'black':
