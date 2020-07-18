@@ -317,7 +317,6 @@ class Board:
         
         while True:
             inputstr = input(f'{self.turn.title()} player: ')
-            self.display()
             if not valid_format(inputstr):
                 print('Invalid input. Please enter your move in the '
                       'following format: __ __, _ represents a digit.')
