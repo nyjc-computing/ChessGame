@@ -1,4 +1,4 @@
-from chess import Board
+from chess import Board, King, Rook, Pawn
 
 def testGame():
     import os

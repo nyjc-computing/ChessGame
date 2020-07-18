@@ -1,0 +1,3 @@
+white pawn 41 -> 42
+black pawn 36 -> 35
+white queen 30 -> 74
