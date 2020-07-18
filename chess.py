@@ -1,3 +1,10 @@
+class MoveError(Exception):
+    def __init__(self, piece, message):
+        self.message = message
+        self.piece = piece
+    
+    def __str__(self):
+        return f'{self.piece} -> {self.message}'
 class Board:
     '''
     The game board is represented as an 8×8 grid,
@@ -65,10 +72,11 @@ class Board:
         self.position = self.copy
     
     def get_king(self,colour):
-        for i in self.position.items():
-            piece = i[1]
+        '''Return the coordinates of King piece'''
+        for coord in self.coords():
+            piece = self.get_piece(coord)
             if piece.colour == colour and piece.name == 'king':
-                return i[0]
+                return coord
     
     def start(self):
         '''Set up the pieces and start the game.'''
@@ -164,7 +172,7 @@ class Board:
             end = (int(end[0]), int(end[1]))
             return (start, end)
         
-        def valid_piece(start):
+        def is_own_piece(start):
             '''Ensures that there is a start piece of the player's colour selected'''
             start_piece = self.get_piece(start)
             if start_piece is None or start_piece.colour != self.turn:
@@ -173,26 +181,36 @@ class Board:
                 return True
 
         while True:
-            inputstr = input(f'{self.turn.title()} player: ')
-            if not valid_format(inputstr):
-                print('Invalid input. Please enter your move in the '
-                      'following format: __ __, _ represents a digit.')
-            elif not valid_num(inputstr):
-                print('Invalid input. Move digits should be 0-7.')
-            else:
-                start, end = split_and_convert(inputstr)
-                # print(f'valid_move: {self.valid_move(start, end)}')
-                # print(f'valid_piece: {valid_piece(start)}')
-                # print(f'uncheck: {self.uncheck(start, end)}')
-
-                if valid_piece(start) and self.valid_move(start, end) and self.uncheck(start,end):
-                    start_piece = self.get_piece(start)
-                    if start_piece.name == 'pawn':
-                        start_piece.update_doublemove(start,end)
-
-                    return start, end
+            try:
+                inputstr = input(f'{self.turn.title()} player: ')
+                if not valid_format(inputstr):
+                    print('Invalid input. Please enter your move in the '
+                        'following format: __ __, _ represents a digit.')
+                elif not valid_num(inputstr):
+                    print('Invalid input. Move digits should be 0-7.')
                 else:
-                    print(f'Invalid move for {self.get_piece(start)}.')
+                    start, end = split_and_convert(inputstr)
+
+                    if is_own_piece(start) and self.valid_move(start, end) and self.move_will_check_own_king(start,end):
+                        start_piece = self.get_piece(start)
+                        if start_piece.name == 'pawn':
+                            start_piece.update_Pawndoublemove(start,end)
+                        return start, end
+                    else:
+                        raise MoveError(self.get_piece(start), 'Invalid move')
+            except MoveError:
+                print(f'Invalid move for {self.get_piece(start)}')
+
+    def moveclassifier(self, start, end):
+        '''
+        a method that classfies and returns the move made
+        '''
+        end_piece = self.get_piece(end)
+        if end_piece is not None:
+            return 'capture'
+        else:
+            return 'move'
+
 
 
     def valid_move(self, start, end):
@@ -207,13 +225,14 @@ class Board:
             '''
             validation for pawn capture and enpassant
             '''
-            iscapture = start_piece.iscapture(start, end)
+            x, y, dist = start_piece.vector(start, end)
+            iscapture = (x == -1 or x == 1)
             if iscapture and end_piece is None:
                 xcord = end[0]
                 ycord = start[1]
                 sidepiece = self.get_piece((xcord, ycord))
                 if sidepiece.name == 'pawn':
-                    if not sidepiece.doublemoveprevturn:
+                    if not sidepiece.moved:
                         return False
                     
                     else:
@@ -240,17 +259,17 @@ class Board:
                 return False
         return True
 
-    def uncheck(self,start,end):
+    def move_will_check_own_king(self,start,end):
         '''Returns False if the ally king will be checked after the input move is played'''
         self.save()
         colour = self.get_piece(start).colour
         self.move(start,end)
-        validation = not self.check(colour)
+        validation = not self.is_king_checked(colour)
 
         self.undo()
         return validation
     
-    def path(self,start,end):
+    def coords_moving_between(self,start,end):
         '''Returns a list of positions that the start piece will move accross to reach end'''
         x, y, dist = BasePiece.vector(start, end)
         if x == 0:
@@ -280,8 +299,8 @@ class Board:
     def nojump(self,start,end):
         '''Returns False if there is a piece between the start and end position'''
         valid = True
-        for pos in self.path(start,end):
-            if self.get_piece(pos) != None:
+        for coords in self.coords_moving_between(start,end):
+            if self.get_piece(coords) != None:
                 valid = False
 
         return valid
@@ -293,68 +312,58 @@ class Board:
         if type(piece) == Pawn and (end[1] == 0 or end[1] == 7):
             self.add(end,Queen(colour))
 
-    def threaten(self,position,colour,**kwargs):
-        ''' Checks whether the input position is threatened by any piece of the input colour
-        If return_list=True, Returns a list of positions of pieces of input colour which threatens the input position'''
-        return_list = kwargs.get('return_list',False)
+    def get_threat_coords_for(self,input_coords,colour,**kwargs):
+        ''' Checks whether the input_coords is threatened by any piece of the input colour
+        If return_list=True, Returns a list of input_coords of pieces of input colour which threatens the input_coords'''
         include_king = kwargs.get('include_king',True)
         list_ = []
-        for item in self.position.items():
-            piece = item[1]
-            piece_position = item[0]
+        for coord in self.coords():
+            piece = self.get_piece(coord)
             if piece.colour == colour and (include_king or piece.name != 'king'):
-                if self.valid_move(piece_position, position):
-                    #print(f'{item} threatens {position}')
-                    list_.append(piece_position)
-        boolean_ = list_ != []
-        if return_list:
-            return (boolean_,list_)
-        else:
-            return boolean_
+                if self.valid_move(coord, input_coords):
+                    #print(f'{item} threatens {input_coords}')
+                    list_.append(coord)
+        return list_
 
-    def check(self,colour,**kwargs):
+    def is_king_checked(self,colour,**kwargs):
         '''Checks if the king of the input colour is checked
         If return_checks = True, will also return a list of the positions of pieces checking the king'''
 
         return_checks = kwargs.get('return_checks',False)
 
         king_pos = self.get_king(colour)
-        
+        checks = self.get_threat_coords_for(king_pos,self.other_colour(colour))
         if return_checks:
-            return self.threaten(king_pos,self.other_colour(colour),return_list=True)
+            return (checks != []),checks
         else:
-            return self.threaten(king_pos,self.other_colour(colour))
+            return (checks != [])
     
-    def checkmate(self):
-        '''Will print a statement if the opponent king is in check and will end the game if the opponent king is in checkmate '''
-        check,checks = self.check(self.other_turn,return_checks = True)
-        if check:
-            #print(f'checks: {checks}')
-            king_pos = self.get_king(self.other_turn)
-            checkmate = True
-            for check_pos in checks:
-                block_positions = self.path(check_pos,king_pos)
-                block_positions.append(check_pos)
-                for block_pos in block_positions:
-                    if self.threaten(block_pos,self.other_turn,include_king=False):
-                        checkmate = False
-            if checkmate:
-                king_x,king_y = king_pos
-                for x in [(king_x-1),king_x,(king_x+1)]:
-                    for y in [(king_y-1),king_y,(king_y+1)]:
-                        if x in range(8) and y in range(8):
-                            pos = (x,y)
-                            if self.valid_move(king_pos,pos):
-                                if self.uncheck(king_pos,pos):
-                                    print((king_pos,pos))
-                                    checkmate = False
-                                    break
-            
-            if checkmate:
-                self.display()
-                self.winner = self.turn
-            else:
-                print(f'{self.other_turn} is checked')
+    def checkmate(self,checks):
+        #print(f'checks: {checks}')
+        king_pos = self.get_king(self.other_turn)
+        checkmate = True
+        for check_pos in checks:
+            block_positions = self.coords_moving_between(check_pos,king_pos)
+            block_positions.append(check_pos)
+            for block_pos in block_positions:
+                if self.get_threat_coords_for(block_pos,self.other_turn,include_king=False) != []:
+                    checkmate = False
+        if checkmate:
+            king_x,king_y = king_pos
+            for x in [(king_x-1),king_x,(king_x+1)]:
+                 for y in [(king_y-1),king_y,(king_y+1)]:
+                    if x in range(8) and y in range(8):
+                        coords = (x,y)
+                        if self.valid_move(king_pos,coords):
+                            if self.move_will_check_own_king(king_pos,coords):
+                                print((king_pos,coords))
+                                checkmate = False
+                                break
+        return checkmate        
+
+    def end(self):
+        self.display()
+        self.winner = self.turn
 
     def printmove(self,start,end):
         '''Print the move after its made'''
@@ -362,9 +371,8 @@ class Board:
         c,d = end
         print(f'{self.get_piece(end)} {a}{b} -> {c}{d}')
         #movelog
-        f = open('moves.txt','a')
-        f.write(f'{self.get_piece(end)} {a}{b} -> {c}{d}\n')
-        f.close()
+        with open('moves.txt','a') as f:
+            f.write(f'{self.get_piece(end)} {a}{b} -> {c}{d}\n')
 
     def update(self, start, end):
         if self.debug == True:
@@ -372,7 +380,12 @@ class Board:
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
-        self.checkmate()
+        check,checks = self.is_king_checked(self.other_turn,return_checks = True)
+        if check:
+            if self.checkmate(checks):
+                self.end()
+            else:
+                print(f'{self.other_turn} is checked')
         self.promotion(end)
         self.printmove(start,end)
         
@@ -396,6 +409,7 @@ class Board:
 
 class BasePiece:
     name = 'piece'
+    moved = False
     def __init__(self, colour):
         if type(colour) != str:
             raise TypeError('colour argument must be str')
@@ -491,6 +505,7 @@ class Knight(BasePiece):
 
 
 class Rook(BasePiece):
+    #abc
     name = 'rook'
     sym = {'white': '♖', 'black': '♜'}
     def __repr__(self):
@@ -513,15 +528,15 @@ class Pawn(BasePiece):
     def __repr__(self):
         return f"Pawn('{self.name}')"
 
-    def update_doublemove(self,start,end):
+    def update_Pawndoublemove(self,start,end):
         x, y, dist = self.vector(start, end)
         if abs(y) == 2:
-            self.doublemoveprevturn = True
+            self.moved = True
         else:
-            self.doublemoveprevturn = False
+            self.moved = False
 
     def isvalid(self, start: tuple, end: tuple):
-        '''Pawn can only move 1 step forward or 1 step forward and 1 step horizontally when capturing enemy pieces. If pawn moves 2 steps, self.doublemoveprevturn is True'''
+        '''Pawn can only move 1 step forward or 1 step forward and 1 step horizontally when capturing enemy pieces. If pawn moves 2 steps, self.moved is True'''
 
         x, y, dist = self.vector(start, end)
         if x == -1 or x == 1 or x == 0:
@@ -545,7 +560,4 @@ class Pawn(BasePiece):
         Return True if pawn captures an enemy piece, else returns False
         '''
         x, y, dist = self.vector(start, end)
-        if x == -1 or x == 1:
-            return True
-        else:
-            return False
+        return x == -1 or x == 1
