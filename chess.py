@@ -253,8 +253,6 @@ class Board:
         elif not self.nojumpcheck(start, end):
 
             return False
-<<<<<<< HEAD
-=======
         return True
         
     def nojumpcheck(self, start, end):
@@ -552,7 +550,6 @@ class Board:
                     if self.debug:
                         print(f"VALID MOVE FOUND: {coord} -> {move}")
                     return False
->>>>>>> PohAnson-master
         return True
         
     def nojumpcheck(self, start, end):
