@@ -143,43 +143,43 @@ class TestBonusReqs(unittest.TestCase):
         game.update((0, 3), (1, 4))
         self.assertEqual(game.get_piece((1, 4)).colour, 'white')
     
-    def test_enpassant(self):
-        '''Pawn can capture en passant'''
-        game = gameSetupWithKings()
-        game.add((3, 4), Pawn('white'))
-        game.add((4, 6), Pawn('black'))
-        game.turn = 'black'
-        game.update((4, 6), (4, 4))
-        game.update((3, 4), (4, 5))
-        self.assertEqual(game.get_piece((4, 5)).colour, 'white')
-        self.assertIsNone(game.get_piece((4, 4)))
+    # def test_enpassant(self):
+    #     '''Pawn can capture en passant'''
+    #     game = gameSetupWithKings()
+    #     game.add((3, 4), Pawn('white'))
+    #     game.add((4, 6), Pawn('black'))
+    #     game.turn = 'black'
+    #     game.update((4, 6), (4, 4))
+    #     game.update((3, 4), (4, 5))
+    #     self.assertEqual(game.get_piece((4, 5)).colour, 'white')
+    #     self.assertIsNone(game.get_piece((4, 4)))
 
-        game = gameSetupWithKings()
-        game.add((3, 1), Pawn('white'))
-        game.add((4, 3), Pawn('black'))
-        game.turn = 'white'
-        game.update((3, 1), (3, 3))
-        game.update((4, 3), (3, 2))
-        self.assertEqual(game.get_piece((3, 2)).colour, 'black')
-        self.assertIsNone(game.get_piece((3, 3)))
+    #     game = gameSetupWithKings()
+    #     game.add((3, 1), Pawn('white'))
+    #     game.add((4, 3), Pawn('black'))
+    #     game.turn = 'white'
+    #     game.update((3, 1), (3, 3))
+    #     game.update((4, 3), (3, 2))
+    #     self.assertEqual(game.get_piece((3, 2)).colour, 'black')
+    #     self.assertIsNone(game.get_piece((3, 3)))
 
-    def test_rook_castling(self):
-        '''Rook can castle'''
-        for colour, row in zip(['white', 'black'], [0, 7]):
-            # TODO: make castling a King move
-            game = gameSetupWithKings()
-            game.add((0, row), Rook(colour))
-            game.turn = colour
-            game.update((4, row), (2, row))
-            self.assertEqual(game.get_piece((3, row)).name, 'rook')
-            self.assertEqual(game.get_piece((2, row)).name, 'king')
+    # def test_rook_castling(self):
+    #     '''Rook can castle'''
+    #     for colour, row in zip(['white', 'black'], [0, 7]):
+    #         # TODO: make castling a King move
+    #         game = gameSetupWithKings()
+    #         game.add((0, row), Rook(colour))
+    #         game.turn = colour
+    #         game.update((4, row), (2, row))
+    #         self.assertEqual(game.get_piece((3, row)).name, 'rook')
+    #         self.assertEqual(game.get_piece((2, row)).name, 'king')
 
-            game = gameSetupWithKings()
-            game.add((7, row), Rook(colour))
-            game.turn = colour
-            game.update((4, row), (6, row))
-            self.assertEqual(game.get_piece((5, row)).name, 'rook')
-            self.assertEqual(game.get_piece((6, row)).name, 'king')
+    #         game = gameSetupWithKings()
+    #         game.add((7, row), Rook(colour))
+    #         game.turn = colour
+    #         game.update((4, row), (6, row))
+    #         self.assertEqual(game.get_piece((5, row)).name, 'rook')
+    #         self.assertEqual(game.get_piece((6, row)).name, 'king')
 
     def test_no_jump(self):
         '''Pieces cannot jump over pieces of same colour'''

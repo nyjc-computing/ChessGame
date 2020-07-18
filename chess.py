@@ -223,7 +223,7 @@ class Board:
         elif not start_piece.isvalid(start, end):
             return False
         elif start_piece.name != 'knight':
-            if check_spaces_btw(start, end):
+            if self.check_spaces_btw(start, end):
                return False 
         elif self.check(start_piece.colour):
             self.move(start, end)
@@ -242,24 +242,24 @@ class Board:
             if start[1]>end[1]:
                 #moves down
                 for i in range(end[1]+1,start[1]):
-                    if self.get_coords((start[0],i) != None:
+                    if self.get_coords((start[0],i)) != None:
                         obstical = True
             else:
                 #moves up
                 for i in range(start[1]+1,end[1]):
-                    if self.get_coords((start[0],i) != None:
+                    if self.get_coords((start[0],i)) != None:
                         obstical = True
         elif start[1] == end[1]: 
             #check if piece moves horizontally
             if start[0]>end[0]:
                 #moves left
                 for i in range(end[0]+1,start[0]):
-                    if self.get_coords((i,start[1]) != None:
+                    if self.get_coords((i,start[1])) != None:
                         obstical = True
             else:
                 #moves right
                 for i in range(start[1]+1,end[1]):
-                    if self.get_coords((i,start[1]) != None:
+                    if self.get_coords((i,start[1])) != None:
                         obstical = True
         else:                  
             #at this point the piece is moving
