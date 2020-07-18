@@ -1,5 +1,10 @@
 from chess import Board, King, Queen, Bishop, Knight, Rook, Pawn
-import time
+
+def testGame():
+    import os
+    os.system('python3 -m unittest -v test_chess.TestCoreReqs')
+    os.system('python3 -m unittest -v test_chess.TestBonusReqs')
+testGame()
 
 print(
     "\033[2;37;44m               ##               "
