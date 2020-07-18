@@ -70,7 +70,7 @@ class Board:
         Does nothing if there is no piece at coord.
         '''
         if coord in self.coords():
-            del self.position[coord]
+            return self.position.pop(coord)
 
     def move(self, start, end):
         '''
@@ -318,7 +318,6 @@ class Board:
             return False
         return True
 
-
     def update(self, start, end):
         '''
         Update board information with the player's move.
@@ -331,12 +330,10 @@ class Board:
         self.promotion(end)
         self.win(end_piece)
         self.check()
-
-
+        
     def next_turn(self):
         '''Hand the turn over to the other player.'''
         self.debug_message("== NEXT TURN ==")
-
         if self.turn == 'white':
             self.turn = 'black'
         elif self.turn == 'black':
