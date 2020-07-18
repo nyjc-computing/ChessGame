@@ -22,12 +22,6 @@ class Board:
       if self.debug:
         print(message)
 
-    def test(self):
-      '''to be removed'''
-      self.add((0, 1), Rook('black'))
-      self.turn = 'white'
-      self.update((0, 1), (0, 0))
-
     def coords(self):
         '''Return list of piece coordinates.'''
         return self.position.keys()

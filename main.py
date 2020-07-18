@@ -8,7 +8,6 @@ testGame()
 
 game = Board(debug=True)
 game.start()
-game.test()
 while game.winner is None:
     game.display()
     start, end = game.prompt()
