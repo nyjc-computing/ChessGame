@@ -130,3 +130,6 @@ dmypy.json
 
 # Ignore move log
 moves.txt
+
+# replit
+.replit

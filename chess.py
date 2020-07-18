@@ -148,7 +148,7 @@ class Board:
 
         def valid_num(inputstr):
             '''Ensure all inputted numerals are 0-7.'''
-            for char in (inputstr[0:1] + inputstr[3:4]):
+            for char in (inputstr[0:2] + inputstr[3:5]):
                 if char not in '01234567':
                     return False
             return True
