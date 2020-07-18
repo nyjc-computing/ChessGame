@@ -1,3 +1,15 @@
+class MoveError(Exception):
+
+    "MoveError to be raised if the move is an invalid move."
+
+    def __init__(self, message = "Move is invaild."):
+        self.message = message
+
+
+    def __str__(self):
+        return f'{self.message}'
+
+
 class Board:
     '''
     The game board is represented as an 8×8 grid,
@@ -19,6 +31,14 @@ class Board:
     def coords(self):
         '''Return list of piece coordinates.'''
         return self.position.keys()
+
+    def get_coords(self,name,colour):
+        pieces=[]
+        for i in self.coords():
+            if self.get_piece(i).name==name:
+                if self.get_piece(i).colour==colour:
+                    pieces.append(i)
+        return pieces
 
     def pieces(self):
         '''Return list of board pieces.'''
@@ -58,15 +78,15 @@ class Board:
         Promote the 'Pawn' piece to a 'Queen' piece when the 'Pawn' piece reaches the opposite end
         '''
         if self.get_piece(end).name == "pawn" and (end[1] == 0 or end[1] == 7):
-            if self.get_piece(end).colour == 'black':
-                self.remove(end)
-                self.add(end,Queen(black))
-            else:
-                self.remove(end)
-                self.add(end,Queen(white))
+            self.promote(self.get_piece(end), end)
 
-        
-        
+    def promote(self, piece, end):
+        if piece.colour == 'black':
+            self.remove(end)
+            self.add(end,Queen('black'))
+        else:
+            self.remove(end)
+            self.add(end,Queen('white')) 
 
     def start(self):
         '''Set up the pieces and start the game.'''
@@ -202,24 +222,109 @@ class Board:
             return False
         elif not start_piece.isvalid(start, end):
             return False
+        elif start_piece.name != 'knight':
+            if check_spaces_btw(start, end):
+               return False 
+        elif self.check(start_piece.colour):
+            self.move(start, end)
+            if self.check(start_piece.colour):
+                self.move(end, start)
+                print(f'The {start_piece.colour} king is still in check')
+                return False
+            self.move(end, start)
+
         return True
+
+    def check_spaces_btw(self,start,end):
+        obstical = False
+        if start[0] == end[0]: 
+            #check if piece moves vertically
+            if start[1]>end[1]:
+                #moves down
+                for i in range(end[1]+1,start[1]):
+                    if self.get_coords((start[0],i) != None:
+                        obstical = True
+            else:
+                #moves up
+                for i in range(start[1]+1,end[1]):
+                    if self.get_coords((start[0],i) != None:
+                        obstical = True
+        elif start[1] == end[1]: 
+            #check if piece moves horizontally
+            if start[0]>end[0]:
+                #moves left
+                for i in range(end[0]+1,start[0]):
+                    if self.get_coords((i,start[1]) != None:
+                        obstical = True
+            else:
+                #moves right
+                for i in range(start[1]+1,end[1]):
+                    if self.get_coords((i,start[1]) != None:
+                        obstical = True
+        else:                  
+            #at this point the piece is moving
+            x=start[0]
+            y=start[1]
+            if start[0]>end[0]:
+                #move left
+                if start[1]>end[1]:
+                    #move down
+                    for i in range(start[0],end[0]):
+                        x-=1
+                        y-=1
+                        if self.get_coords((x,y)) != None:
+                            obstical = True
+                else:
+                    #move up
+                    for i in range(start[0],end[0]):
+                        x-=1
+                        y+=1
+                        if self.get_coords((x,y)) != None:
+                            obstical = True
+            else:
+                #move right
+                if start[1]>end[1]:
+                    #move down
+                    for i in range(start[0],end[0]):
+                        x+=1
+                        y-=1
+                        if self.get_coords((x,y)) != None:
+                            obstical = True
+                else:
+                    #move up
+                    for i in range(start[0],end[0]):
+                        x+=1
+                        y+=1
+                        if self.get_coords((x,y)) != None:
+                            obstical = True
+        return obstical
+
 
     def update(self, start, end):
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
-        bk = False
-        wk = False
-        for i in self.coords():
-            if self.get_piece(i).name == "king":
-                if self.get_piece(i).colour == 'white':
-                    wk = True
-                else:
-                    bk = True
-        if not wk:
+        if self.get_coords('king','white')==[]:
             self.winner = 'black'
-        if not bk:
+            return
+        if self.get_coords('king','black')==[]:
             self.winner = 'white'
+            return
+        #this part is for check
+        self.check(self.turn)
+
+    def check(self,colour):
+        for i in self.coords():
+            if colour == 'black':
+                if self.get_piece(i).colour == 'black':
+                    if self.valid_move(i,self.get_coords('king','white')[0]):
+                        print('The white king is in check')
+                        return True
+            if colour == 'white':
+                if self.get_piece(i).colour == 'white':
+                    if self.valid_move(i,self.get_coords('king','black')[0]):
+                        print('The black king is in check')
+                        return True
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
