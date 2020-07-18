@@ -17,6 +17,10 @@ class Board:
         self.position = {}
         self.debug = debug
 
+    def debug_message(self, message):
+      if self.debug:
+        print(message)
+
     def coords(self):
         '''Return list of piece coordinates.'''
         return self.position.keys()
@@ -31,6 +35,30 @@ class Board:
         Returns None if no piece at coord.
         '''
         return self.position.get(coord, None)
+
+    def get_coords(self, **kwargs):
+        '''
+        Return pieces of specified colour and name
+        '''
+        coords = []
+        
+        colour = kwargs.get("colour", False)
+        name = kwargs.get("name", False)
+
+        for coord, piece in zip(self.coords(), self.pieces()):
+          if colour and name:
+            if piece.colour == colour and piece.name == name:
+              coords.append(coord)
+          elif colour:
+            if piece.colour == colour:
+              coords.append(coord)
+          elif name:
+            if piece.name == name:
+              coords.append(coord)
+          else:
+            print("get_coords() requires atleast 1 argument")
+
+        return coords
 
     def add(self, coord, piece):
         '''Add a piece at coord.'''
@@ -51,102 +79,112 @@ class Board:
         to ensure the move is valid.
         '''
         piece = self.get_piece(start)
+        print(piece.name)
         self.remove(start)
         self.add(end, piece)
+        piece_ = self.get_piece(end)
+        piece_.moved = True
         self.log(piece, start, end)
+        self.get_piece(end)
 
     def blocked(self, start, end):
         '''
         Checks coordinates between start and end.
         Returns true if pieces present between else false.
         '''
-        x = end[0] - start[0]
-        y = end[1] - start[1]
-        dir_ = tuple((e//e if e>0 else -e//e) if e else 0 for e in (x,y))
-        vector = start
-
         blocked = False
-        while vector != end:
-          vector = tuple(sum(x) for x in zip(vector, dir_))
-          if self.get_piece(vector):
+
+        for coord in self.tween_coords(start, end):
+          if self.get_piece(coord):
             blocked = True
+
         return blocked
 
-    def check(self, colour):
+    def tween_coords(self, start, end):
         '''
-        
+        Returns list of coordinates between start and end
         '''
-        end = tuple()
-        while not end:
-          for coord, piece in zip(self.coords(), self.pieces()):
-            if piece.colour != colour and isinstance(piece, King):
-              end = coord
-        for coord, piece in zip(self.coords(), self.pieces()):
-          if piece.colour == colour:
-            if self.valid_move(coord, end):
-              checked = "black" if colour == "white" else "white"
-              print(f"{checked} is checked")
-              
-    
-    
-    def uncheck(self, colour):
+        x, y, _ = BasePiece.vector(start, end)
+        x_dir = int(x/abs(x)) if x else 0
+        y_dir = int(y/abs(y)) if y else 0
+        x_pos, y_pos = start
+
+        result = []
+        while True:
+          x_pos += x_dir
+          y_pos += y_dir
+          if (x_pos, y_pos) == end:
+            break
+          result.append((x_pos, y_pos))
+
+        return result
+
+
+    def check(self):
         '''
-        
+        Checks possibility of movement between pieces of players to opponent king.
         '''
-        end = tuple()
- 
-        while not end:
-            for coord, piece in zip(self.coords(), self.pieces()):
-                if piece.colour == colour and isinstance(piece, King):
-                    end = coord
-            for coord, piece in zip(self.coords(), self.pieces()):
-                if piece.colour != colour:
-                    if self.valid_move(coord, end):
-                        return False
-            return True
-                
+        player_colour = self.turn
+        opponent_colour = "black" if player_colour == "white" else "white"
+        opponent_king_coord = self.get_coords(colour=opponent_colour, name="king")[0]
+
+        for coord in self.get_coords(colour=player_colour):
+          if self.valid_move(coord, opponent_king_coord):
+            checked = opponent_colour
+            print(f"{checked} is checked.")
+
+    def uncheck(self):
+        '''
+        Checks possibility of movement between player king without being checked.
+        '''
+        player_colour = self.turn
+        opponent_colour = "black" if player_colour == "white" else "white"
+        player_king_coord = self.get_coords(colour=player_colour, name="king")[0]
+
+        for coord in self.get_coords(colour=opponent_colour):
+          if self.valid_move(coord, player_king_coord):
+            return False
+        return True
+       
     def log(self, piece, start, end):
       '''
       Print move
       Log moves to moves.txt
       '''
-      def combine(l):
-        return "".join([str(x) for x in l])
-
-      start, end = combine(start), combine(end)
-      move = f"{piece} {start} -> {end}"
+      x0,y0 = start
+      x1,y1 = end
+      move = f"{piece} {x0}{y0} -> {x1}{y1}"
       print(move)
       with open("moves.txt", "a") as f:
         f.write(move+"\n")
 
-    def moveclassifier(self,start,end):
-        start_piece = self.get_piece(start)
-        end_piece = self.get_piece(end)
-        if end_piece == None:
-            return 'move'
-        elif end_piece != None and end_piece.colour != self.turn:
-            return 'capture'
+    def promotion_prompt():
+      choices = {
+          'queen': Queen(),
+          'knight': Knight(),
+          'bishop': Bishop(),
+          'rook': Rook(),
+        }
 
-
-    def promotion(self,coord,colour):
-        ''' 
-        promote a pawn into a rook
-        '''
-        print(
-          'please choose a piece you want to promote to,the input sould be one of the following:\nqueen knight bishop rook\n')
-        choices = {'queen':Queen(colour),
-                   'knight':Knight(colour),
-                   'bishop':Bishop(colour),
-                   'rook':Rook(colour)}
-        new = input()
-        if not new in ['queen','knight','bishhop','rook']:
-            print('wrong input. the input sould be one of the following:\n queen knight bishop rook\n')
+      while True:
+        player_input = input("Choose a piece to promote to (queen, knight, bishop, rook): ").strip().lower()
+        
+        if player_input in choices.keys():
+          return choices[player_input]
         else:
-            self.remove(coord)
-            self.add(coord,choices[new])        
+          print("Incorrect input.")
 
+    def promotion(self, end):
+      if end[1] in (0,7) and end_piece.name == "pawn":
+        end_piece = self.get_piece(end)
+        player_colour = self.turn
+        self.remove(end)
+        new_piece = self.promotion_prompt()
+        self.add(end, new_piece(player_colour))
 
-
+    def win(self, end_piece):
+        if end_piece and end_piece.name == "king":
+          self.winner = self.turn
 
     def start(self):
         '''Set up the pieces and start the game.'''
@@ -186,8 +224,7 @@ class Board:
         # helper function to generate symbols for piece
         # Row 7 is at the top, so print in reverse order
 
-        if self.debug:
-          print("== DISPLAY ==")
+        self.debug_message("== DISPLAY ==")
         
         for row in range(7, -1, -1):#print the indicating number for column and row
           if row == 7:
@@ -218,8 +255,7 @@ class Board:
         then another 2 ints
         e.g. 07 27
         '''
-        if self.debug:
-          print("== PROMPT ==")
+        self.debug_message("== PROMPT ==")
 
         def valid_format(inputstr):
             '''
@@ -276,38 +312,28 @@ class Board:
             return False
         elif not start_piece.isvalid(start, end):
             return False
-        elif not isinstance(start_piece, Knight) and self.blocked(start, end):
+        elif start_piece.name != "knight" and self.blocked(start, end):
             return False
-        elif not self.uncheck(self.turn):
+        elif not self.uncheck():
             return False
         return True
 
     def update(self, start, end):
-        '''Update board information with the player's move.'''
+        '''
+        Update board information with the player's move.
+        '''
+        self.debug_message("== UPDATE ==")
 
-        if self.debug:
-          print("== UPDATE ==")
-        start_piece = self.get_piece(start)
-        dead = self.remove(end)
+        end_piece = self.get_piece(end) 
+        self.remove(end)
         self.move(start, end)
-        if isinstance(dead, King):
-          color = str(start_piece).split(" ")[0]
-          self.winner = color
-        self.check(self.turn)
-
-        if end[1] == 0 or end[1] == 7:
-             if self.get_piece(end).name == 'pawn':
-                 colour = self.turn
-                 self.promotion(end,colour)
-        
-        
-
+        self.promotion(end)
+        self.win(end_piece)
+        self.check()
         
     def next_turn(self):
         '''Hand the turn over to the other player.'''
-        if self.debug:
-          print("== NEXT TURN ==")
-
+        self.debug_message("== NEXT TURN ==")
         if self.turn == 'white':
             self.turn = 'black'
         elif self.turn == 'black':
@@ -316,6 +342,7 @@ class Board:
 
 class BasePiece:
     name = 'piece'
+    moved = False
     def __init__(self, colour):
         if type(colour) != str:
             raise TypeError('colour argument must be str')
@@ -437,29 +464,15 @@ class Pawn(BasePiece):
         x, y, dist = self.vector(start, end)
         if x == 0:
             if self.colour == 'black':
-                self.__class__ = newPawn
-                return (y == -1 or y == -2)
+                if self.moved:
+                    return (y == -1)
+                else:
+                    return (y == -1) or (y == -2)
             elif self.colour == 'white':
-                self.__class__ = newPawn
-                return (y == 1 or y == 2)
-            else:
-                return False
-        return False
-
-class newPawn(BasePiece):
-    name = 'pawn'
-    sym = {'white': '♙', 'black': '♟︎'}
-    def __repr__(self):
-        return f"Pawn('{self.name}')"
-
-    def isvalid(self, start: tuple, end: tuple):
-        '''Pawn can only move 1 step forward.'''
-        x, y, dist = self.vector(start, end)
-        if x == 0:
-            if self.colour == 'black':
-                return (y == -1)
-            elif self.colour == 'white':
-                return (y == 1)
+                if self.moved:
+                    return (y == 1)
+                else:
+                    return (y == 1) or (y == 2)
             else:
                 return False
         return False
