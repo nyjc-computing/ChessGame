@@ -212,6 +212,7 @@ class Board:
             return 'move'
 
 
+
     def valid_move(self, start, end):
         '''
         Returns True if all conditions are met:
@@ -523,6 +524,7 @@ class Rook(BasePiece):
 class Pawn(BasePiece):
     name = 'pawn'
     sym = {'white': '♙', 'black': '♟︎'}
+    doublemoveprevturn = False
     def __repr__(self):
         return f"Pawn('{self.name}')"
 
