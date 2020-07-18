@@ -177,11 +177,11 @@ class Board:
             else:
                 start, end = split_and_convert(inputstr)
                 if self.valid_move(start, end):
-                    print(
-                        self.get_piece(start),
-                        f"{start[0]}{start[1]} -> {end[0]}{end[1]}",
-                    )
-                    print (start,end)
+                    # print(
+                    #     self.get_piece(start),
+                    #     f"{start[0]}{start[1]} -> {end[0]}{end[1]}",
+                    # )
+                    # print (start,end)
                     print(printmove())
                     endtime = self.datetime.today()
                     with open('moves.txt', 'a+') as f:
