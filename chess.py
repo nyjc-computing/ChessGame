@@ -59,6 +59,12 @@ class Board:
             print("get_coords() requires atleast 1 argument")
 
         return coords
+      
+    def get_coords_specific(self, **kwargs):
+        coord = self.get_coords(**kwargs)
+
+        if coord:
+          return coord[0]
 
     def add(self, coord, piece):
         '''Add a piece at coord.'''
@@ -70,7 +76,7 @@ class Board:
         Does nothing if there is no piece at coord.
         '''
         if coord in self.coords():
-            return self.position.pop(coord)
+            del self.position[coord]
 
     def move(self, start, end):
         '''
@@ -79,7 +85,6 @@ class Board:
         to ensure the move is valid.
         '''
         piece = self.get_piece(start)
-        print(piece.name)
         self.remove(start)
         self.add(end, piece)
         piece_ = self.get_piece(end)
@@ -119,14 +124,17 @@ class Board:
 
         return result
 
-
     def check(self):
         '''
         Checks possibility of movement between pieces of players to opponent king.
         '''
         player_colour = self.turn
         opponent_colour = "black" if player_colour == "white" else "white"
-        opponent_king_coord = self.get_coords(colour=opponent_colour, name="king")[0]
+        opponent_king_coord = self.get_coords_specific(colour=opponent_colour, name="king")
+
+        #not ideal solution but automated tests break if i reference self.winner to check if game is ended before check() 
+        if opponent_king_coord is None:
+          return
 
         for coord in self.get_coords(colour=player_colour):
           if self.valid_move(coord, opponent_king_coord):
@@ -139,7 +147,10 @@ class Board:
         '''
         player_colour = self.turn
         opponent_colour = "black" if player_colour == "white" else "white"
-        player_king_coord = self.get_coords(colour=player_colour, name="king")[0]
+        player_king_coord = self.get_coords_specific(colour=player_colour, name="king")
+
+        if player_king_coord is None:
+          return
 
         for coord in self.get_coords(colour=opponent_colour):
           if self.valid_move(coord, player_king_coord):
@@ -158,12 +169,12 @@ class Board:
       with open("moves.txt", "a") as f:
         f.write(move+"\n")
 
-    def promotion_prompt():
+    def promotion_prompt(self, colour):
       choices = {
-          'queen': Queen(),
-          'knight': Knight(),
-          'bishop': Bishop(),
-          'rook': Rook(),
+          'queen': Queen(colour),
+          'knight': Knight(colour),
+          'bishop': Bishop(colour),
+          'rook': Rook(colour),
         }
 
       while True:
@@ -175,12 +186,12 @@ class Board:
           print("Incorrect input.")
 
     def promotion(self, end):
+      end_piece = self.get_piece(end)
       if end[1] in (0,7) and end_piece.name == "pawn":
-        end_piece = self.get_piece(end)
         player_colour = self.turn
         self.remove(end)
-        new_piece = self.promotion_prompt()
-        self.add(end, new_piece(player_colour))
+        new_piece = self.promotion_prompt(player_colour)
+        self.add(end, new_piece)
 
     def win(self, end_piece):
         if end_piece and end_piece.name == "king":
