@@ -1,1 +1,5 @@
-white knight 10 -> 22
+white pawn 41 -> 42
+black pawn 36 -> 35
+white queen 30 -> 74
+black pawn 56 -> 55
+white queen 74 -> 47
