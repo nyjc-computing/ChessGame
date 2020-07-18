@@ -1,4 +1,6 @@
 class Board:
+    from datetime import datetime
+    starttime = datetime.today()
     """
     The game board is represented as an 8×8 grid,
     with each position on the grid described as
@@ -173,7 +175,8 @@ class Board:
             if not valid_format(inputstr):
                 print(
                     "Invalid input. Please enter your move in the "
-                    "following format: __ __, _ represents a 07digit."
+                    "following format: __ __ where '__' contains digit 0 to 7.\n"
+                    "Example: [current-column][current-row] [new-column][new-row]"
                 )
             elif not valid_num(inputstr):
                 print("Invalid input. Move digits should be 0-7.")
@@ -185,8 +188,12 @@ class Board:
                         f"{start[0]}{start[1]} -> {end[0]}{end[1]}",
                     )
                     print (start,end)
-                    with open('MOVELOGS.txt', 'a') as f:
-                        f.write(f'{self.turn} {start[0]}{start[1]} -> {end[0]}{end[1]}\n')
+                    endtime = self.datetime.today()
+                    with open('moves.txt', 'a') as f:
+                        f.write(f'{endtime}: {self.turn} {start[0]}{start[1]} -> {end[0]}{end[1]}\n')
+                    timetaken = endtime - self.starttime
+                    timetaken_inseconds = timetaken.total_seconds()
+                    print(f"{self.turn} player took {timetaken_inseconds}seconds to make a move.")
                     return start, end
                 else:
                     print(f"Invalid move for {self.get_piece(start)}.")
