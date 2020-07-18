@@ -170,6 +170,17 @@ class Board:
           self.move(end, start)
         return valid
     '''
+
+    def moveclassify(self, start, end):
+      '''
+      Returns type of move being made
+      Output: capture, move
+      '''
+      end_piece = self.get_piece(end)
+      if end_piece is not None:
+        print('capture')
+      else:
+        print('move')
     
     def log(self, start, end):
       '''
@@ -357,6 +368,7 @@ class Board:
         player_colour, opponent_colour = self.get_colours()
         end_piece = self.get_piece(end) 
         self.remove(end)
+        self.moveclassify(start, end)
         self.log(start, end)
         self.move(start, end)
         self.promotion(end)

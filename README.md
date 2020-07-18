@@ -137,7 +137,7 @@ Add additional move validation to the `Pawn` class for **capturing** moves.
 
 A capturing move by a `Pawn` involves moving one step forward and one step to the left or right to capture another piece. A `Pawn` may only capture through such a capturing move, and never by moving only forward without a left or right step.
 
-### branch: **moveclassifier** (★★) Yirui
+### branch: **moveclassifier** (★★) Anoop (X)
 
 Add a method that classifies and returns the type of move being made.
 
