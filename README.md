@@ -6,7 +6,7 @@ A repository for a chess game in Python (NYJC J1 Computing Assignment 12)
 
 ## Team members
 
-Zheng Nan, SiYi, Vina, Bryan, David
+ZhengNan, SiYi, Vina, Bryan, David
 
 ## Grading rubrics
 
