@@ -21,6 +21,14 @@ class Board:
       if self.debug:
         print(message)
 
+    def save(self):
+      '''Creates a copy of board positions'''
+      self.copy = dict(self.position)
+
+    def undo(self):
+      '''Restore positions to last copy'''
+      self.position = self.copy
+
     def coords(self):
         '''Return list of piece coordinates.'''
         return self.position.keys()
@@ -138,24 +146,24 @@ class Board:
 
         for coord in self.get_coords(colour=player_colour):
           if self.valid_move(coord, opponent_king_coord):
-            checked = opponent_colour
-            print(f"{checked} is checked.")
+            print(f"{opponent_colour} is checked.")
+            return True
 
-    def uncheck(self):
+    def uncheck(self, start, end):
         '''
-        Checks possibility of movement between player king without being checked.
+        Checks possibility of movement without being checked.
         '''
-        player_colour = self.turn
-        opponent_colour = "black" if player_colour == "white" else "white"
-        player_king_coord = self.get_coords_specific(colour=player_colour, name="king")
+        self.save()
+        self.move(start, end)
 
-        if player_king_coord is None:
-          return
+        valid = True
+        if self.check():
+          valid = False
 
-        for coord in self.get_coords(colour=opponent_colour):
-          if self.valid_move(coord, player_king_coord):
-            return False
-        return True
+        self.undo()
+        return valid
+
+
        
     def log(self, piece, start, end):
       '''
@@ -325,7 +333,7 @@ class Board:
             return False
         elif start_piece.name != "knight" and self.blocked(start, end):
             return False
-        elif not self.uncheck():
+        elif not self.uncheck(start, end):
             return False
         return True
 
