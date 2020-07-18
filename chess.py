@@ -15,18 +15,7 @@ class Board:
     01  11  21  31  41  51  61  71
     00  10  20  30  40  50  60  70
     """
-    # def countdown(self, t=300):
-    #     import time
-    #     while True:
-    #         mins, secs = divmod(t, 60)
-    #         timeformat = '{:02d}:{:02d}'.format(mins, secs)
-    #         print(timeformat, end='\r')
-    #         time.sleep(1)
-    #         t -= 1
-    #         if t == 0:
-    #             print("Time's up! Next player's turn.\n\n\n\n\n")
-            
-    
+
     def __init__(self, debug=False):
         self.position = {}
         self.debug = debug
@@ -170,6 +159,11 @@ class Board:
             end = (int(end[0]), int(end[1]))
             return (start, end)
 
+        def printmove():
+            return (
+                f"{str(self.get_piece(start))} {start[0]}{start[1]} -> {end[0]}{end[1]}"
+            )
+
         while True:
             inputstr = input(f"{self.turn.title()} player: ")
             if not valid_format(inputstr):
@@ -188,8 +182,9 @@ class Board:
                         f"{start[0]}{start[1]} -> {end[0]}{end[1]}",
                     )
                     print (start,end)
+                    print(printmove())
                     endtime = self.datetime.today()
-                    with open('moves.txt', 'a') as f:
+                    with open('moves.txt', 'a+') as f:
                         f.write(f'{endtime}: {self.turn} {start[0]}{start[1]} -> {end[0]}{end[1]}\n')
                     timetaken = endtime - self.starttime
                     timetaken_inseconds = timetaken.total_seconds()
@@ -298,6 +293,7 @@ class Board:
             self.turn = "black"
         elif self.turn == "black":
             self.turn = "white"
+
 
 class BasePiece:
     name = "piece"
