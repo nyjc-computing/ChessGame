@@ -1,4 +1,6 @@
 class Board:
+    from datetime import datetime
+    starttime = datetime.today()
     """
     The game board is represented as an 8×8 grid,
     with each position on the grid described as
@@ -58,7 +60,7 @@ class Board:
     def start(self):
         """Set up the pieces and start the game."""
         colour = "black"
-        self.add((0, 7), Pawn(colour))
+        self.add((0, 7), Rook(colour))
         self.add((1, 7), Knight(colour))
         self.add((2, 7), Bishop(colour))
         self.add((3, 7), Queen(colour))
@@ -157,20 +159,36 @@ class Board:
             end = (int(end[0]), int(end[1]))
             return (start, end)
 
+        def printmove():
+            return (
+                f"{str(self.get_piece(start))} {start[0]}{start[1]} -> {end[0]}{end[1]}"
+            )
+
         while True:
             inputstr = input(f"{self.turn.title()} player: ")
             if not valid_format(inputstr):
                 print(
                     "Invalid input. Please enter your move in the "
-                    "following format: __ __, _ represents a 07digit."
+                    "following format: __ __ where '__' contains digit 0 to 7.\n"
+                    "Example: [current-column][current-row] [new-column][new-row]"
                 )
             elif not valid_num(inputstr):
                 print("Invalid input. Move digits should be 0-7.")
             else:
                 start, end = split_and_convert(inputstr)
                 if self.valid_move(start, end):
-                    startcoord, endcoord = inputstr.split(" ")
-                    print(f"{self.get_piece(start)} {startcoord} --> {endcoord}")
+                    # print(
+                    #     self.get_piece(start),
+                    #     f"{start[0]}{start[1]} -> {end[0]}{end[1]}",
+                    # )
+                    # print (start,end)
+                    print(printmove())
+                    endtime = self.datetime.today()
+                    with open('moves.txt', 'a+') as f:
+                        f.write(f'{endtime}: {self.turn} {start[0]}{start[1]} -> {end[0]}{end[1]}\n')
+                    timetaken = endtime - self.starttime
+                    timetaken_inseconds = timetaken.total_seconds()
+                    print(f"{self.turn} player took {timetaken_inseconds}seconds to make a move.")
                     return start, end
                 else:
                     print(f"Invalid move for {self.get_piece(start)}.")

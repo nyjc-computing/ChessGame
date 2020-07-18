@@ -1,10 +1,10 @@
+# GingerBread ChessGame
 
+A repository for a chess game in Python (NYJC J1 Computing Assignment 12)
 
-# ChessGame
+## Team members
 
-A repository for a chess game in Python (Assignment 12).
-
-
+ZhengNan, SiYi, Vina, Bryan, David
 
 ## Grading rubrics
 
