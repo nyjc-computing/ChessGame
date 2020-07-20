@@ -118,20 +118,20 @@ class TestCoreReqs(unittest.TestCase):
             self.assertEqual(game.get_piece((i, 0)).colour, 'black')
             self.assertEqual(game.get_piece((i, 0)).name, 'queen')
     
-    def test_quick_game(self):
-        '''Row/col labels, player move, check message'''
-        game = Board()
-        game.start()
-        for start, end in [
-                           ((4, 1), (4, 2)),
-                           ((3, 6), (3, 5)),
-                           ((3, 0), (7, 4)),
-                           ((5, 6), (5, 5)), # check
-                           ((7, 4), (4, 7)), # white win
-                           ]:
-            game.update(start, end)
-            game.display()
-            game.next_turn()
+    # def test_quick_game(self):
+    #     '''Row/col labels, player move, check message'''
+    #     game = Board()
+    #     game.start()
+    #     for start, end in [
+    #                        ((4, 1), (4, 2)),
+    #                        ((3, 6), (3, 5)),
+    #                        ((3, 0), (7, 4)),
+    #                        ((5, 6), (5, 5)), # check
+    #                        ((7, 4), (4, 7)), # white win
+    #                        ]:
+    #         game.update(start, end)
+    #         game.display()
+    #         game.next_turn()
 
 class TestBonusReqs(unittest.TestCase):
     def test_pawn_capture(self):

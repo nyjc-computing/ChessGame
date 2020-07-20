@@ -225,13 +225,13 @@ class Board:
         # elif start_piece.name != 'knight':
         #     if check_spaces_btw(start, end):
         #        return False 
-        elif self.check(start_piece.colour):
-            self.move(start, end)
-            if self.check(start_piece.colour):
-                self.move(end, start)
-                print(f'The {start_piece.colour} king is still in check')
-                return False
-            self.move(end, start)
+        # elif self.check(start_piece.colour):
+        #     self.move(start, end)
+        #     if self.check(start_piece.colour):
+        #         self.move(end, start)
+        #         print(f'The {start_piece.colour} king is still in check')
+        #         return False
+        #     self.move(end, start)
 
         return True
 
