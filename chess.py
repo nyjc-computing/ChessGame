@@ -1,5 +1,139 @@
 from errors import *
 
+
+class BasePiece:
+    name = 'piece'
+    def __init__(self, colour):
+        if type(colour) != str:
+            raise TypeError('colour argument must be str')
+        elif colour.lower() not in {'white', 'black'}:
+            raise ValueError('colour must be {white, black}')
+        else:
+            self.colour = colour
+            self.moved = False
+
+    def __repr__(self):
+        return f'BasePiece({repr(self.colour)})'
+
+    def __str__(self):
+        return f'{self.colour} {self.name}'
+
+    def symbol(self):
+        return f'{self.sym[self.colour]}'
+
+    @staticmethod
+    def vector(start, end):
+        '''
+        Return three values as a tuple:
+        - x, the number of spaces moved horizontally,
+        - y, the number of spaces moved vertically,
+        - dist, the total number of spaces moved.
+        
+        positive integers indicate upward or rightward direction,
+        negative integers indicate downward or leftward direction.
+        dist is always positive.
+        '''
+        x = end[0] - start[0]
+        y = end[1] - start[1]
+        dist = abs(x) + abs(y)
+        return x, y, dist
+
+
+class King(BasePiece):
+    name = 'king'
+    sym = {'white': '♔', 'black': '♚'}
+    def __repr__(self):
+        return f"King('{self.name}')"
+
+    def isvalid(self, start: tuple, end: tuple):
+        '''
+        King can move one step in any direction
+        horizontally, vertically, or diagonally.
+        '''
+        x, y, dist = self.vector(start, end)
+        return (dist == 1) or (abs(x) == abs(y) == 1)
+
+    
+class Queen(BasePiece):
+    name = 'queen'
+    sym = {'white': '♕', 'black': '♛'}
+    def __repr__(self):
+        return f"Queen('{self.name}')"
+
+    def isvalid(self, start: tuple, end: tuple):
+        '''
+        Queen can move any number of steps horizontally,
+        vertically, or diagonally.
+        '''
+        x, y, dist = self.vector(start, end)
+        return (abs(x) == abs(y) != 0) \
+            or ((abs(x) == 0 and abs(y) != 0) \
+            or (abs(y) == 0 and abs(x) != 0))
+
+
+class Bishop(BasePiece):
+    name = 'bishop'
+    sym = {'white': '♗', 'black': '♝'}
+    def __repr__(self):
+        return f"Bishop('{self.name}')"
+
+    def isvalid(self, start: tuple, end: tuple):
+        '''Bishop can move any number of steps diagonally.'''
+        x, y, dist = self.vector(start, end)
+        return (abs(x) == abs(y) != 0)
+
+
+class Knight(BasePiece):
+    name = 'knight'
+    sym = {'white': '♘', 'black': '♞'}
+    def __repr__(self):
+        return f"Knight('{self.name}')"
+
+    def isvalid(self, start: tuple, end: tuple):
+        '''
+        Knight moves 2 spaces in any direction, and
+        1 space perpendicular to that direction, in an L-shape.
+        '''
+        x, y, dist = self.vector(start, end)
+        return (dist == 3) and (abs(x) != 3 and abs(y) != 3)
+
+
+class Rook(BasePiece):
+    name = 'rook'
+    sym = {'white': '♖', 'black': '♜'}
+    def __repr__(self):
+        return f"Rook('{self.name}')"
+
+    def isvalid(self, start: tuple, end: tuple):
+        '''
+        Rook can move any number of steps horizontally
+        or vertically.
+        '''
+        x, y, dist = self.vector(start, end)
+        return (abs(x) == 0 and abs(y) != 0) \
+            or (abs(y) == 0 and abs(x) != 0) 
+
+
+class Pawn(BasePiece):
+    name = 'pawn'
+    sym = {'white': '♙', 'black': '♟︎'}
+    def __repr__(self):
+        return f"Pawn('{self.name}')"
+
+    def isvalid(self, start: tuple, end: tuple):
+        '''Pawn can only move 1 step forward.'''
+        x, y, dist = self.vector(start, end)
+        if x == 0:
+            if self.colour == 'black':
+                return (y == -1)
+            elif self.colour == 'white':
+                return (y == 1)
+            else:
+                return False
+        return False
+
+
+
 class Board:
     '''
     The game board is represented as an 8×8 grid,
@@ -81,8 +215,8 @@ class Board:
             return [(col, start[1]) for col in \
                     range(start[0] + incr, end[0], incr)]
         elif abs(x) == abs(y):
-            y_incr = 1 if y > 0 y_else -1
-            x_incr = 1 if x > 0 y_else -1
+            y_incr = 1 if y > 0 else -1
+            x_incr = 1 if x > 0 else -1
             cols = [(col, start[1]) for col in \
                     range(start[0] + y_incr, end[0] + y_incr, y_incr)]
             rows = [(start[0], y_row) for row in \
@@ -238,16 +372,16 @@ class Board:
     def check_and_promote(self, ReplacementPieceClass=Queen):
         for coord in self.get_coords('white', 'pawn'):
             col, row = coord
-                if row == 7:
-                    ReplacementPieceClass = self.prompt_for_promotion_piece(coord)
-                    self.remove(coord)
-                    self.add(coord, ReplacementPieceClass('white'))
+            if row == 7:
+                ReplacementPieceClass = self.prompt_for_promotion_piece(coord)
+                self.remove(coord)
+                self.add(coord, ReplacementPieceClass('white'))
         for coord in self.get_coords('black', 'pawn'):
             col, row = coord
-                if row == 0:
-                    ReplacementPieceClass = self.prompt_for_promotion_piece(coord)
-                    self.remove(coord)
-                    self.add(coord, ReplacementPieceClass('black'))
+            if row == 0:
+                ReplacementPieceClass = self.prompt_for_promotion_piece(coord)
+                self.remove(coord)
+                self.add(coord, ReplacementPieceClass('black'))
 
     def isblocked(self, start, end):
         piece = self.get_piece(start)
@@ -351,135 +485,3 @@ class Board:
             self.turn = 'black'
         elif self.turn == 'black':
             self.turn = 'white'
-
-
-class BasePiece:
-    name = 'piece'
-    def __init__(self, colour):
-        if type(colour) != str:
-            raise TypeError('colour argument must be str')
-        elif colour.lower() not in {'white', 'black'}:
-            raise ValueError('colour must be {white, black}')
-        else:
-            self.colour = colour
-            self.moved = False
-
-    def __repr__(self):
-        return f'BasePiece({repr(self.colour)})'
-
-    def __str__(self):
-        return f'{self.colour} {self.name}'
-
-    def symbol(self):
-        return f'{self.sym[self.colour]}'
-
-    @staticmethod
-    def vector(start, end):
-        '''
-        Return three values as a tuple:
-        - x, the number of spaces moved horizontally,
-        - y, the number of spaces moved vertically,
-        - dist, the total number of spaces moved.
-        
-        positive integers indicate upward or rightward direction,
-        negative integers indicate downward or leftward direction.
-        dist is always positive.
-        '''
-        x = end[0] - start[0]
-        y = end[1] - start[1]
-        dist = abs(x) + abs(y)
-        return x, y, dist
-
-
-class King(BasePiece):
-    name = 'king'
-    sym = {'white': '♔', 'black': '♚'}
-    def __repr__(self):
-        return f"King('{self.name}')"
-
-    def isvalid(self, start: tuple, end: tuple):
-        '''
-        King can move one step in any direction
-        horizontally, vertically, or diagonally.
-        '''
-        x, y, dist = self.vector(start, end)
-        return (dist == 1) or (abs(x) == abs(y) == 1)
-
-    
-class Queen(BasePiece):
-    name = 'queen'
-    sym = {'white': '♕', 'black': '♛'}
-    def __repr__(self):
-        return f"Queen('{self.name}')"
-
-    def isvalid(self, start: tuple, end: tuple):
-        '''
-        Queen can move any number of steps horizontally,
-        vertically, or diagonally.
-        '''
-        x, y, dist = self.vector(start, end)
-        return (abs(x) == abs(y) != 0) \
-            or ((abs(x) == 0 and abs(y) != 0) \
-            or (abs(y) == 0 and abs(x) != 0))
-
-
-class Bishop(BasePiece):
-    name = 'bishop'
-    sym = {'white': '♗', 'black': '♝'}
-    def __repr__(self):
-        return f"Bishop('{self.name}')"
-
-    def isvalid(self, start: tuple, end: tuple):
-        '''Bishop can move any number of steps diagonally.'''
-        x, y, dist = self.vector(start, end)
-        return (abs(x) == abs(y) != 0)
-
-
-class Knight(BasePiece):
-    name = 'knight'
-    sym = {'white': '♘', 'black': '♞'}
-    def __repr__(self):
-        return f"Knight('{self.name}')"
-
-    def isvalid(self, start: tuple, end: tuple):
-        '''
-        Knight moves 2 spaces in any direction, and
-        1 space perpendicular to that direction, in an L-shape.
-        '''
-        x, y, dist = self.vector(start, end)
-        return (dist == 3) and (abs(x) != 3 and abs(y) != 3)
-
-
-class Rook(BasePiece):
-    name = 'rook'
-    sym = {'white': '♖', 'black': '♜'}
-    def __repr__(self):
-        return f"Rook('{self.name}')"
-
-    def isvalid(self, start: tuple, end: tuple):
-        '''
-        Rook can move any number of steps horizontally
-        or vertically.
-        '''
-        x, y, dist = self.vector(start, end)
-        return (abs(x) == 0 and abs(y) != 0) \
-            or (abs(y) == 0 and abs(x) != 0) 
-
-
-class Pawn(BasePiece):
-    name = 'pawn'
-    sym = {'white': '♙', 'black': '♟︎'}
-    def __repr__(self):
-        return f"Pawn('{self.name}')"
-
-    def isvalid(self, start: tuple, end: tuple):
-        '''Pawn can only move 1 step forward.'''
-        x, y, dist = self.vector(start, end)
-        if x == 0:
-            if self.colour == 'black':
-                return (y == -1)
-            elif self.colour == 'white':
-                return (y == 1)
-            else:
-                return False
-        return False
