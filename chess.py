@@ -19,13 +19,29 @@ class Board:
     def __init__(self):
         self.position = {}
 
-    def coords(self):
-        '''Return list of piece coordinates.'''
-        return self.position.keys()
+    def coords(self, colour=None):
+        '''
+        Return list of piece coordinates.
+        Filters for colour if provided in keyword argument.
+        '''
+        if colour in ('white', 'black'):
+            return [coord for coord, piece in self.position.items() if piece.colour == colour]
+        elif colour is None:
+            return self.position.keys()
+        else:
+            raise ValueError('Invalid keyword argument colour={colour}')
 
-    def pieces(self):
-        '''Return list of board pieces.'''
-        return self.position.values()
+    def pieces(self, colour=None):
+        '''
+        Return list of board pieces.
+        Filters for colour if provided in keyword argument.
+        '''
+        if colour in ('white', 'black'):
+            return [piece for piece in self.position.values() if piece.colour == colour]
+        elif colour is None:
+            return self.position.values()
+        else:
+            raise ValueError('Invalid keyword argument colour={colour}')
     
     def get_coords(self, name, colour):
         '''
@@ -314,6 +330,7 @@ class Board:
         self.remove(end)
         self.move(start, end)
         self.check_and_promote()
+        self.
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
