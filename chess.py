@@ -43,7 +43,7 @@ class Board:
         else:
             raise ValueError('Invalid keyword argument colour={colour}')
     
-    def get_coords(self, name, colour):
+    def get_coords(self, colour, name):
         '''
         Returns a list of coords of pieces matching the name and
         colour.
@@ -236,13 +236,13 @@ class Board:
             return Queen
 
     def check_and_promote(self, ReplacementPieceClass=Queen):
-        for coord in self.get_coords('pawn', 'white'):
+        for coord in self.get_coords('white', 'pawn'):
             col, row = coord
                 if row == 7:
                     ReplacementPieceClass = self.prompt_for_promotion_piece(coord)
                     self.remove(coord)
                     self.add(coord, ReplacementPieceClass('white'))
-        for coord in self.get_coords('pawn', 'black'):
+        for coord in self.get_coords('black', 'pawn'):
             col, row = coord
                 if row == 0:
                     ReplacementPieceClass = self.prompt_for_promotion_piece(coord)
@@ -325,12 +325,25 @@ class Board:
             raise InvalidMoveError(f'Invalid move for {start_piece}')
         return 'move'
 
+    def ischecked(self, colour):
+        '''
+        Return True if <colour> king is checked,
+        else return False.
+        '''
+        for own_king_coord in self.get_coords(colour, 'king'):
+            other_colour = 'white' if colour == 'black' else 'black'
+            for opp_coord in self.coords(other_colour):
+                if self.valid_move(opp_coord, own_king_coord):
+                    return True
+        return False
+
     def update(self, start, end):
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
         self.check_and_promote()
-        self.
+        if self.ischecked(self.turn):
+            print(f'{self.turn} is in check.')
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
