@@ -24,6 +24,18 @@ class Board:
         '''Return list of board pieces.'''
         return self.position.values()
     
+    def get_coords(self, name, colour):
+        '''
+        Returns a list of coords of pieces matching the name and
+        colour.
+        Returns empty list if none found.
+        '''
+        pieces = [i for i in self.coords() 
+                  if self.get_piece(i).name == name
+                  and self.get_piece(i).colour == colour
+                  ]
+        return pieces
+    
     def get_piece(self, coord):
         '''
         Return the piece at coord.
@@ -148,6 +160,43 @@ class Board:
                 else:
                     print(f'Invalid move for {self.get_piece(start)}.')
 
+    def prompt_for_promotion_piece(self, coord):
+        piece = self.get_piece(coord)
+        print(f'{piece} at {coord} can be promoted.')
+        piece_code = None
+        while piece_code not in 'rkbq':
+            piece_code = input('Select piece to promote pawn to '
+                               '(r=Rook, '
+                               'k=Knight, '
+                               'b=Bishop, '
+                               'q=Queen, '
+                               'default=Queen):'
+                                ).lower()
+            if piece_code == '':
+                return Queen
+        if piece_code == 'r':
+            return Rook
+        elif piece_code == 'k':
+            return Knight
+        elif piece_code == 'b':
+            return Bishop
+        elif piece_code == 'q':
+            return Queen
+
+    def check_and_promote(self, ReplacementPieceClass=Queen):
+        for coord in self.get_coords('pawn', 'white'):
+            col, row = coord
+                if row == 7:
+                    ReplacementPieceClass = self.prompt_for_promotion_piece(coord)
+                    self.remove(coord)
+                    self.add(coord, ReplacementPieceClass('white'))
+        for coord in self.get_coords('pawn', 'black'):
+            col, row = coord
+                if row == 0:
+                    ReplacementPieceClass = self.prompt_for_promotion_piece(coord)
+                    self.remove(coord)
+                    self.add(coord, ReplacementPieceClass('black'))
+
     def valid_move(self, start, end):
         '''
         Returns True if all conditions are met:
@@ -171,6 +220,7 @@ class Board:
         '''Update board information with the player's move.'''
         self.remove(end)
         self.move(start, end)
+        self.check_and_promote()
 
     def next_turn(self):
         '''Hand the turn over to the other player.'''
