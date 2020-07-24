@@ -70,13 +70,13 @@ class TestCoreReqs(unittest.TestCase):
         game.add((4, 5), Rook('white'))
         game.turn = 'white'
         game.update((4, 5), (4, 7))
-        self.assertEqual(game.winner, 'white')
+        self.assertEqual(game.winner(), 'white')
 
         game = gameSetupWithKings()
         game.add((4, 2), Rook('black'))
         game.turn = 'black'
         game.update((4, 2), (4, 0))
-        self.assertEqual(game.winner, 'black')
+        self.assertEqual(game.winner(), 'black')
 
     def test_pawn_first_move(self):
         '''Pawn can move two steps only on first move'''
@@ -84,20 +84,20 @@ class TestCoreReqs(unittest.TestCase):
             game = gameSetupWithKings()
             game.add((col, 1), Pawn('white'))
             game.turn = 'white'
-            self.assertTrue(game.valid_move((col, 1), (col, 3)))
+            self.assertTrue(game.valid_move((col, 1), (col, 3), game.turn))
             game.update((col, 1), (col, 3))
             self.assertEqual(game.get_piece((col, 3)).colour, 'white')
             self.assertIsNone(game.get_piece((col, 1)))
-            self.assertFalse(game.valid_move((col, 3), (col, 5)))
+            self.assertFalse(game.valid_move((col, 3), (col, 5), game.turn))
 
             game = gameSetupWithKings()
             game.add((col, 6), Pawn('black'))
             game.turn = 'black'
-            self.assertTrue(game.valid_move((col, 6), (col, 4)))
+            self.assertTrue(game.valid_move((col, 6), (col, 4), game.turn))
             game.update((col, 6), (col, 4))
             self.assertEqual(game.get_piece((col, 4)).colour, 'black')
             self.assertIsNone(game.get_piece((col, 6)))
-            self.assertFalse(game.valid_move((col, 4), (col, 2)))
+            self.assertFalse(game.valid_move((col, 4), (col, 2), game.turn))
 
     def test_pawn_promotion(self):
         '''Pawn on last row is promoted'''
@@ -150,6 +150,8 @@ class TestBonusReqs(unittest.TestCase):
         game.add((4, 6), Pawn('black'))
         game.turn = 'black'
         game.update((4, 6), (4, 4))
+        game.next_turn()
+        breakpoint()
         game.update((3, 4), (4, 5))
         self.assertEqual(game.get_piece((4, 5)).colour, 'white')
         self.assertIsNone(game.get_piece((4, 4)))
@@ -159,6 +161,7 @@ class TestBonusReqs(unittest.TestCase):
         game.add((4, 3), Pawn('black'))
         game.turn = 'white'
         game.update((3, 1), (3, 3))
+        game.next_turn()
         game.update((4, 3), (3, 2))
         self.assertEqual(game.get_piece((3, 2)).colour, 'black')
         self.assertIsNone(game.get_piece((3, 3)))
@@ -189,25 +192,27 @@ class TestBonusReqs(unittest.TestCase):
         game.add((4, 6), King('black'))
         game.add((4, 3), Rook('black'))
         game.turn = 'white'
-        self.assertFalse(game.valid_move((4, 4), (4, 0)))
-        self.assertFalse(game.valid_move((4, 3), (4, 7)))
+        self.assertFalse(game.valid_move((4, 4), (4, 0), game.turn))
+        self.assertFalse(game.valid_move((4, 3), (4, 7), game.turn))
 
     def test_next_move_uncheck(self):
         game = gameSetupWithKings()
         game.add((0, 1), Rook('black'))
-        game.turn = 'white'
+        game.turn = 'black'
         game.update((0, 1), (0, 0))
+        game.next_turn()
         # white king is in check, next move must bring it out of check
-        self.assertFalse(game.valid_move((4, 0), (3, 0)))
-        self.assertTrue(game.valid_move((4, 0), (4, 1)))
+        self.assertFalse(game.valid_move((4, 0), (3, 0), game.turn))
+        self.assertTrue(game.valid_move((4, 0), (4, 1), game.turn))
 
         game = gameSetupWithKings()
         game.add((0, 6), Rook('white'))
-        game.turn = 'black'
+        game.turn = 'white'
         game.update((0, 6), (0, 7))
+        game.next_turn()
         # black king is in check, next move must bring it out of check
-        self.assertFalse(game.valid_move((4, 7), (3, 7)))
-        self.assertTrue(game.valid_move((4, 7), (4, 6)))
+        self.assertFalse(game.valid_move((4, 7), (3, 7), game.turn))
+        self.assertTrue(game.valid_move((4, 7), (4, 6), game.turn))
 
     def test_move_logging(self):
         game = Board()
