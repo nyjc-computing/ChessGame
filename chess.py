@@ -538,8 +538,11 @@ class Board:
     def update(self, start, end):
         '''Update board information with the player's move.'''
         self.remove(end)
-
-        self.move(start, end, movetype=self.classify_move(start, end, self.turn))
+        try:
+            movetype = self.classify_move(start, end, self.turn)
+        except MoveError:
+            movetype = None
+        self.move(start, end, movetype=movetype)
         self.check_and_promote()
         if self.ischecked(self.turn):
             print(f'{self.turn} is in check.')

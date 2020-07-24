@@ -151,7 +151,6 @@ class TestBonusReqs(unittest.TestCase):
         game.turn = 'black'
         game.update((4, 6), (4, 4))
         game.next_turn()
-        breakpoint()
         game.update((3, 4), (4, 5))
         self.assertEqual(game.get_piece((4, 5)).colour, 'white')
         self.assertIsNone(game.get_piece((4, 4)))
