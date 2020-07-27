@@ -1,5 +1,6 @@
 import curses
-from chess import Board
+from chess import Interface, GameMaster, ChessBoard
+from errors import InputError, MoveError
 
 # def testGame():
 #     import os
@@ -8,39 +9,36 @@ from chess import Board
 # testGame()
 
 
-screen = curses.initscr()
-begin_y = 0; begin_x = 0
-height = 10; width = 80
-boardframe = curses.newwin(height, width, begin_y, begin_x)
-
-begin_y = 11; begin_x = 0
-height = 3; width = 80
-statusbar = curses.newwin(height, width, begin_y, begin_x)
-
-begin_y = 14; begin_x = 0
-height = 1; width = 80
-playerframe = curses.newwin(height, width, begin_y, begin_x)
-
-screen.refresh()
-# curses.endwin()
-
-game = Board()
-game.start()
 try:
-    while game.winner() is None:
-        # breakpoint()
-        boardframe.addstr(game.board())
-        boardframe.refresh()
-        
-        playerframe.addstr('[TEXT] White player: ')
-        playerframe.getstr(5)
-        # start, end = game.prompt()
-        game.update(start, end)
-        game.next_turn()
-except Exception as e:
-    raise e
-else:
-    print(f'Game over. {game.winner()} player wins!')
-finally:
-    curses.endwin()
+    ui = Interface(height=19,
+                   width=40,
+                   )
+    board = ChessBoard()
 
+    game = GameMaster()
+    game.start(board=board,
+               ui=ui,
+               )
+    ui.set_msg('New game started.')
+    while game.winner(board=board, ui=ui) is None:
+        ui.set_board(board.as_str())
+        while True:
+            try:
+                start, end, movetype = game.prompt(board=board,
+                                                   ui=ui,
+                                                   )
+            except (InputError, MoveError) as e:
+                ui.set_msg(e.msg)
+            else:
+                break
+        ui.set_msg(game.format_move(start, end, movetype))
+        game.update(start,
+                    end,
+                    movetype,
+                    board=board,
+                    )
+        game.next_turn()
+    ui.set_msg(f'Game over. {game.winner(board=board, ui=ui)} player wins!')
+except Exception:
+    ui.close()
+    raise

@@ -23,3 +23,12 @@ class InvalidPawnCaptureError(InvalidMoveError):
 
 class InvalidCastlingError(InvalidMoveError):
     pass
+
+class InputError(ValueError):
+    def __init__(self,  msg):
+        self.msg = msg
+
+        super().__init__(f'{start} -> {end}: {self.msg}')
+
+class InvalidBoardError(Exception):
+    pass

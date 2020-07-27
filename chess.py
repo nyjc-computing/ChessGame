@@ -1,4 +1,27 @@
+import curses
 from errors import *
+
+
+def vector(start, end):
+    '''
+    Return three values as a tuple:
+    - x, the number of spaces moved horizontally,
+    - y, the number of spaces moved vertically,
+    - dist, the total number of spaces moved.
+    
+    positive integers indicate upward or rightward direction,
+    negative integers indicate downward or leftward direction.
+    dist is always positive.
+    '''
+    x = end[0] - start[0]
+    y = end[1] - start[1]
+    dist = abs(x) + abs(y)
+    return x, y, dist
+
+def debugmsg(msg):
+    print('[DEBUG]', msg)
+
+
 
 class BasePiece:
     name = 'piece'
@@ -20,23 +43,6 @@ class BasePiece:
     def symbol(self):
         return f'{self.sym[self.colour]}'
 
-    @staticmethod
-    def vector(start, end):
-        '''
-        Return three values as a tuple:
-        - x, the number of spaces moved horizontally,
-        - y, the number of spaces moved vertically,
-        - dist, the total number of spaces moved.
-        
-        positive integers indicate upward or rightward direction,
-        negative integers indicate downward or leftward direction.
-        dist is always positive.
-        '''
-        x = end[0] - start[0]
-        y = end[1] - start[1]
-        dist = abs(x) + abs(y)
-        return x, y, dist
-
 
 class King(BasePiece):
     name = 'king'
@@ -49,7 +55,7 @@ class King(BasePiece):
         King can move one step in any direction
         horizontally, vertically, or diagonally.
         '''
-        x, y, dist = self.vector(start, end)
+        x, y, dist = vector(start, end)
         return (dist == 1) or (abs(x) == abs(y) == 1)
 
     
@@ -64,7 +70,7 @@ class Queen(BasePiece):
         Queen can move any number of steps horizontally,
         vertically, or diagonally.
         '''
-        x, y, dist = self.vector(start, end)
+        x, y, dist = vector(start, end)
         return (abs(x) == abs(y) != 0) \
             or ((abs(x) == 0 and abs(y) != 0) \
             or (abs(y) == 0 and abs(x) != 0))
@@ -78,7 +84,7 @@ class Bishop(BasePiece):
 
     def isvalid(self, start: tuple, end: tuple):
         '''Bishop can move any number of steps diagonally.'''
-        x, y, dist = self.vector(start, end)
+        x, y, dist = vector(start, end)
         return (abs(x) == abs(y) != 0)
 
 
@@ -93,7 +99,7 @@ class Knight(BasePiece):
         Knight moves 2 spaces in any direction, and
         1 space perpendicular to that direction, in an L-shape.
         '''
-        x, y, dist = self.vector(start, end)
+        x, y, dist = vector(start, end)
         return (dist == 3) and (abs(x) != 3 and abs(y) != 3)
 
 
@@ -108,7 +114,7 @@ class Rook(BasePiece):
         Rook can move any number of steps horizontally
         or vertically.
         '''
-        x, y, dist = self.vector(start, end)
+        x, y, dist = vector(start, end)
         return (abs(x) == 0 and abs(y) != 0) \
             or (abs(y) == 0 and abs(x) != 0) 
 
@@ -121,23 +127,342 @@ class Pawn(BasePiece):
 
     def isvalid(self, start: tuple, end: tuple):
         '''Pawn can only move 1 step forward.'''
-        x, y, dist = self.vector(start, end)
+        x, y, dist = vector(start, end)
         if x == 0:
             if self.colour == 'black':
                 if self.moved:
                     return (y == -1)
                 else:
-                    return (y == -2)
+                    return (0 > y >= -2)
             elif self.colour == 'white':
                 if self.moved:
                     return (y == 1)
                 else:
-                    return (y == 2)
+                    return (0 < y <= 2)
         return False
 
 
 
-class Board:
+class Interface:
+    '''
+    The Interface is responsible for:
+
+    1. Displaying the welcome screen
+    2. Displaying the board
+    3. Displaying the player prompt
+    4. Displaying any messages
+    '''
+    def __init__(self, **kwargs):
+        self.height = kwargs.get('height', 20)
+        self.width = kwargs.get('width', 20)
+        self.screen = curses.initscr()
+        y_pos = 0
+        this_height = self.height - 8
+        self.board = curses.newwin(this_height, self.width, y_pos, 0)
+        self.board.border()
+        self.board.addstr(0, 2, 'Board')
+
+        y_pos += this_height
+        this_height = 5
+        self.msgbar = curses.newwin(this_height, self.width, y_pos, 0)
+        self.msgbar.border()
+        self.msgbar.addstr(0, 2, 'Messages')
+
+        y_pos += this_height
+        this_height = 3
+        self.inputbar = curses.newwin(this_height, self.width, y_pos, 0)
+        self.inputbar.border()
+        self.inputbar.addstr(0, 2, 'Player')
+
+    def set(self, strlist, target):
+        if type(strlist) == str:
+            strlist = strlist.split('\n')
+        if type(strlist) == list:
+            for row, line in enumerate(strlist, 1):
+                target.addstr(row, 1, line)
+        target.refresh()
+
+    def set_board(self, strlist):
+        self.set(strlist, self.board)
+
+    def set_msg(self, strlist):
+        self.set(strlist, self.msgbar)
+    
+    def get_player_input(self, msg):
+        self.set(msg, self.inputbar)
+        value = self.inputbar.getstr(5).decode('utf-8') 
+        self.set((self.width - 2)*' ', self.inputbar)
+        return value
+
+    def refresh(self):
+        self.screen.refresh()
+    
+    def close(self):
+        curses.endwin()
+
+
+
+class GameMaster:
+    '''
+    The GameMaster is responsible for:
+
+    1. Prompting the player for a move
+    2. Checking if the move is valid
+       (and re-prompting the player)
+    3. Passing the move to the board for updating
+    4. Checking if a player has won,
+       and checking game status
+    '''
+    def __init__(self, **kwargs):
+        pass
+
+    @staticmethod
+    def format_move(start, end, movetype):
+        return (f'{start} -> {end} {movetype}')
+
+    def start(self, **kwargs):
+        kwargs['board'].start()
+        kwargs['ui'].refresh()
+        self.turn = 'white'
+    
+    def prompt(self, **kwargs):
+        '''
+        Input format should be two ints,
+        followed by a space,
+        then another 2 ints
+        e.g. 07 27
+        '''
+        def valid_format(inputstr):
+            '''
+            Ensure input is 5 characters: 2 numerals,
+            followed by a space,
+            followed by 2 numerals
+            '''
+            return len(inputstr) == 5 and inputstr[2] == ' ' \
+                and inputstr[0:2].isdigit() \
+                and inputstr[3:5].isdigit()
+        
+        def valid_num(inputstr):
+            '''Ensure all inputted numerals are 0-7.'''
+            for char in (inputstr[0:2] + inputstr[3:5]):
+                if char not in '01234567':
+                    return False
+            return True
+        
+        def split_and_convert(inputstr):
+            '''Convert 5-char inputstr into start and end tuples.'''
+            start, end = inputstr.split(' ')
+            start = (int(start[0]), int(start[1]))
+            end = (int(end[0]), int(end[1]))
+            return (start, end)
+
+        inputstr = kwargs['ui'].get_player_input(f'{self.turn.title()} player: ')
+        if not valid_format(inputstr):
+            raise InputError('Invalid input. Please enter your move in the following format: __ __, _ represents a digit.')
+        elif not valid_num(inputstr):
+            raise InputError('Invalid input. Move digits should be 0-7.')
+        else:
+            start, end = split_and_convert(inputstr)
+            try:
+                movetype = self.classify_move(start, end, self.turn, board=kwargs['board'])
+            except InvalidMoveError as m:
+                raise
+            else:
+                return start, end, movetype
+
+    def prompt_for_promotion_piece(self, coord, **kwargs):
+        piece = kwargs['board'].get_piece(coord)
+        upgrade_code = None
+        while upgrade_code is not None and upgrade_code not in 'rkbq':
+            upgrade_code = kwargs['ui'].get_player_input('Select piece to '
+                'promote pawn to (r=Rook, '
+                                 'k=Knight, '
+                                 'b=Bishop, '
+                                 'q=Queen:'
+                ).lower()
+        classes = {'r': Rook,
+                   'k': Knight,
+                   'b': Bishop,
+                   'q': Queen,
+                   }
+        return classes[upgrade_code]
+
+    def promote_pawns(self, ReplacementPieceClass=Queen, **kwargs):
+        for coord in kwargs['board'].get_coords('white', 'pawn'):
+            col, row = coord
+            if row == 7:
+                if self.debug:
+                    ReplacementPieceClass = Queen
+                else:
+                    ReplacementPieceClass = self.prompt_for_promotion_piece(coord)
+                # debugmsg(f'{kwargs['board'].get_piece(coord)} at {coord} promoted to {ReplacementPieceClass.name}.')
+                self.add(coord, ReplacementPieceClass('white'))
+        for coord in kwargs['board'].get_coords('black', 'pawn'):
+            col, row = coord
+            if row == 0:
+                if self.debug:
+                    ReplacementPieceClass = Queen
+                else:
+                    ReplacementPieceClass = self.prompt_for_promotion_piece(coord)
+                # debugmsg(f'{kwargs['board'].get_piece(coord)} at {coord} promoted to {ReplacementPieceClass.name}.')
+                self.remove(coord)
+                self.add(coord, ReplacementPieceClass('black'))
+
+    def valid_move(self, start, end, colour, **kwargs):
+        try:
+            movetype = self.classify_move(start, end, colour)
+        except MoveError as m:
+            return False
+        else:
+            return True
+
+    def classify_move(self, start, end, colour, **kwargs):
+        '''
+        Checks for the following conditions:
+        1. There is a start piece of the player's colour
+        2. There is no end piece, or end piece is not of player's colour
+        3. The move is a valid castling move
+        4. There are no pieces between start and end coord (for Rook, Bishop, Queen)
+        5. The move is valid for the selected piece
+        6. The move is a valid pawn capture or en passant capture
+        
+        Returns the type of move, otherwise raises InvalidMoveError
+        '''
+        def isblocked(start, end):
+            piece = kwargs['board'].get_piece(start)
+            if piece.name.lower() != 'knight':
+                for coord in kwargs['board'].coords_between(start, end):
+                    if kwargs['board'].get_piece(coord) is not None:
+                        return True
+            return False
+
+        def ispawncapture(start, end, colour):
+            x, y, dist = vector(start, end)
+            own_piece = kwargs['board'].get_piece(start)
+            opp_piece = kwargs['board'].get_piece(end)
+            if opp_piece is not None \
+                    and opp_piece.colour != self.turn \
+                    and abs(x) == 1:
+                if own_piece.colour == 'white' and y == 1:
+                    return True
+                elif own_piece.colour == 'black' and y == -1:
+                    return True
+            return False
+        
+        def isenpassantcapture(start, end, colour):
+            s_col, s_row = start
+            e_col, e_row = end
+            enpassant_coord = (s_row, e_col)
+            own_piece = kwargs['board'].get_piece(start)
+            opp_piece = kwargs['board'].get_piece(enpassant_coord)
+            # TODO: Use more robust way of checking for 
+            # enpassant capture
+            if opp_piece is not None \
+                    and (self.turn == 'white' and s_row == 4
+                        or self.turn == 'black' and s_row == 3) \
+                    and opp_piece.colour != self.turn \
+                    and opp_piece.moved == 1 \
+                    and abs(e_col - s_col) == 1:
+                return True
+            return False
+
+        def iscastling(start, end, colour):
+            start_piece = kwargs['board'].get_piece(start)
+            end_piece = kwargs['board'].get_piece(end)
+            if not start_piece.name == 'king' or start_piece.moved:
+                return False
+            x, y, dist = vector(start, end)
+            if not (y == 0 and abs(x) == 2):
+                return False
+            rook_col = 0 if x < 0 else 7
+            rook_row = 0 if colour == 'white' else 7
+            rook_coord = (rook_col, rook_row)
+            rook_piece = kwargs['board'].get_piece(rook_coord)
+            if not rook_piece.name == 'rook' or rook_piece.moved:
+                return False
+            return True
+
+        start_piece = kwargs['board'].get_piece(start)
+        end_piece = kwargs['board'].get_piece(end)
+        other_colour = 'white' if colour == 'black' else 'black'
+        # (1)
+        if start_piece is None:
+            raise InvalidPieceMovedError(start, end, f'No {self.turn} piece at {start}')
+        elif start_piece.colour != colour:
+            raise InvalidPieceMovedError(start, end, f'{start_piece} does not belong to player')
+        # (2)
+        elif end_piece is not None and end_piece.colour == colour:
+            raise DestinationIsBlockedError(start, end, f'{end} is occupied by {end_piece}')
+        # (3)
+        elif iscastling(start, end, colour):
+            return 'castling'
+        # (4) 
+        elif isblocked(start, end):
+            raise PathIsBlockedError(start, end, f'Path from {start} to {end} is blocked')
+        # (5)
+        elif start_piece.isvalid(start, end):
+            return 'move'
+        # (6)
+        elif start_piece.name == 'pawn':
+            if ispawncapture(start, end, colour):
+                return 'pawncapture'
+            elif isenpassantcapture(start, end, colour):
+                return 'enpassantcapture'
+        raise InvalidMoveError(start, end, f'{start} -> {end}:\nInvalid move for {start_piece}')
+
+    def update(self, start, end, movetype, **kwargs):
+        '''Update board information with the player's move.'''
+        def ischecked(colour):
+            '''
+            Return True if <colour> king is checked,
+            else return False.
+            '''
+            for own_king_coord in kwargs['board'].get_coords(colour, 'king'):
+                other_colour = 'white' if colour == 'black' else 'black'
+                for opp_coord in kwargs['board'].coords(other_colour):
+                    try:
+                        movetype = self.classify_move(opp_coord,
+                                                      own_king_coord,
+                                                      other_colour,
+                                                      debug = False,
+                                                      board=kwargs['board'],
+                                                      )
+                        # debugmsg(f'{kwargs['board'].get_piece(own_king_coord)} is checked by {kwargs['board'].get_piece(opp_coord)}')
+                    except MoveError:
+                        return False
+            return True
+
+        try:
+            movetype = self.classify_move(start, end, self.turn, board=kwargs['board'])
+        except MoveError:
+            movetype = None
+        kwargs['board'].move(start, end, movetype=movetype)
+        self.promote_pawns(board=kwargs['board'])
+        if ischecked(self.turn):
+            kwargs['ui'].set_msg(f'{self.turn} is in check.')
+
+    def next_turn(self):
+        '''Hand the turn over to the other player.'''
+        if self.turn == 'white':
+            self.turn = 'black'
+        elif self.turn == 'black':
+            self.turn = 'white'
+
+    def winner(self, **kwargs):
+        white_king_alive = bool(kwargs['board'].get_coords('white', 'king'))
+        black_king_alive = bool(kwargs['board'].get_coords('black', 'king'))
+        if white_king_alive and black_king_alive:
+            return None
+        elif white_king_alive and not black_king_alive:
+            return 'white'
+        elif not white_king_alive and black_king_alive:
+            return 'black'
+        else:
+            kwargs['ui'].set_msg('Neither king is on the board')
+
+
+
+class ChessBoard:
     '''
     The game board is represented as an 8×8 grid,
     with each position on the grid described as
@@ -157,10 +482,52 @@ class Board:
         self.position = {}
         self.debug = kwargs.get('debug', False)
 
-    def debugmsg(self, msg):
-        if self.debug:
-            print('[DEBUG]', msg)
+    @staticmethod
+    def vector(start, end):
+        '''
+        Return three values as a tuple:
+        - x, the number of spaces moved horizontally,
+        - y, the number of spaces moved vertically,
+        - dist, the total number of spaces moved.
+        
+        positive integers indicate upward or rightward direction,
+        negative integers indicate downward or leftward direction.
+        dist is always positive.
+        '''
+        x = end[0] - start[0]
+        y = end[1] - start[1]
+        dist = abs(x) + abs(y)
+        return x, y, dist
 
+    @classmethod
+    def coords_between(cls, start, end):
+        '''
+        Return list of coordinates between start and end coord.
+        List does not include start coord but includes end coord.
+        Move must be horizontal, vertical, or diagonal only.
+        '''
+        x, y, dist = vector(start, end)
+        if dist == 0:  # x == 0 and y == 0
+            return []
+        elif x == 0:  # vertical move
+            incr = 1 if y > 0 else -1
+            return [(start[0], row) for row in \
+                    range(start[1] + incr, end[1], incr)]
+        elif y == 0:  # horizontal move
+            incr = 1 if x > 0 else -1
+            return [(col, start[1]) for col in \
+                    range(start[0] + incr, end[0], incr)]
+        elif abs(x) == abs(y):
+            y_incr = 1 if y > 0 else -1
+            x_incr = 1 if x > 0 else -1
+            cols = [(col, start[1]) for col in \
+                    range(start[0] + y_incr, end[0] + y_incr, y_incr)]
+            rows = [(start[0], row) for row in \
+                    range(start[1] + x_incr, end[1] + x_incr, x_incr)]
+            return [(col, row) for col, row in zip(cols, rows)]
+        else:
+            raise InvalidMoveError(start, end, 'Not a horizontal, vertical, or diagonal move')
+        
     def coords(self, colour=None):
         '''
         Return list of piece coordinates.
@@ -204,37 +571,10 @@ class Board:
         '''
         return self.position.get(coord, None)
 
-    @staticmethod
-    def coords_between(start, end):
-        '''
-        Return list of coordinates between start and end coord.
-        List does not include start coord but includes end coord.
-        Move must be horizontal, vertical, or diagonal only.
-        '''
-        x, y, dist = BasePiece.vector(start, end)
-        if dist == 0:  # x == 0 and y == 0
-            return []
-        elif x == 0:  # vertical move
-            incr = 1 if y > 0 else -1
-            return [(start[0], row) for row in \
-                    range(start[1] + incr, end[1], incr)]
-        elif y == 0:  # horizontal move
-            incr = 1 if x > 0 else -1
-            return [(col, start[1]) for col in \
-                    range(start[0] + incr, end[0], incr)]
-        elif abs(x) == abs(y):
-            y_incr = 1 if y > 0 else -1
-            x_incr = 1 if x > 0 else -1
-            cols = [(col, start[1]) for col in \
-                    range(start[0] + y_incr, end[0] + y_incr, y_incr)]
-            rows = [(start[0], row) for row in \
-                    range(start[1] + x_incr, end[1] + x_incr, x_incr)]
-            return [(col, row) for col, row in zip(cols, rows)]
-        else:
-            raise InvalidMoveError(start, end, 'Not a horizontal, vertical, or diagonal move')
-        
     def add(self, coord, piece):
-        '''Add a piece at coord.'''
+        '''Add/replace a piece at coord.'''
+        if self.position.get(coord, None) is not None:
+            del self.position[coord]
         self.position[coord] = piece
 
     def remove(self, coord):
@@ -296,294 +636,26 @@ class Board:
         for x in range(0, 8):
             self.add((x, 1), Pawn(colour))
         
-        self.turn = 'white'
-        
-    def board(self):
+    def as_str(self):
         '''
         Returns the contents of the board
         as a linebreak-delimited string.
         '''
-        output = ''
+        output = ['   0 1 2 3 4 5 6 7']
+        row_ctr = 7
         # Row 7 is at the top, so print in reverse order
         for row in range(7, -1, -1):
+            line = f' {row_ctr} '
+            row_ctr -= 1
             for col in range(8):
                 coord = (col, row)  # tuple
                 if coord in self.coords():
                     piece = self.get_piece(coord)
-                    output += f'{piece.symbol()}'
+                    line += f'{piece.symbol()}'
                 else:
                     piece = None
-                    output += ' '
-                if col == 7:     # Put line break at the end
-                    output += '\n'
-                else:            # Print a space between pieces
-                    output += ' '
+                    line += ' '
+                if col < 7:
+                    line += ' '
+            output.append(line)
         return output
-
-    def display(self):
-        '''
-        Displays the contents of the board.
-        Each piece is represented by a coloured symbol.
-        '''
-        # helper function to generate symbols for piece
-        # Row 7 is at the top, so print in reverse order
-        for row in range(7, -1, -1):
-            for col in range(8):
-                coord = (col, row)  # tuple
-                if coord in self.coords():
-                    piece = self.get_piece(coord)
-                    print(f'{piece.symbol()}', end='')
-                else:
-                    piece = None
-                    print(' ', end='')
-                if col == 7:     # Put line break at the end
-                    print('')
-                else:            # Print a space between pieces
-                    print(' ', end='')
-
-    def prompt(self):
-        '''
-        Input format should be two ints,
-        followed by a space,
-        then another 2 ints
-        e.g. 07 27
-        '''
-        def valid_format(inputstr):
-            '''
-            Ensure input is 5 characters: 2 numerals,
-            followed by a space,
-            followed by 2 numerals
-            '''
-            return len(inputstr) == 5 and inputstr[2] == ' ' \
-                and inputstr[0:2].isdigit() \
-                and inputstr[3:5].isdigit()
-        
-        def valid_num(inputstr):
-            '''Ensure all inputted numerals are 0-7.'''
-            for char in (inputstr[0:2] + inputstr[3:5]):
-                if char not in '01234567':
-                    return False
-            return True
-        
-        def split_and_convert(inputstr):
-            '''Convert 5-char inputstr into start and end tuples.'''
-            start, end = inputstr.split(' ')
-            start = (int(start[0]), int(start[1]))
-            end = (int(end[0]), int(end[1]))
-            return (start, end)
-
-        while True:
-            inputstr = input(f'{self.turn.title()} player: ')
-            if not valid_format(inputstr):
-                print('Invalid input. Please enter your move in the '
-                      'following format: __ __, _ represents a digit.')
-            elif not valid_num(inputstr):
-                print('Invalid input. Move digits should be 0-7.')
-            else:
-                start, end = split_and_convert(inputstr)
-                if self.valid_move(start,
-                                   end,
-                                   self.turn,
-                                   ):
-                    return start, end
-
-    def prompt_for_promotion_piece(self, coord):
-        piece = self.get_piece(coord)
-        upgrade_code = None
-        while upgrade_code is not None and upgrade_code not in 'rkbq':
-            upgrade_code = input('Select piece to promote pawn to '
-                                 '(r=Rook, '
-                                 'k=Knight, '
-                                 'b=Bishop, '
-                                 'q=Queen:'
-                                  ).lower()
-        classes = {'r': Rook,
-                   'k': Knight,
-                   'b': Bishop,
-                   'q': Queen,
-                   }
-        return classes[upgrade_code]
-
-    def check_and_promote(self, ReplacementPieceClass=Queen):
-        for coord in self.get_coords('white', 'pawn'):
-            col, row = coord
-            if row == 7:
-                if self.debug:
-                    ReplacementPieceClass = Queen
-                else:
-                    ReplacementPieceClass = self.prompt_for_promotion_piece(coord)
-                self.debugmsg(f'{self.get_piece(coord)} at {coord} promoted to {ReplacementPieceClass.name}.')
-                self.remove(coord)
-                self.add(coord, ReplacementPieceClass('white'))
-        for coord in self.get_coords('black', 'pawn'):
-            col, row = coord
-            if row == 0:
-                if self.debug:
-                    ReplacementPieceClass = Queen
-                else:
-                    ReplacementPieceClass = self.prompt_for_promotion_piece(coord)
-                self.debugmsg(f'{self.get_piece(coord)} at {coord} promoted to {ReplacementPieceClass.name}.')
-                self.remove(coord)
-                self.add(coord, ReplacementPieceClass('black'))
-
-    def isblocked(self, start, end):
-        piece = self.get_piece(start)
-        if piece.name.lower() != 'knight':
-            for coord in self.coords_between(start, end):
-                if self.get_piece(coord) is not None:
-                    return True
-            return False
-        else:
-            return False
-
-    def ispawncapture(self, start, end, colour):
-        x, y, dist = BasePiece.vector(start, end)
-        own_piece = self.get_piece(start)
-        opp_piece = self.get_piece(end)
-        if opp_piece is not None \
-                and opp_piece.colour != self.turn \
-                and abs(x) == 1:
-            if own_piece.colour == 'white' and y == 1:
-                return True
-            elif own_piece.colour == 'black' and y == -1:
-                return True
-        else:
-            return False
-    
-    def isenpassantcapture(self, start, end, colour):
-        s_col, s_row = start
-        e_col, e_row = end
-        enpassant_coord = (s_row, e_col)
-        own_piece = self.get_piece(start)
-        opp_piece = self.get_piece(enpassant_coord)
-        # TODO: Use more robust way of checking for 
-        # enpassant capture
-        if opp_piece is not None \
-                and (self.turn == 'white' and s_row == 4
-                     or self.turn == 'black' and s_row == 3) \
-                and opp_piece.colour != self.turn \
-                and opp_piece.moved == 1 \
-                and abs(e_col - s_col) == 1:
-            return True
-        else:
-            return False
-
-    def iscastling(self, start, end, colour):
-        start_piece = self.get_piece(start)
-        end_piece = self.get_piece(end)
-        if not start_piece.name == 'king' or start_piece.moved:
-            return False
-        x, y, dist = BasePiece.vector(start, end)
-        if not (y == 0 and abs(x) == 2):
-            return False
-        rook_col = 0 if x < 0 else 7
-        rook_row = 0 if colour == 'white' else 7
-        rook_coord = (rook_col, rook_row)
-        rook_piece = self.get_piece(rook_coord)
-        if not rook_piece.name == 'rook' or rook_piece.moved:
-            return False
-        return True
-
-    def valid_move(self, start, end, colour, **kwargs):
-        try:
-            movetype = self.classify_move(start, end, colour)
-        except MoveError as e:
-            if kwargs.get('debug', False):
-                self.debugmsg(e.msg)
-            return False
-        else:
-            if movetype is not None:
-                return True
-            else:
-                return False
-
-    def classify_move(self, start, end, colour):
-        '''
-        Checks for the following conditions:
-        1. There is a start piece of the player's colour
-        2. There is no end piece, or end piece is not of player's colour
-        3. The move is a valid castling move
-        4. There are no pieces between start and end coord (for Rook, Bishop, Queen)
-        5. The move is valid for the selected piece
-        6. The move is a valid pawn capture or en passant capture
-        
-        Returns the type of move, otherwise returns None
-        '''
-        start_piece = self.get_piece(start)
-        end_piece = self.get_piece(end)
-        other_colour = 'white' if colour == 'black' else 'black'
-        # (1)
-        if start_piece is None or start_piece.colour != colour:
-            raise InvalidPieceMovedError(start, end, f'{start_piece} does not belong to player')
-        # (2)
-        elif end_piece is not None and end_piece.colour == colour:
-            raise DestinationIsBlockedError(start, end, f'Destination is occupied by {end_piece}')
-        # (3)
-        elif self.iscastling(start, end, colour):
-            self.debugmsg(f'{start} -> {end} is castling move')
-            return 'castling'
-        # (4) 
-        elif self.isblocked(start, end):
-            raise PathIsBlockedError(start, end, f'path from {start} to {end} is blocked')
-        # (5)
-        elif start_piece.isvalid(start, end):
-            self.debugmsg(f'{start} -> {end} is a valid {start_piece} move')
-            return 'move'
-        # (6)
-        elif start_piece.name == 'pawn':
-            if self.ispawncapture(start, end, colour):
-                self.debugmsg(f'{start} -> {end} is a pawn capture')
-                return 'pawncapture'
-            elif self.isenpassantcapture(start, end, colour):
-                self.debugmsg(f'{start} -> {end} is en passant capture')
-                return 'enpassantcapture'
-        else:
-            raise InvalidMoveError(start, end, f'Invalid move for {start_piece}')
-
-    def ischecked(self, colour):
-        '''
-        Return True if <colour> king is checked,
-        else return False.
-        '''
-        for own_king_coord in self.get_coords(colour, 'king'):
-            other_colour = 'white' if colour == 'black' else 'black'
-            for opp_coord in self.coords(other_colour):
-                if self.valid_move(opp_coord,
-                                   own_king_coord,
-                                   other_colour,
-                                   debug = False,
-                                   ):
-                    self.debugmsg(f'{self.get_piece(own_king_coord)} is checked by {self.get_piece(opp_coord)}')
-                    return True
-        return False
-
-    def update(self, start, end):
-        '''Update board information with the player's move.'''
-        self.remove(end)
-        try:
-            movetype = self.classify_move(start, end, self.turn)
-        except MoveError:
-            movetype = None
-        self.move(start, end, movetype=movetype)
-        self.check_and_promote()
-        if self.ischecked(self.turn):
-            print(f'{self.turn} is in check.')
-
-    def next_turn(self):
-        '''Hand the turn over to the other player.'''
-        if self.turn == 'white':
-            self.turn = 'black'
-        elif self.turn == 'black':
-            self.turn = 'white'
-
-    def winner(self):
-        white_king_alive = bool(self.get_coords('white', 'king'))
-        black_king_alive = bool(self.get_coords('black', 'king'))
-        if white_king_alive and black_king_alive:
-            return None
-        elif white_king_alive and not black_king_alive:
-            return 'white'
-        elif not white_king_alive and black_king_alive:
-            return 'black'
-        else:
-            print('Neither king is on the board')
