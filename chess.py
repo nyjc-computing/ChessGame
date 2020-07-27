@@ -298,6 +298,28 @@ class Board:
         
         self.turn = 'white'
         
+    def board(self):
+        '''
+        Returns the contents of the board
+        as a linebreak-delimited string.
+        '''
+        output = ''
+        # Row 7 is at the top, so print in reverse order
+        for row in range(7, -1, -1):
+            for col in range(8):
+                coord = (col, row)  # tuple
+                if coord in self.coords():
+                    piece = self.get_piece(coord)
+                    output += f'{piece.symbol()}'
+                else:
+                    piece = None
+                    output += ' '
+                if col == 7:     # Put line break at the end
+                    output += '\n'
+                else:            # Print a space between pieces
+                    output += ' '
+        return output
+
     def display(self):
         '''
         Displays the contents of the board.
